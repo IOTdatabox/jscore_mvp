@@ -158,11 +158,11 @@ const EditorBlockDetail = ({
                 {
                     (block.name == 'multiple-choice' || block.name == 'dropdown') && (
                         <>
-                            <div className='mt-2 space-y-2'>
+                            <div className='mt-2 space-y-2' >
                                 {
                                     choices.map((item: Choice, index: number) => {
                                         return (
-                                            <div className='flex items-center gap-2'>
+                                            <div className='flex items-center gap-2' key={index}>
                                                 <input
                                                     name={`choice-${index}`}
                                                     disabled={false}

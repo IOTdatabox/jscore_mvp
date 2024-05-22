@@ -159,7 +159,7 @@ const FormCreator = () => {
 
     const handleAddBlock = (type: string) => {
         if (isEditing) return;
-        let block: FormItem | null = null;
+        let block: FormItem;
         switch (type) {
             case "short-text":
                 block = defaultInputBlock;
@@ -185,18 +185,15 @@ const FormCreator = () => {
             case "multiple-choice":
                 block = defaultMultichoiceBlock;
                 break;
+            default:
+                throw new Error(`Unsupported block type: ${type}`);
         }
-
-        if (!block) {
-            return;
-        }
-
         const blockId = shortid.generate();
         block = {
             ...block,
             id: blockId
         };
-        setBlocks((prev) => [...prev, block]);
+        setBlocks((prev: FormItem[]) => [...prev, block]);
     }
 
     const handleUpdateBlock = (index: number, blockData: FormItem) => {
@@ -337,7 +334,7 @@ const FormCreator = () => {
                                                             <div ref={provided.innerRef} {...provided.droppableProps} className='space-y-2'>
                                                                 {
                                                                     formBlocks.map((block: any, index: number) => {
-                                                                        let icon = null;
+                                                                        let icon: JSX.Element | null = null;  // Explicitly typed as JSX.Element or null
                                                                         switch (block.type) {
                                                                             case 'short-text':
                                                                                 icon = InputBlockSvg;
@@ -413,7 +410,7 @@ const FormCreator = () => {
                                                                         <div ref={provided.innerRef} {...provided.droppableProps} className='space-y-2 h-full'>
                                                                             {
                                                                                 blocks.map((block: FormItem, index: number) => {
-                                                                                    let icon = null;
+                                                                                    let icon: JSX.Element | null = null;  // Explicitly typed as JSX.Element or null
                                                                                     switch (block.name) {
                                                                                         case 'short-text':
                                                                                             icon = InputBlockSvg;
