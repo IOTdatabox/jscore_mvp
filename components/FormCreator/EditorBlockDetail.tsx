@@ -130,7 +130,7 @@ const EditorBlockDetail = ({
                     type='text'
                     value={label}
                     onChange={handleLabelChange}
-                    className="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-primary-yellow focus:border-primary-yellow dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-yellow dark:focus:border-primary-yellow focus:outline-none" placeholder="Please input label ..."
+                    className="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-primary-cyan focus:border-primary-cyan dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-cyan dark:focus:border-primary-cyan focus:outline-none" placeholder="Please input label ..."
                 />
             </div>
             {
@@ -151,7 +151,7 @@ const EditorBlockDetail = ({
                         onChange={handleRequiredChange}
                         className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-0 peer-focus:ring-primary-yellow dark:peer-focus:ring-primary-yellow rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-yellow"></div>
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-0 peer-focus:ring-primary-cyan dark:peer-focus:ring-primary-cyan rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-cyan"></div>
                 </label>
             </div>
             <div className='pb-4 justify-start gap-3'>
@@ -169,7 +169,7 @@ const EditorBlockDetail = ({
                                                     type='text'
                                                     value={item.label}
                                                     onChange={(e) => handleChoiceLabelChange(e, index)}
-                                                    className="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-primary-yellow focus:border-primary-yellow dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-yellow dark:focus:border-primary-yellow focus:outline-none" placeholder={`Choice ${index + 1}`}
+                                                    className="block p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-primary-cyan focus:border-primary-cyan dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-cyan dark:focus:border-primary-cyan focus:outline-none" placeholder={`Choice ${index + 1}`}
                                                 />
                                                 <MinusIcon className='w-6 h-6 text-red-500' onClick={() => handleDeleteChoice(index)} />
                                             </div>
@@ -181,15 +181,15 @@ const EditorBlockDetail = ({
                                 choiceError != '' &&
                                 <span className='text-sm text-red-700'>{choiceError}</span>
                             }
-                            <button className='w-full p-2 border border-primary-yellow rounded-lg cursor-pointer flex items-center justify-center mt-2' onClick={handleAddChoice}>
-                                <PlusIcon className='w-6 h-6 text-primary-yellow' /> Choice
+                            <button className='w-full p-2 border border-primary-cyan rounded-lg cursor-pointer flex items-center justify-center mt-2' onClick={handleAddChoice}>
+                                <PlusIcon className='w-6 h-6 text-primary-cyan' /> Choice
                             </button>
                         </>
                     )
                 }
             </div>
             <div className='flex items-center justify-end'>
-                <button onClick={handleSaveBlock} className="flex items-center justify-center text-white bg-primary-yellow hover:bg-secondary-yellow focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-yellow dark:hover:bg-secondary-yellow focus:outline-none dark:focus:ring-secondary-yellow">
+                <button onClick={handleSaveBlock} className="flex items-center justify-center text-white bg-primary-cyan hover:bg-secondary-cyan focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-cyan dark:hover:bg-secondary-cyan focus:outline-none dark:focus:ring-secondary-cyan">
                     Save
                 </button>
             </div>

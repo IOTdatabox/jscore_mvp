@@ -17,8 +17,8 @@ const EditForm = () => {
                 <div className='mx-auto'>
                     <PageBanner
                         title={'Form Creator'}
-                        description={'The Form Creator allows users to quickly create feedback forms, generate unique URLs.'}
-                        icon={<WindowIcon className='w-6 h-6 mr-2 text-primary-yellow' />}
+                        description={'The Form Creator allows admins to quickly create user input forms, generate unique URLs.'}
+                        icon={<WindowIcon className='w-6 h-6 mr-2 text-primary-cyan' />}
                     />
                     <section className='mt-5'>
                         <div>

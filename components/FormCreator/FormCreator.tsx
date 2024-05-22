@@ -275,7 +275,7 @@ const FormCreator = () => {
     }
 
     const handleSaveClick = () => {
-        if (name != '' && users.length > 0 && blocks.length > 0) {
+        if (name != '' && blocks.length > 0) {
             setNameError('')
             setUsersError('')
             setBlockError('')
@@ -329,9 +329,9 @@ const FormCreator = () => {
                                 <div>
                                     <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 rounded-[15px] pt-5 pb-5 px-4 ">
                                         <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 mt-2 gap-1.5'>
-                                            <div className='py-2 pb-4 px-4 lg:col-span-1 border border-dashed border-primary-yellow rounded-lg'>
+                                            <div className='py-2 pb-4 px-4 lg:col-span-1 border border-dashed border-primary-cyan rounded-lg'>
                                                 <h1 className='text-md font-bold py-2'>Form Blocks</h1>
-                                                <div className='text-primary-yellow mt-2'>
+                                                <div className='text-primary-cyan mt-2'>
                                                     <Droppable droppableId="block-panel">
                                                         {(provided) => (
                                                             <div ref={provided.innerRef} {...provided.droppableProps} className='space-y-2'>
@@ -386,21 +386,21 @@ const FormCreator = () => {
                                                     </Droppable>
                                                 </div>
                                             </div>
-                                            <div className='py-2 pb-4 px-4 lg:col-span-1 border border-dashed border-primary-yellow rounded-lg'>
+                                            <div className='py-2 pb-4 px-4 lg:col-span-1 border border-dashed border-primary-cyan rounded-lg'>
                                                 <div className='flex items-center justify-between py-2'>
                                                     <h1 className='text-md font-bold'>Editor</h1>
                                                     <div className='flex items-center gap-1.5'>
-                                                        <Cog6ToothIcon className='w-6 h-6 text-primary-yellow hover:text-secondary-yellow' />
+                                                        <Cog6ToothIcon className='w-6 h-6 text-primary-cyan hover:text-secondary-cyan' />
                                                         {
                                                             isEditing &&
                                                             <ChevronLeftIcon
-                                                                className='w-6 h-6 text-primary-yellow hover:text-secondary-yellow'
+                                                                className='w-6 h-6 text-primary-cyan hover:text-secondary-cyan'
                                                                 onClick={() => setIsEditing(false)}
                                                             />
                                                         }
                                                     </div>
                                                 </div>
-                                                <div className='text-primary-yellow mt-2 h-[calc(100%-40px)]'>
+                                                <div className='text-primary-cyan mt-2 h-[calc(100%-40px)]'>
                                                     {
                                                         isEditing ?
                                                             <>
@@ -470,12 +470,12 @@ const FormCreator = () => {
                                                     }
                                                 </div>
                                             </div>
-                                            <div className='py-2 pb-4 px-4 lg:col-span-2 border border-dashed border-primary-yellow rounded-lg'>
+                                            <div className='py-2 pb-4 px-4 lg:col-span-2 border border-dashed border-primary-cyan rounded-lg'>
                                                 <div className='flex items-center justify-between py-2'>
                                                     <h1 className='text-md font-bold'>View</h1>
                                                     <div className='flex items-center gap-1.5'>
-                                                        {/* <ArrowsPointingInIcon className='w-6 h-6 text-primary-yellow hover:text-secondary-yellow' />
-                                                        <ArrowsPointingOutIcon className='w-6 h-6 text-primary-yellow hover:text-secondary-yellow' /> */}
+                                                        {/* <ArrowsPointingInIcon className='w-6 h-6 text-primary-cyan hover:text-secondary-cyan' />
+                                                        <ArrowsPointingOutIcon className='w-6 h-6 text-primary-cyan hover:text-secondary-cyan' /> */}
                                                     </div>
                                                 </div>
                                                 <div style={{ width: "100%", height: "calc(50vh)", borderRadius: 15 }}>
@@ -493,16 +493,16 @@ const FormCreator = () => {
                                                                 },
                                                                 theme: {
                                                                     backgroundColor: '#ffffff',
-                                                                    buttonsBgColor: "#d59f2a",
+                                                                    buttonsBgColor: "#50858B",
                                                                     logo: {
                                                                         src: ""
                                                                     },
-                                                                    answersColor: "#d59f2a",
+                                                                    answersColor: "#50858B",
                                                                     buttonsFontColor: "#fff",
                                                                     buttonsBorderRadius: 10,
                                                                     errorsFontColor: "#b91c1c",
                                                                     errorsBgColor: "transparent",
-                                                                    progressBarFillColor: "#d59f2a",
+                                                                    progressBarFillColor: "#50858B",
                                                                     progressBarBgColor: "#ccc",
                                                                 },
                                                                 customCSS: 'rounded-[15px] shadow-none'
@@ -534,7 +534,7 @@ const FormCreator = () => {
                                                             type='text'
                                                             value={name}
                                                             onChange={handleNameChange}
-                                                            className="mt-2 block p-2 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-primary-yellow focus:border-primary-yellow dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-yellow dark:focus:border-primary-yellow focus:outline-none" placeholder="Please input name ..."
+                                                            className="mt-2 block p-2 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-primary-cyan focus:border-primary-cyan dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-cyan dark:focus:border-primary-cyan focus:outline-none" placeholder="Please input name ..."
                                                         />
                                                         {
                                                             nameError != '' &&
@@ -587,7 +587,7 @@ const FormCreator = () => {
                                             </div>
                                             <div className='mt-4 flex items-center justify-end'>
                                                 <button
-                                                    className="sm:w-fit w-full flex items-center justify-center text-white bg-primary-yellow hover:bg-secondary-yellow focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-yellow dark:hover:bg-secondary-yellow focus:outline-none dark:focus:ring-secondary-yellow"
+                                                    className="sm:w-fit w-full flex items-center justify-center text-white bg-primary-cyan hover:bg-secondary-cyan focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-cyan dark:hover:bg-secondary-cyan focus:outline-none dark:focus:ring-secondary-cyan"
                                                     onClick={handleSaveClick}
                                                 >
                                                     {isSaving ? <Spinner text='Saving ...' size={'5'} /> : 'Save'}

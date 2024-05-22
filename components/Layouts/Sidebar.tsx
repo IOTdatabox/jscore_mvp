@@ -36,7 +36,7 @@ const Sidebar = () => {
     }, []);
 
     return (
-        <div className={`fixed flex flex-col left-0 w-14 hover:w-64 md:w-64 dark:bg-gray-900 bg-secondary-yellow-2 h-full text-white dark:text-white transition-all duration-300 border-none z-30 sidebar shadow-lg`}>
+        <div className={`fixed flex flex-col left-0 w-14 hover:w-64 md:w-64 dark:bg-gray-900 bg-secondary-cyan-1 h-full text-white dark:text-white transition-all duration-300 border-none z-30 sidebar shadow-lg`}>
             <div className="overflow-y-auto overflow-x-hidden flex flex-col justify-between flex-grow">
                 <ul className="flex flex-col pb-4 space-y-1">
                     <li>
@@ -53,7 +53,7 @@ const Sidebar = () => {
                                     <li key={`nav_item_${index}`} className={`md:px-3 ${index == 0 ? 'pt-5' : 'pt-0'}`}>
                                         <a
                                             onClick={() => handleMenuClick(index)}
-                                            className={`relative rounded-[15px] cursor-pointer relative flex flex-row items-center h-11 focus:outline-none dark:hover:bg-gray-600 dark:hover:border-gray-800 hover:bg-primary-yellow ${activeMenu == index ? 'bg-white dark:bg-gray-600 border-secondary-yellow-1 dark:border-gray-800 text-secondary-yellow-1 dark:text-white' : 'border-transparent'} hover:border-secondary-yellow-1 hover:text-white border-l-4 pr-6`}
+                                            className={`relative rounded-[15px] cursor-pointer relative flex flex-row items-center h-11 focus:outline-none dark:hover:bg-gray-600 dark:hover:border-gray-800 hover:bg-primary-cyan ${activeMenu == index ? 'bg-white dark:bg-gray-600 border-secondary-cyan-1 dark:border-gray-800 text-secondary-cyan-1 dark:text-white' : 'border-transparent'} hover:border-secondary-cyan-1 hover:text-white border-l-4 pr-6`}
                                         >
                                             {icons[index]}
                                             <span className="ml-2 text-sm tracking-wide truncate">{item.label}</span>

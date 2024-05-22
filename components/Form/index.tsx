@@ -201,16 +201,16 @@ const UserForm = () => {
                                     },
                                     theme: {
                                         backgroundColor: '#ffffff',
-                                        buttonsBgColor: "#d59f2a",
+                                        buttonsBgColor: "#50858B",
                                         logo: {
                                             src: ""
                                         },
-                                        answersColor: "#d59f2a",
+                                        answersColor: "#50858B",
                                         buttonsFontColor: "#fff",
                                         buttonsBorderRadius: 10,
                                         errorsFontColor: "#b91c1c",
                                         errorsBgColor: "transparent",
-                                        progressBarFillColor: "#d59f2a",
+                                        progressBarFillColor: "#50858B",
                                         progressBarBgColor: "#ccc",
                                     },
                                     customCSS: 'rounded-[15px]'

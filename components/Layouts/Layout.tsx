@@ -13,7 +13,7 @@ const Layout = ({
         document.title = `${process.env.NEXT_PUBLIC_SITE_TITLE}`;
     }, []);
     return (
-        <div className="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-light-yellow dark:bg-gray-700 text-black dark:text-white">
+        <div className="min-h-screen flex flex-col flex-auto flex-shrink-0 antialiased bg-light-cyan dark:bg-gray-700 text-black dark:text-white">
             <Sidebar />
             <main className={`h-full ml-14 mt-5 mb-10 md:ml-64`}>
                 <div className={`px-[10px] sm:px-10 py-5 h-full`}>

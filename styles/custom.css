@@ -64,7 +64,7 @@
 @tailwind utilities;
 
 .swal-confirm-btn {
-    @apply rounded-lg bg-primary-yellow !important
+    @apply rounded-lg bg-primary-cyan !important
 }
 
 .swal-cancel-btn {
@@ -127,11 +127,11 @@
 }
 
 .react-datepicker__day--keyboard-selected {
-    @apply w-full block flex-1 cursor-pointer rounded-lg border-0 text-center text-sm font-semibold leading-9 text-gray-900 bg-light-yellow hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600 !important
+    @apply w-full block flex-1 cursor-pointer rounded-lg border-0 text-center text-sm font-semibold leading-9 text-gray-900 bg-light-cyan hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600 !important
 }
 
 .react-datepicker__day.react-datepicker__day--selected {
-    @apply w-full block flex-1 cursor-pointer rounded-lg border-0 text-center text-sm font-semibold leading-9 dark:text-white dark:hover:bg-gray-600 bg-primary-yellow text-white hover:bg-secondary-yellow !important
+    @apply w-full block flex-1 cursor-pointer rounded-lg border-0 text-center text-sm font-semibold leading-9 dark:text-white dark:hover:bg-gray-600 bg-primary-cyan text-white hover:bg-secondary-cyan !important
 }
 
 .react-datepicker__month {
@@ -143,7 +143,7 @@
 }
 
 .react-datepicker__today-button {
-    @apply w-full rounded-lg px-5 py-2 text-center text-sm font-medium focus:ring-4 focus:ring-primary-yellow bg-primary-yellow text-white hover:bg-secondary-yellow dark:bg-secondary-yellow dark:hover:bg-primary-yellow border-0 !important
+    @apply w-full rounded-lg px-5 py-2 text-center text-sm font-medium focus:ring-4 focus:ring-primary-cyan bg-primary-cyan text-white hover:bg-secondary-cyan dark:bg-secondary-cyan dark:hover:bg-primary-cyan border-0 !important
 }
 
 /* Typeform Style */
@@ -157,11 +157,11 @@
 
 /* Tree Structure Style */
 .dx-treeview-item.dx-state-hover, .dx-treeview-item.dx-state-focused {
-    @apply text-white hover:text-white dark:text-white hover:bg-primary-yellow dark:hover:text-white !important
+    @apply text-white hover:text-white dark:text-white hover:bg-primary-cyan dark:hover:text-white !important
 }
 
 .dx-treeview-node.dx-state-focused > .dx-item.dx-treeview-item {
-    @apply bg-primary-yellow !important
+    @apply bg-primary-cyan !important
 }
 
 .dx-treeview-node.dx-state-focused > .dx-item.dx-treeview-item svg {

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import shortid from 'shortid';
 import Swal from 'sweetalert2';
+import { UserCircle } from "phosphor-react"
 import {
     WindowIcon,
     ChevronRightIcon,
@@ -104,8 +105,8 @@ const FormsTable = ({
                                         {
                                             !column.disableSortBy && (
                                                 <div className="pl-2 flex">
-                                                    <ArrowLongUpIcon className={`w-4 h-4 ${column.isSorted && !column.isSortedDesc ? 'text-primary-yellow dark:text-primary-yellow' : 'text-gray-400 dark:text-white'}`} />
-                                                    <ArrowLongDownIcon className={`w-4 h-4 -ml-2 ${column.isSorted && column.isSortedDesc ? 'text-primary-yellow dark:text-primary-yellow' : 'text-gray-400 dark:text-white'}`} />
+                                                    <ArrowLongUpIcon className={`w-4 h-4 ${column.isSorted && !column.isSortedDesc ? 'text-primary-cyan dark:text-primary-cyan' : 'text-gray-400 dark:text-white'}`} />
+                                                    <ArrowLongDownIcon className={`w-4 h-4 -ml-2 ${column.isSorted && column.isSortedDesc ? 'text-primary-cyan dark:text-primary-cyan' : 'text-gray-400 dark:text-white'}`} />
                                                 </div>
                                             )
                                         }
@@ -145,8 +146,8 @@ const FormsTable = ({
                                                         :
                                                         cell.column.id == 'author' ?
                                                             <div className='flex items-center gap-x-2'>
-                                                                <Image src={row.original.authorImage ? row.original.authorImage : UserImage} alt={cell.value ?? 'User image'} width={35} height={35} className='rounded-full w-[35px] min-w-[35px] h-[35px] object-cover' />
-                                                                Author name
+                                                                {/* <Image src={row.original.authorImage ? row.original.authorImage : UserImage} alt={cell.value ?? 'User image'} width={35} height={35} className='rounded-full w-[35px] min-w-[35px] h-[35px] object-cover' /> */}
+                                                                <UserCircle size={32} color="#50858B" />Author name
                                                             </div>
                                                             : cell.render("Cell")
                                                 }
@@ -213,7 +214,7 @@ const FormsTable = ({
                     <li>
                         <input
                             type="number"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm ml-1 focus:outline-none focus:ring-primary-yellow focus:border-primary-yellow block w-20 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-white dark:focus:border-white" placeholder=""
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm ml-1 focus:outline-none focus:ring-primary-cyan focus:border-primary-cyan block w-20 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-white dark:focus:border-white" placeholder=""
                             value={pageIndex + 1}
                             onChange={(e) => {
                                 const page = e.target.value ? Number(e.target.value) - 1 : 0;
@@ -414,8 +415,8 @@ const FormList = () => {
                     <div className='mx-auto'>
                         <PageBanner
                             title={'Form Creator'}
-                            description={'The Form Creator allows users to quickly create feedback forms, generate unique URLs.'}
-                            icon={<WindowIcon className='w-6 h-6 mr-2 text-primary-yellow' />}
+                            description={'The Form Creator allows admins to quickly create user input forms, generate unique URLs.'}
+                            icon={<WindowIcon className='w-6 h-6 mr-2 text-primary-cyan' />}
                         />
                         <section className='mt-5'>
                             <div>
@@ -436,7 +437,7 @@ const FormList = () => {
                                                 name="search"
                                                 onChange={handleSearchChange}
                                             />
-                                            <button className="flex items-center justify-center text-white bg-primary-yellow hover:bg-secondary-yellow focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-yellow dark:hover:bg-secondary-yellow focus:outline-none dark:focus:ring-secondary-yellow"
+                                            <button className="flex items-center justify-center text-white bg-primary-cyan hover:bg-secondary-cyan focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-cyan dark:hover:bg-secondary-cyan focus:outline-none dark:focus:ring-secondary-cyan"
                                                 onClick={() => {
                                                     router.push(`/formcreator/create`);
                                                 }}>

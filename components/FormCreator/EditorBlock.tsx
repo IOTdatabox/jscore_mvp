@@ -26,7 +26,7 @@ const EditorBlock = ({
             <div>
                 <Image src={DragDropMarkSvg} alt='Drag' className='w-6 h-6' />
             </div>
-            <div className='w-full p-2 flex items-center gap-2 border border-primary-yellow rounded-lg cursor-pointer'>
+            <div className='w-full p-2 flex items-center gap-2 border border-primary-cyan rounded-lg cursor-pointer'>
                 <Image src={icon} alt='' className='w-6 h-6' /> {text}
             </div>
             <div className='p-0.5 cursor-default' onClick={() => onEdit(index)}>

@@ -163,7 +163,7 @@ async function checkValidUser(req: NextApiRequest, res: NextApiResponse) {
             res.status(500).json({ err: 'Not found matched form' });
             return;
         } else {
-            if (!form.users.includes(email)) {
+            if (form.users.length > 0 && (!form.users.includes(email))) {
                 res.status(500).json({ err: `You don't have access to this form` });
                 return;
             }

@@ -9,7 +9,7 @@ label.signin {
 }
 
 input.signin {
-  @apply block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:outline-none focus:ring-inset focus:ring-primary-yellow sm:text-sm sm:leading-6
+  @apply block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:outline-none focus:ring-inset focus:ring-primary-cyan sm:text-sm sm:leading-6
 }
 
 input.signinError {
@@ -17,15 +17,15 @@ input.signinError {
 }
 
 a.signin {
-  @apply font-semibold text-secondary-yellow hover:text-primary-yellow
+  @apply font-semibold text-secondary-cyan hover:text-primary-cyan
 }
 
 button.signin {
-  @apply flex w-full justify-center rounded-md bg-primary-yellow px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-secondary-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-yellow
+  @apply flex w-full justify-center rounded-md bg-primary-cyan px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-secondary-cyan focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-cyan
 }
 
 button.signin-disabled {
-  @apply flex w-full justify-center rounded-md bg-light-yellow px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-yellow
+  @apply flex w-full justify-center rounded-md bg-light-cyan px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-cyan
 }
 
 
