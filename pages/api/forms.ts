@@ -6,7 +6,7 @@ import { Types } from "mongoose";
 import { z } from "zod";
 
 import { BAD_REQUEST_MSG, SERVER_ERR_MSG } from "@/config/constants";
-import { connectMongo } from "@/utils/dbConfig";
+import { connectMongo } from "@/utils/dbConnect";
 import { Form } from "@/models/form.model";
 
 export default function handler(
