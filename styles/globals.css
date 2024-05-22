@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+label.signin {
+  @apply block text-sm font-medium leading-6 text-gray-900
+}
+
+input.signin {
+  @apply block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:outline-none focus:ring-inset focus:ring-primary-yellow sm:text-sm sm:leading-6
+}
+
+input.signinError {
+  @apply block w-full rounded-md border-2 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:outline-none border-rose-500 focus:ring-inset focus:ring-rose-100 sm:text-sm sm:leading-6
+}
+
+a.signin {
+  @apply font-semibold text-secondary-yellow hover:text-primary-yellow
+}
+
+button.signin {
+  @apply flex w-full justify-center rounded-md bg-primary-yellow px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-secondary-yellow focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-yellow
+}
+
+button.signin-disabled {
+  @apply flex w-full justify-center rounded-md bg-light-yellow px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-yellow
+}
+
+
+h2.signin {
+  @apply mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900
+}
+
+body {
+  @apply font-Inter
+}

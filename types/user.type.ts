@@ -1,0 +1,45 @@
+import { Types } from "mongoose";
+
+export type User = {
+    _id: Types.ObjectId | string | null,
+    name: string,
+    email: string,
+    image: string | null,
+    orgId: Types.ObjectId,
+    role: string,
+    loggedInCount: number,
+    password: string,
+    isEmailVerified: boolean,
+    notifications: any[],
+    firstName: string,
+    lastName: string,
+    managingOrgId: Types.ObjectId,
+    is2faDone: boolean,
+    is2faEnabled: boolean,
+    isEmailNotifyEnabled: boolean,
+    isRememberDevice: boolean,
+    rememberExpireTime: Date,
+    lastLoggedInAt: Date,
+    phoneNumber: string,
+    __v?: number | 0,
+};
+
+export const defaultUser = {
+    _id: new Types.ObjectId(),
+    name: null,
+    email: null,
+    image: null,
+    orgId: new Types.ObjectId(),
+    role: "user",
+    loggedInCount: 0,
+    password: null,
+    isEmailVerified: false,
+    notifications: [],
+    is2faDone: false,
+    is2faEnabled: false,
+    isEmailNotifyEnabled: false,
+    isRememberDevice: false,
+    rememberExpireTime: new Date(),
+    lastLoggedInAt: new Date(),
+    phoneNumber: ''
+}
