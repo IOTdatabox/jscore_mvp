@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import shortid from 'shortid';
 import Swal from 'sweetalert2';
-import { UserCircle } from "phosphor-react"
+import { UserCircle, Copy } from "phosphor-react"
 import {
     WindowIcon,
     ChevronRightIcon,
@@ -19,7 +19,8 @@ import {
 import {
     PencilSquareIcon,
     TrashIcon,
-    FaceFrownIcon
+    FaceFrownIcon,
+    DocumentDuplicateIcon,
 } from "@heroicons/react/24/outline";
 import { useTable, usePagination, useSortBy } from "react-table";
 import UserImage from '@/public/static/images/user.svg'
@@ -32,12 +33,14 @@ const FormsTable = ({
     columns,
     initialState,
     clickRecord,
+    duplicateRecord,
     deleteRecord,
 }: {
     data: any[],
     columns: any[],
     initialState: any,
     clickRecord?: Function,
+    duplicateRecord?: Function,
     deleteRecord?: Function,
 }) => {
     const { data: session, status } = useSession();
@@ -79,11 +82,19 @@ const FormsTable = ({
         }
     }
 
+    const handleDuplicate = (id: string) => {
+        if (duplicateRecord) {
+            duplicateRecord(id)
+        }
+    }
+
+
     const handleDelete = (id: string) => {
         if (deleteRecord) {
             deleteRecord(id)
         }
     }
+
 
     return (
         <div className="overflow-x-auto">
@@ -135,6 +146,13 @@ const FormsTable = ({
                                                                 data-tooltip-place="bottom"
                                                                 onClick={() => handleClick(cell.value)}
                                                             />
+                                                            {/* <DocumentDuplicateIcon
+                                                                className="w-5 h-5 text-blue-500 cursor-pointer"
+                                                                data-tooltip-id={"action-tool-tip"}
+                                                                data-tooltip-content={'Copy'}
+                                                                data-tooltip-place="bottom"
+                                                                onClick={() => handleDuplicate(cell.value)}
+                                                            /> */}
                                                             <TrashIcon
                                                                 className="w-5 h-5 text-red-500 cursor-pointer"
                                                                 data-tooltip-id={"action-tool-tip"}
@@ -250,6 +268,7 @@ const FormsTable = ({
 const FormList = () => {
     const router = useRouter();
 
+    const [formUpdateTrigger, setFormUpdateTrigger] = useState(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [forms, setForms] = useState<any[]>([]);
     const [allForms, setAllForms] = useState<any[]>([]);
@@ -258,7 +277,7 @@ const FormList = () => {
     useEffect(() => {
         document.title = `Forms - ${process.env.NEXT_PUBLIC_SITE_TITLE}`;
         getForms();
-    }, []);
+    }, [formUpdateTrigger]);
 
     const handleSearchChange = (e: any) => {
         setSearch(e.target.value);
@@ -311,6 +330,20 @@ const FormList = () => {
         setForms(filteredForms);
     }
 
+    const handleDuplicate = async (id: string) => {
+        console.log("Here@@@")
+        Swal.showLoading();
+        const duplicateResult = await duplicateForm(id);
+        Swal.hideLoading();
+        Swal.close()
+        if (duplicateResult) {
+            alert('Form was duplicated successfully');
+            setFormUpdateTrigger(prev => prev + 1);
+        } else {
+            alert('Form duplicate was failed')
+        }
+    }
+
     const handleDelete = (id: string) => {
         Swal.fire({
             title: 'Delete Form',
@@ -358,7 +391,42 @@ const FormList = () => {
         })
     }
 
+    const duplicateForm = async (id: string) => {
+        try {
+            const getResponse = await fetch(`/api/forms/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            if (!getResponse.ok) throw new Error('Failed to get original form data');
+
+            const originalFormData = await getResponse.json();
+
+            console.log("originalFormData", originalFormData);
+            console.log("originalFormData - name", originalFormData.detail.blocks);
+
+            delete originalFormData._id;
+            const postResponse = await fetch('/api/forms', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: originalFormData.detail.name,
+                    users: originalFormData.detail.users,
+                    blocks: originalFormData.detail.blocks
+                })
+            });
+            if (!postResponse.ok) throw new Error('Failed to duplicate form');
+            const duplicatedFormData = await postResponse.json();
+            console.log('Duplicated Form:', duplicatedFormData);
+            return duplicatedFormData;
+        } catch (err) {
+            console.error('Error duplicating form:', err);
+        }
+    };
+
     const deleteForm = async (id: string) => {
+
         const response = await fetch(`/api/forms/${id}`, {
             method: 'DELETE',
             headers: {
@@ -448,7 +516,7 @@ const FormList = () => {
                                             </button>
                                         </div>
                                     </div>
-                                    <FormsTable data={forms} columns={columns} initialState={initialState} clickRecord={handleClick} deleteRecord={handleDelete} />
+                                    <FormsTable data={forms} columns={columns} initialState={initialState} clickRecord={handleClick} duplicateRecord={handleDuplicate} deleteRecord={handleDelete} />
                                 </div>
                             </div>
                         </section>

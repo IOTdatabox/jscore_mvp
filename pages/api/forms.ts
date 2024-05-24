@@ -75,6 +75,8 @@ async function createForm(req: NextApiRequest, res: NextApiResponse) {
             blocks: blocks
         }
 
+        console.log(form.blocks[0].attributes);
+        console.log(form);
         const newForm = new Form(form);
         const result = await newForm.save();
         if (!result) {

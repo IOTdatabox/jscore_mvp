@@ -1,5 +1,6 @@
 import mongoose, { Schema, model, models, Types, SchemaTypes } from 'mongoose';
 import { FormItem, Choice } from '@/types/quillform.type';
+import { string } from 'zod';
 
 interface IForm {
     name: string,
@@ -73,6 +74,14 @@ const FormItemSchema = new Schema<FormItem>(
             },
             suffix: {
                 type: String,
+                required: false
+            },
+            buttonText: {
+                type: String,
+                required: false
+            },
+            quotationMarks: {
+                type: Boolean,
                 required: false
             }
         }

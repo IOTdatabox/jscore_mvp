@@ -26,7 +26,8 @@ import {
     defaultTextAreaBlock,
     defaultDropdownBlock,
     defaultMultichoiceBlock,
-    defaultSliderBlock
+    defaultSliderBlock,
+    defaultStaticStatement
 } from '@/types/quillform.type';
 import InputBlockSvg from '@/public/static/images/form-blocks/text-box.svg';
 import NumberBlockSvg from '@/public/static/images/form-blocks/numeric.svg';
@@ -84,6 +85,11 @@ const formBlocks = [
         icon: MultiChoiceBlockSvg,
         label: "Multi Choice",
         type: "multiple-choice"
+    },
+    {
+        icon: InputBlockSvg,
+        label: "Statement",
+        type: "statement"
     }
 ];
 
@@ -184,6 +190,9 @@ const FormCreator = () => {
                 break;
             case "multiple-choice":
                 block = defaultMultichoiceBlock;
+                break;
+            case "statement":
+                block = defaultStaticStatement;
                 break;
             default:
                 throw new Error(`Unsupported block type: ${type}`);
@@ -360,6 +369,9 @@ const FormCreator = () => {
                                                                             case 'multiple-choice':
                                                                                 icon = MultiChoiceBlockSvg;
                                                                                 break;
+                                                                            case 'statement':
+                                                                                icon = InputBlockSvg;
+                                                                                break;
                                                                         }
                                                                         return (
                                                                             <Draggable key={shortid()} draggableId={`form-block-${index.toString()}`} index={index}>
@@ -436,6 +448,9 @@ const FormCreator = () => {
                                                                                         case 'multiple-choice':
                                                                                             icon = MultiChoiceBlockSvg;
                                                                                             break;
+                                                                                        case 'statement':
+                                                                                            icon = InputBlockSvg;
+                                                                                            break;
                                                                                     }
                                                                                     return (
                                                                                         <Draggable key={shortid()} draggableId={`editor-block-${index.toString()}`} index={index}>
@@ -447,7 +462,7 @@ const FormCreator = () => {
                                                                                                 >
                                                                                                     <EditorBlock
                                                                                                         icon={icon}
-                                                                                                        text={block.attributes.label}
+                                                                                                        text={'label' in block.attributes ? block.attributes.label : 'Statement'}
                                                                                                         index={index}
                                                                                                         type={block.name}
                                                                                                         onDelete={handleDeleteBlock}

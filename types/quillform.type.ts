@@ -84,7 +84,19 @@ export type MultipleChoice = {
     }
 }
 
-export type FormItem = ShortText | LongText | NumberField | DropDown | MultipleChoice | EmailField | DateField | Slider;
+
+export type StaticStatement = {
+    name: "statement",
+    id:string,
+    attributes: {
+        required: boolean;
+        label: string;
+        buttonText: string;
+        quotationMarks: boolean;
+    }
+}
+
+export type FormItem = ShortText | LongText | NumberField | DropDown | MultipleChoice | EmailField | DateField | Slider | StaticStatement;
 
 export const defaultChoice: Choice = {
     label: "",
@@ -175,5 +187,16 @@ export const defaultMultichoiceBlock: MultipleChoice = {
             label: "Choice 1",
             value: "choice-1"
         }]
+    }
+}
+
+export const defaultStaticStatement: StaticStatement = {
+    name: "statement",
+    id:"",
+    attributes: {
+        required: false,
+        label: "Static Statement",
+        buttonText: 'Continue',
+        quotationMarks: false
     }
 }
