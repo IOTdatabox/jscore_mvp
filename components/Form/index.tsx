@@ -114,7 +114,28 @@ const UserForm = () => {
     }
 
     const handleSubmit = async (data: any) => {
-        console.log(data.answers);
+    try {
+        const response = await fetch('/api/userinputs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                answers: data.answers,
+                userEmail: 'leon@test.com'
+              })        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log(result);
+        // Handle success
+    } catch (error) {
+        console.error('There was an error submitting the form:', error);
+        // Handle errors
+    }
     }
 
     return (

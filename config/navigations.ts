@@ -4,4 +4,9 @@ export const navigations = [
         show: [],
         href: '/formcreator'
     },
+    {
+        label: 'Portfolio Visualizer',
+        show: [],
+        href: '/portfoliovisualizer'
+    },
 ]

@@ -4,13 +4,15 @@ import { useSession } from "next-auth/react";
 import { User } from "next-auth";
 import shortid from "shortid";
 import {
-    WindowIcon
+    WindowIcon,
+    CpuChipIcon
 } from '@heroicons/react/24/outline'
 
 import { navigations } from "@/config/navigations";
 
 export const icons: any[] = [
-    <span key={shortid()} className="inline-flex justify-center items-center ml-4"><WindowIcon className='h-5 w-5' /></span>
+    <span key={shortid()} className="inline-flex justify-center items-center ml-4"><WindowIcon className='h-5 w-5' /></span>,
+    <span key={shortid()} className="inline-flex justify-center items-center ml-4"><CpuChipIcon className='h-5 w-5' /></span>
 ]
 
 const Sidebar = () => {
@@ -53,7 +55,7 @@ const Sidebar = () => {
                                     <li key={`nav_item_${index}`} className={`md:px-3 ${index == 0 ? 'pt-5' : 'pt-0'}`}>
                                         <a
                                             onClick={() => handleMenuClick(index)}
-                                            className={`relative rounded-[15px] cursor-pointer relative flex flex-row items-center h-11 focus:outline-none dark:hover:bg-gray-600 dark:hover:border-gray-800 hover:bg-primary-cyan ${activeMenu == index ? 'bg-white dark:bg-gray-600 border-secondary-cyan-1 dark:border-gray-800 text-secondary-cyan-1 dark:text-white' : 'border-transparent'} hover:border-secondary-cyan-1 hover:text-white border-l-4 pr-6`}
+                                            className={`relative rounded-[15px] cursor-pointer flex flex-row items-center h-11 focus:outline-none dark:hover:bg-gray-600 dark:hover:border-gray-800 hover:bg-primary-cyan ${activeMenu == index ? 'bg-white dark:bg-gray-600 border-secondary-cyan-1 dark:border-gray-800 text-secondary-cyan-1 dark:text-white' : 'border-transparent'} hover:border-secondary-cyan-1 hover:text-white border-l-4 pr-6`}
                                         >
                                             {icons[index]}
                                             <span className="ml-2 text-sm tracking-wide truncate">{item.label}</span>

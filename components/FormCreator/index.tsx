@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import shortid from 'shortid';
 import Swal from 'sweetalert2';
-import { UserCircle, Copy } from "phosphor-react"
 import {
     WindowIcon,
     ChevronRightIcon,
@@ -21,6 +20,7 @@ import {
     TrashIcon,
     FaceFrownIcon,
     DocumentDuplicateIcon,
+    UserCircleIcon
 } from "@heroicons/react/24/outline";
 import { useTable, usePagination, useSortBy } from "react-table";
 import UserImage from '@/public/static/images/user.svg'
@@ -165,7 +165,7 @@ const FormsTable = ({
                                                         cell.column.id == 'author' ?
                                                             <div className='flex items-center gap-x-2'>
                                                                 {/* <Image src={row.original.authorImage ? row.original.authorImage : UserImage} alt={cell.value ?? 'User image'} width={35} height={35} className='rounded-full w-[35px] min-w-[35px] h-[35px] object-cover' /> */}
-                                                                <UserCircle size={32} color="#50858B" />Author name
+                                                                <UserCircleIcon className="w-8 h-8" style={{ color: '#50858B' }}/>Author name
                                                             </div>
                                                             : cell.render("Cell")
                                                 }
