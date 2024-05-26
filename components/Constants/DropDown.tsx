@@ -3,11 +3,12 @@ import React from 'react';
 interface DropdownProps {
     label: string;
     options: string[];
+    value?: string;
     onSelectionChange: (selectedValue: string) => void;
 
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ label, options, onSelectionChange }) => {
+const Dropdown: React.FC<DropdownProps> = ({ label, options, value, onSelectionChange }) => {
     return (
         <div className="w-full px-3 mb-6 md:mb-2">
             <div className="flex-grow">
@@ -17,6 +18,7 @@ const Dropdown: React.FC<DropdownProps> = ({ label, options, onSelectionChange }
                 </label>
                 <div className="relative">
                     <select
+                        value={value}
                         onChange={(e) => onSelectionChange(e.target.value)}
                         className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="dropdown-select">
                         {options.map((option, index) => (

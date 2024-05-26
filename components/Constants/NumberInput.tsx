@@ -3,13 +3,16 @@ import React from 'react';
 interface NumberInputProps {
     label: string;
     placeholder: string;
-    onValueChange: (value: string) => void; // Callback function to notify parent component
+    value?: number;
+    onValueChange: (value: number) => void; // Callback function to notify parent component
 }
 
-const NumberInput: React.FC<NumberInputProps> = ({ label, placeholder, onValueChange }) => {
+const NumberInput: React.FC<NumberInputProps> = ({ label, placeholder,value,  onValueChange }) => {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        // Notify parent component of the new value
-        onValueChange(event.target.value);
+        const numericValue = parseFloat(event.target.value);
+        if (!isNaN(numericValue)) {
+            onValueChange(numericValue);
+        }
     };
 
     return (
@@ -21,6 +24,7 @@ const NumberInput: React.FC<NumberInputProps> = ({ label, placeholder, onValueCh
                 <input
                     className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-2 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     type="number"
+                    value={value}
                     placeholder={placeholder}
                     onChange={handleChange} // Attach the change handler
                 />

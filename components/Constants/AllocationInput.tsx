@@ -63,12 +63,14 @@ const assetOptions = [
 
 interface AllocationInputProps {
   label: string;
+  assetValue?: string;
+  amountValue?: number;
   onSelectionChange: (selectedValue: string) => void;
   onAmountChange: (amount: number) => void;
 
 }
 
-const AllocationInput: React.FC<AllocationInputProps> = ({ label, onSelectionChange, onAmountChange }) => {
+const AllocationInput: React.FC<AllocationInputProps> = ({ label, assetValue, amountValue, onSelectionChange, onAmountChange }) => {
   const [allocationAmount, setAllocationAmount] = useState<number>(0); // Indicate the state will hold a number
   const handleAllocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newAllocationAmount = parseFloat(e.target.value);
@@ -94,6 +96,7 @@ const AllocationInput: React.FC<AllocationInputProps> = ({ label, onSelectionCha
         <div className="relative">
           {/* Dropdown Select */}
           <select
+            value={assetValue}
             onChange={(e) => onSelectionChange(e.target.value)}
             className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             id="dropdown-select">s
@@ -122,6 +125,7 @@ const AllocationInput: React.FC<AllocationInputProps> = ({ label, onSelectionCha
           Allocation(%)
         </label>
         <input
+          value={amountValue}
           type="number"
           id="allocation-amount"
           onChange={(e) => {
