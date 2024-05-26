@@ -290,9 +290,9 @@ const FormCreator = () => {
             if (name == '') {
                 setNameError('Name is required!')
             }
-            if (users.length == 0) {
-                setUsersError('No users selected!')
-            }
+            // if (users.length == 0) {
+            //     setUsersError('No users selected!')
+            // }
             if (blocks.length == 0) {
                 setBlockError('Form is empty!')
             }
