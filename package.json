@@ -11,8 +11,8 @@
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
-    "@quillforms/react-renderer-utils": "^5.9.2",
-    "@quillforms/renderer-core": "^5.7.1",
+    "@quillforms/react-renderer-utils": "^5.11.0",
+    "@quillforms/renderer-core": "^5.9.0",
     "flowbite-react": "^0.6.4",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.29.4",
