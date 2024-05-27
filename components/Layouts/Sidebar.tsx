@@ -5,14 +5,16 @@ import { User } from "next-auth";
 import shortid from "shortid";
 import {
     WindowIcon,
-    CpuChipIcon
+    CpuChipIcon,
+    TableCellsIcon
 } from '@heroicons/react/24/outline'
 
 import { navigations } from "@/config/navigations";
 
 export const icons: any[] = [
     <span key={shortid()} className="inline-flex justify-center items-center ml-4"><WindowIcon className='h-5 w-5' /></span>,
-    <span key={shortid()} className="inline-flex justify-center items-center ml-4"><CpuChipIcon className='h-5 w-5' /></span>
+    <span key={shortid()} className="inline-flex justify-center items-center ml-4"><CpuChipIcon className='h-5 w-5' /></span>,
+    <span key={shortid()} className="inline-flex justify-center items-center ml-4"><TableCellsIcon className='h-5 w-5' /></span>
 ]
 
 const Sidebar = () => {

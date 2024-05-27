@@ -128,52 +128,54 @@ async function updateForm(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function checkValidUser(req: NextApiRequest, res: NextApiResponse) {
-    try {
-        const querySchema = z.object({
-            id: zodObjectId,
-        })
+    // try {
+    //     const querySchema = z.object({
+    //         id: zodObjectId,
+    //     })
 
-        const queryZodResponse = querySchema.safeParse(req.query);
+    //     const queryZodResponse = querySchema.safeParse(req.query);
 
-        if (!queryZodResponse.success) {
-            const { errors } = queryZodResponse.error;
-            console.error("[Server Error] - Bad Request: ", errors);
-            return res.status(400).json({ err: BAD_REQUEST_MSG });
-        }
+    //     if (!queryZodResponse.success) {
+    //         const { errors } = queryZodResponse.error;
+    //         console.error("[Server Error] - Bad Request: ", errors);
+    //         return res.status(400).json({ err: BAD_REQUEST_MSG });
+    //     }
 
-        const { id } = queryZodResponse.data;
+    //     const { id } = queryZodResponse.data;
 
-        const bodySchema = z.object({
-            email: z.string().email()
-        })
+    //     const bodySchema = z.object({
+    //         email: z.string().email()
+    //     })
 
-        const bodyZodResponse = bodySchema.safeParse(req.body);
+    //     const bodyZodResponse = bodySchema.safeParse(req.body);
+    //     if (!bodyZodResponse.success) {
+    //         const { errors } = bodyZodResponse.error;
+    //         console.error("[Server Error] - Bad Request: ", errors);
+    //         return res.status(400).json({ err: BAD_REQUEST_MSG });
+    //     }
+    //     console.log("Hi there");
 
-        if (!bodyZodResponse.success) {
-            const { errors } = bodyZodResponse.error;
-            console.error("[Server Error] - Bad Request: ", errors);
-            return res.status(400).json({ err: BAD_REQUEST_MSG });
-        }
+    //     const formId = new Types.ObjectId(id.toString())
+    //     const { email } = bodyZodResponse.data;
+    //     const form = await Form.findById(formId);
 
-        const formId = new Types.ObjectId(id.toString())
-        const { email } = bodyZodResponse.data;
-        const form = await Form.findById(formId);
+    //     if (!form) {
+    //         res.status(500).json({ err: 'Not found matched form' });
+    //         return;
+    //     } else {
+    //         if (form.users.length > 0 && (!form.users.includes(email))) {
+    //             res.status(500).json({ err: `You don't have access to this form` });
+    //             return;
+    //         }
 
-        if (!form) {
-            res.status(500).json({ err: 'Not found matched form' });
-            return;
-        } else {
-            if (form.users.length > 0 && (!form.users.includes(email))) {
-                res.status(500).json({ err: `You don't have access to this form` });
-                return;
-            }
+    //         res.status(200).json({ success: true, err: null });
+    //     }
+    // } catch (err) {
+    //     console.error("[Server Error] - Check Email Valid of Form ", err)
+    //     res.status(500).json({ err: SERVER_ERR_MSG });
+    // }
+    res.status(200).json({ success: true, err: null });
 
-            res.status(200).json({ success: true, err: null });
-        }
-    } catch (err) {
-        console.error("[Server Error] - Check Email Valid of Form ", err)
-        res.status(500).json({ err: SERVER_ERR_MSG });
-    }
 }
 
 async function deleteForm(req: NextApiRequest, res: NextApiResponse) {

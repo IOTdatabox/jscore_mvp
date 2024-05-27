@@ -9,4 +9,9 @@ export const navigations = [
         show: [],
         href: '/portfoliovisualizer'
     },
+    {
+        label: 'Other Constraint',
+        show: [],
+        href: '/otherconstraint'
+    },
 ]

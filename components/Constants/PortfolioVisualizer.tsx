@@ -159,7 +159,6 @@ const PortfolioVisualizer = () => {
                 console.log(response);
                 if (!response.ok) throw new Error('Failed to fetch portfolio settings');
                 const data = await response.json();
-                console.log(data.federalTax);
 
                 // Update local state with fetched data
                 setInflationOption(data.inflationOption);

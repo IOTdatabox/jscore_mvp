@@ -51,8 +51,6 @@ const PortfolioSettingsZodSchema = z.object({
 async function upsertPortfolioSettings(req: NextApiRequest, res: NextApiResponse) {
     try {
         await connectMongo();
-        
-        console.log("Hi there");
         let inputData;
         try {
             // Validate input data against the Zod schema
