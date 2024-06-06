@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const msg = {
             to: userEmail,
             from: process.env.EMAIL_FROM_ADDRESS ?? "whaydigital@gmail.com", // Use the email address verified with SendGrid
-            templateId: 'd-c4a496ad89d84b9c8b70777d75cdd373',
+            templateId: 'd-9b4542b5f2434f5aa06b86bc96012f52',
             dynamicTemplateData: {
               subject: 'Here are some insights to improve your dashboard.',
               username: 'XXX',
