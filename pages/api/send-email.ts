@@ -8,8 +8,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
         // Extract the form submission data sent via Typeform webhook
-        const { name } = req.body;
-        console.log("Name", name);
+        console.log("Request body", req.body);
         res.status(200).json({ success: true })
 
         // console.log("------------HERE----------");
