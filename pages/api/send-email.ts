@@ -10,6 +10,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Extract the form submission data sent via Typeform webhook
         const { formResponse } = req.body;
 
+        console.log('Req : ❤️', req);
+
         console.log('FormResponse : ❤️', formResponse);
 
         // You will need to replace 'email_field_id' with the actual ID of your email field from Typeform
