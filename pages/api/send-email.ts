@@ -10,6 +10,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Extract the form submission data sent via Typeform webhook
         const { formResponse } = req.body;
 
+        console.log("------------HERE----------");
+
         console.log('Req : ❤️', req);
 
         console.log('FormResponse : ❤️', formResponse);
