@@ -28,20 +28,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             console.log("Constructed AnswerDoc", answerDoc);
             const result = await answerDoc.save();
 
-            const toEmail = answerDoc.answers[8].email;
-            const userName = answerDoc.answers[5].text;
-
-            const emailResponse = await sendEmailWithLink(toEmail, userName);
-
             if (!result) {
                 return res.status(500).json({ success: false, err: SERVER_ERR_MSG });
             } else {
-                return res.status(200).json({ success: true, data: result });
+                const toEmail = answerDoc.answers[0].text;
+                const userName = answerDoc.answers[1].text;
+
+                console.log("toEmail", toEmail);
+                console.log("userName", userName);
+            
+                const emailResponse = await sendEmailWithLink(toEmail, userName);
+                if (emailResponse.success) {
+                    res.status(200).json({
+                        message: emailResponse.message,
+                        data: result,
+                    });
+                    console.log('Email sent successfully');
+                } else {
+                    res.status(500).json({ error: emailResponse.error });
+                    console.log('Unknown error occurred');
+                }
             }
-          } catch (error) {
+        } catch (error) {
             console.error('Error saving answers:', error);
             res.status(500).json({ error: 'Failed to save answers' });
-          }
+        }
     } else {
         res.setHeader('Allow', ['POST']);
         res.status(405).end(`Method ${req.method} Not Allowed`);
@@ -51,29 +62,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 const sendEmailWithLink = async (
     toEmail: string,
     userName: string
-  ) => {
+) => {
     const msg = {
-      to: toEmail, // Recipient email address
-      from: {
-        email: EMAIL_FROM_ADDRESS,
-        name: 'GH2 Benefits',
-      }, // Your verified sender address
-      templateId: SENDGRID_TEMPLATE_ID,
-      dynamicTemplateData: {
-        subject: `Here are some insights to improve your dashboard.`,
-        username: userName,
-      },
-      isMultiple: false,
+        to: toEmail, // Recipient email address
+        from: {
+            email: EMAIL_FROM_ADDRESS,
+            name: 'GH2 Benefits',
+        }, // Your verified sender address
+        templateId: SENDGRID_TEMPLATE_ID,
+        dynamicTemplateData: {
+            subject: `Here are some insights to improve your dashboard.`,
+            username: userName,
+        },
+        isMultiple: false,
     };
-  
+
     try {
-      await sgMail.send(msg);
-      console.log('❤❤❤');
-      return { success: true, message: 'Email sent successfully' };
+        await sgMail.send(msg);
+        console.log('❤❤❤');
+        return { success: true, message: 'Email sent successfully' };
     } catch (error) {
-      console.error(error);
-      return { success: false, error: 'Unknown error occurred' };
-      // }
+        console.error(error);
+        return { success: false, error: 'Unknown error occurred' };
+        // }
     }
-  };
+};
 
