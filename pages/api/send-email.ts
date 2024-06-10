@@ -68,10 +68,10 @@ const sendEmailWithLink = async (
         from: {
             email: EMAIL_FROM_ADDRESS,
             name: 'GH2 Benefits',
-        }, // Your verified sender address
+        },
         templateId: SENDGRID_TEMPLATE_ID,
         dynamicTemplateData: {
-            subject: `Here are some insights to improve your dashboard.`,
+            subject: `We received your submission successfully.`,
             username: userName,
         },
         isMultiple: false,
@@ -81,10 +81,13 @@ const sendEmailWithLink = async (
         await sgMail.send(msg);
         console.log('❤❤❤');
         return { success: true, message: 'Email sent successfully' };
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        // Log detailed error response from SendGrid
+        if (error.response) {
+            console.error('ResponseError', error.response.body);
+        } else {
+            console.error(error);
+        }
         return { success: false, error: 'Unknown error occurred' };
-        // }
     }
 };
-
