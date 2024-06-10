@@ -1,5 +1,7 @@
 // pages/api/send-email.js
 import sgMail from '@sendgrid/mail';
+import { connectMongo } from "@/utils/dbConnect";
+import { AnswerData } from '@/models/typeformanswer.model';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 // Set the SendGrid API key
@@ -8,17 +10,22 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
         // Extract the form submission data sent via Typeform webhook
-        console.log("Fields", req.body.form_response.definition);
-        console.log("ANswer", req.body.form_response.answers);
+        console.log("Answer", req.body.form_response.answers);
 
-        res.status(200).json({ success: true })
+        await connectMongo();
 
-        // console.log("------------HERE----------");
+        const { answers } = req.body.form_response.answers;
 
-        // console.log('Req : ❤️', req);
 
-        // console.log('FormResponse : ❤️', formResponse);
-
+        try {
+            const answerDoc = new AnswerData({ answers });
+            await answerDoc.save();
+            res.status(200).json({ message: 'Answers saved successfully' });
+          } catch (error) {
+            console.error('Error saving answers:', error);
+            res.status(500).json({ error: 'Failed to save answers' });
+          }
+          
         // // You will need to replace 'email_field_id' with the actual ID of your email field from Typeform
         // const userEmail : string = formResponse.answers.find((answer: { field: { id: string; }; }) => answer.field.id === 'email_field_id').email;
 
