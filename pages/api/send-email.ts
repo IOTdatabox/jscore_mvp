@@ -15,24 +15,17 @@ const SENDGRID_TEMPLATE_ID = process.env.SENDGRID_TEMPLATE_ID ?? "";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        // Extract the form submission data sent via Typeform webhook
-        console.log("Answer", req.body.form_response.answers);
-
         await connectMongo();
-
         const answers = req.body.form_response.answers;
-
-
         try {
             const answerDoc = new AnswerData({ answers });
             console.log("Constructed AnswerDoc", answerDoc);
             const result = await answerDoc.save();
-
             if (!result) {
                 return res.status(500).json({ success: false, err: SERVER_ERR_MSG });
             } else {
-                const userName = answerDoc.answers[5].text;
-                const toEmail = answerDoc.answers[8].email;
+                const userName = answerDoc.answers[6].text;
+                const toEmail = answerDoc.answers[9].email;
 
                 console.log("userName", userName);
                 console.log("toEmail", toEmail);
@@ -43,10 +36,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         message: emailResponse.message,
                         data: result,
                     });
-                    console.log('Email sent successfully');
+                    console.log('Email for submission sent successfully.');
                 } else {
                     res.status(500).json({ error: emailResponse.error });
-                    console.log('Unknown error occurred');
+                    console.log('Unknown error occurred during sending email for submssion.');
                 }
             }
         } catch (error) {
