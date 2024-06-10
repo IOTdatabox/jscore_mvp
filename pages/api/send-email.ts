@@ -31,8 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (!result) {
                 return res.status(500).json({ success: false, err: SERVER_ERR_MSG });
             } else {
-                const toEmail = answerDoc.answers[1].text;
-                const userName = answerDoc.answers[0].text;
+                const toEmail = answerDoc.answers[5].text;
+                const userName = answerDoc.answers[8].email;
 
                 console.log("toEmail", toEmail);
                 console.log("userName", userName);
