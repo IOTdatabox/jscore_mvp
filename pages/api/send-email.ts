@@ -3,6 +3,8 @@ import sgMail from '@sendgrid/mail';
 import { connectMongo } from "@/utils/dbConnect";
 import { AnswerData } from '@/models/typeformanswer.model';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { BAD_REQUEST_MSG, SERVER_ERR_MSG } from "@/config/constants";
+
 
 // Set the SendGrid API key
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
@@ -19,13 +21,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         try {
             const answerDoc = new AnswerData({ answers });
-            await answerDoc.save();
+            console.log("AnswerDoc", answerDoc);
+            const result = await answerDoc.save();
+            if (!result) {
+                return res.status(500).json({ success: false, err: SERVER_ERR_MSG });
+            } else {
+                return res.status(200).json({ success: true, data: result });
+            }
             res.status(200).json({ message: 'Answers saved successfully' });
           } catch (error) {
             console.error('Error saving answers:', error);
             res.status(500).json({ error: 'Failed to save answers' });
           }
-          
+
         // // You will need to replace 'email_field_id' with the actual ID of your email field from Typeform
         // const userEmail : string = formResponse.answers.find((answer: { field: { id: string; }; }) => answer.field.id === 'email_field_id').email;
 

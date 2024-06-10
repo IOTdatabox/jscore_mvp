@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const answerSchema = new Schema({
-    answers: [mongoose.Schema.Types.Mixed] // Stores only answers as an array of mixed types.
+    answers: [mongoose.Schema.Types.Mixed]
 
 });
 
