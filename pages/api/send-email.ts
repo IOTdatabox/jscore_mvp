@@ -16,11 +16,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         await connectMongo();
 
-        const { answers } = req.body.form_response.answers;
+        const answers = req.body.form_response.answers;
 
 
         try {
-            const answerDoc = new AnswerData({ answers });
+            const answerDoc = new AnswerData(answers);
             console.log("AnswerDoc", answerDoc);
             const result = await answerDoc.save();
             if (!result) {
