@@ -38,10 +38,10 @@ export async function mainProcess(answer: any) {
 }
 
 async function calculateAndStore(token: string, answer: any) {
-    console.log("Lenght of Email", answer[8].length);
+    console.log("answer", answer);
+    console.log ('rateURL', `${process.env.NEXT_PUBLIC_URL}api/variousratesettings`);
     try {
         /*------Fetch Various Rate-------*/
-        console.log ('rateURL', `${process.env.NEXT_PUBLIC_URL}api/variousratesettings`);
 
         const responseForVariousRate = await fetch(`${process.env.NEXT_PUBLIC_URL}api/variousratesettings`, { method: 'GET' });
         if (!responseForVariousRate.ok) throw new Error('Failed to fetch portfolio settings');
