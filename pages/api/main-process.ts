@@ -44,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function calculateAndStore(token: string, answer: any) {
-    console.log("Lenght of Email", answer[9].length);
+    console.log("Lenght of Email", answer[8].length);
     try {
         /*------Fetch Various Rate-------*/
         const responseForVariousRate = await fetch('/api/variousratesettings', { method: 'GET' });

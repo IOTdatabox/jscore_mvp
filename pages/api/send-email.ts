@@ -24,8 +24,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (!result) {
                 return res.status(500).json({ success: false, err: SERVER_ERR_MSG });
             } else {
-                const userName = answerDoc.answers[6].text;
-                const toEmail = answerDoc.answers[9].email;
+                const userName = answerDoc.answers[5].text;
+                const toEmail = answerDoc.answers[8].email;
 
                 console.log("userName", userName);
                 console.log("toEmail", toEmail);
@@ -33,11 +33,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const emailResponse = await sendEmailForSubmission(toEmail, userName);
                 if (emailResponse.success) {
                     console.log('Email for submission sent successfully.');
-                    
+                    // return res.status(200).json({
+                    //     success: true,
+                    //     message: emailResponse.message,
+                    // });
+                    const mainProcessResponse = await fetch('/api/main-process', {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(answerDoc.answers)
+                    });
+
+                    if (!mainProcessResponse.ok) {
+                        throw new Error(`HTTP error! status: ${mainProcessResponse.status}`);
+                    }
                     return res.status(200).json({
                         success: true,
                         message: emailResponse.message,
                     });
+
                 } else {
                     console.log('Unknown error occurred during sending email for submssion.');
                     return res.status(500).json({ success: false, error: emailResponse.error });
