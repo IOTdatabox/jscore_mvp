@@ -5,7 +5,6 @@ import { connectMongo } from "@/utils/dbConnect";
 import { BAD_REQUEST_MSG, SERVER_ERR_MSG } from "@/config/constants";
 import { VariousRateModel } from '@/models/variousrate.model';
 
-import { SuiteContext } from 'node:test';
 import { getSubsidy } from '@/utils/subsidy';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
@@ -13,8 +12,8 @@ const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? "";
 const SENDGRID_TEMPLATE_ID_RESULT = process.env.SENDGRID_TEMPLATE_ID_RESULT ?? "";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    console.log("Start main process...")
     try {
-        console.log("Start main process...")
         const token = generateRandomToken();
         const answer = req.body;
         const calculatedResults = await calculateAndStore(token, answer);
@@ -99,18 +98,18 @@ async function showSubsidy() {
     const householdIncome = 50000;
     const dependentsCount = 2;
     const applicantDetails = [
-      { relationship: 'primary', age: 35, smoker: false, gender: 'male' },
-      // Add more applicant details as needed...
+        { relationship: 'primary', age: 35, smoker: false, gender: 'male' },
+        // Add more applicant details as needed...
     ];
-  
+
     try {
-      const subsidyAmount = await getSubsidy(state, zipCode, fipCode, householdSize, householdIncome, dependentsCount, applicantDetails);
-      console.log(`The subsidy amount is ${subsidyAmount}`);
+        const subsidyAmount = await getSubsidy(state, zipCode, fipCode, householdSize, householdIncome, dependentsCount, applicantDetails);
+        console.log(`The subsidy amount is ${subsidyAmount}`);
     } catch (error) {
-      console.error(error);
+        console.error(error);
     }
-  }
-  
+}
+
 
 function generateRandomToken() {
     const characters =
