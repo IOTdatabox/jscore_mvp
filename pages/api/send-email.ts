@@ -30,10 +30,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 console.log("userName", userName);
                 console.log("toEmail", toEmail);
 
+                const baseUrl = process.env.NEXT_PUBLIC_URL;
                 const emailResponse = await sendEmailForSubmission(toEmail, userName);
                 if (emailResponse.success) {
                     console.log('Email for submission sent successfully.');
-                    const mainProcessResponse = await fetch('./main-process', {
+                    const mainProcessResponse = await fetch(`${baseUrl}/api/main-process`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
