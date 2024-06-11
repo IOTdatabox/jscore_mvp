@@ -1,9 +1,6 @@
-// api/main-process.ts
-import type { NextApiRequest, NextApiResponse } from 'next';
+// util/main-process.ts
 import sgMail from '@sendgrid/mail';
 import { connectMongo } from "@/utils/dbConnect";
-import { BAD_REQUEST_MSG, SERVER_ERR_MSG } from "@/config/constants";
-import { VariousRateModel } from '@/models/variousrate.model';
 
 import { getSubsidy } from '@/utils/subsidy';
 
@@ -44,28 +41,30 @@ async function calculateAndStore(token: string, answer: any) {
     console.log("Lenght of Email", answer[8].length);
     try {
         /*------Fetch Various Rate-------*/
-        const responseForVariousRate = await fetch('/api/variousratesettings', { method: 'GET' });
+        console.log ('rateURL', `${process.env.NEXT_PUBLIC_URL}api/variousratesettings`);
+
+        const responseForVariousRate = await fetch(`${process.env.NEXT_PUBLIC_URL}api/variousratesettings`, { method: 'GET' });
         if (!responseForVariousRate.ok) throw new Error('Failed to fetch portfolio settings');
         const variousRateData = await responseForVariousRate.json();
         console.log("variousRateData", variousRateData);
         /*------Fetch Various Rate-------*/
 
         /*------Fetch RMD Data-------*/
-        const responseForRMD = await fetch('/api/rmdsettings');
+        const responseForRMD = await fetch(`${process.env.NEXT_PUBLIC_URL}api/rmdsettings`);
         if (!responseForRMD.ok) throw new Error(`HTTP error! Status: ${responseForRMD.status}`);
         const loadedRMDValues = await responseForRMD.json();
         console.log("loadedRMDValues", loadedRMDValues);
         /*------Fetch RMD Data-------*/
 
         /*------Fetch IRMAA Data-------*/
-        const responseForIRMAA = await fetch('/api/irmaasettings');
+        const responseForIRMAA = await fetch(`${process.env.NEXT_PUBLIC_URL}api/irmaasettings`);
         if (!responseForIRMAA.ok) throw new Error(`HTTP error! Status: ${responseForIRMAA.status}`);
         const loadedPremiums = await responseForIRMAA.json();
         console.log("loadedPremiums", loadedPremiums);
         /*------Fetch IRMAA Data-------*/
 
         /*------Fetch Portfolio Setting Data-------*/
-        const response = await fetch('/api/portfoliosettings', { method: 'GET' });
+        const response = await fetch( `${process.env.NEXT_PUBLIC_URL}api/portfoliosettings`, { method: 'GET' });
         console.log(response);
         if (!response.ok) throw new Error('Failed to fetch portfolio settings');
         const PvDatas = await response.json();
