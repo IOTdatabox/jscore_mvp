@@ -14,6 +14,7 @@ const SENDGRID_TEMPLATE_ID_RESULT = process.env.SENDGRID_TEMPLATE_ID_RESULT ?? "
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     try {
+        console.log("Start main process...")
         const token = generateRandomToken();
         const answer = req.body;
         const calculatedResults = await calculateAndStore(token, answer);
