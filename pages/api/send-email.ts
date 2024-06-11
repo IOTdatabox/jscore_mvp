@@ -1,8 +1,8 @@
 // pages/api/send-email.js
+import type { NextApiRequest, NextApiResponse } from 'next';
 import sgMail from '@sendgrid/mail';
 import { connectMongo } from "@/utils/dbConnect";
 import { AnswerData } from '@/models/typeformanswer.model';
-import type { NextApiRequest, NextApiResponse } from 'next';
 import { BAD_REQUEST_MSG, SERVER_ERR_MSG } from "@/config/constants";
 
 
@@ -29,22 +29,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 console.log("userName", userName);
                 console.log("toEmail", toEmail);
-            
-                const emailResponse = await sendEmailWithLink(toEmail, userName);
+
+                const emailResponse = await sendEmailForSubmission(toEmail, userName);
                 if (emailResponse.success) {
-                    res.status(200).json({
-                        message: emailResponse.message,
-                        data: result,
-                    });
                     console.log('Email for submission sent successfully.');
+                    
+                    return res.status(200).json({
+                        success: true,
+                        message: emailResponse.message,
+                    });
                 } else {
-                    res.status(500).json({ error: emailResponse.error });
                     console.log('Unknown error occurred during sending email for submssion.');
+                    return res.status(500).json({ success: false, error: emailResponse.error });
                 }
             }
         } catch (error) {
             console.error('Error saving answers:', error);
-            res.status(500).json({ error: 'Failed to save answers' });
+            res.status(500).json({ success: false, error: 'Failed to save answers' });
         }
     } else {
         res.setHeader('Allow', ['POST']);
@@ -52,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 }
 
-const sendEmailWithLink = async (
+const sendEmailForSubmission = async (
     toEmail: string,
     userName: string
 ) => {
