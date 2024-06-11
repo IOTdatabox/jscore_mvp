@@ -33,11 +33,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const emailResponse = await sendEmailForSubmission(toEmail, userName);
                 if (emailResponse.success) {
                     console.log('Email for submission sent successfully.');
-                    // return res.status(200).json({
-                    //     success: true,
-                    //     message: emailResponse.message,
-                    // });
                     const mainProcessResponse = await fetch('/api/main-process', {
+                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },

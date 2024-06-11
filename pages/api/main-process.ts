@@ -12,7 +12,10 @@ const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? "";
 const SENDGRID_TEMPLATE_ID_RESULT = process.env.SENDGRID_TEMPLATE_ID_RESULT ?? "";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    console.log("Start main process...")
+    console.log("Start main process...");
+    if (req.method !== 'POST') {
+        return res.status(405).json({ message: 'Method not allowed' });
+      }
     try {
         const token = generateRandomToken();
         const answer = req.body;
