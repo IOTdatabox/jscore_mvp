@@ -11,37 +11,31 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? "";
 const SENDGRID_TEMPLATE_ID_RESULT = process.env.SENDGRID_TEMPLATE_ID_RESULT ?? "";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function mainProcess(answer: any) {
     console.log("Start main process...");
-    if (req.method !== 'POST') {
-        return res.status(405).json({ message: 'Method not allowed' });
-      }
     try {
         const token = generateRandomToken();
-        const answer = req.body;
         const calculatedResults = await calculateAndStore(token, answer);
         if (!calculatedResults.success) {
-            return res.status(500).json({ success: false, err: SERVER_ERR_MSG });
+            return { success: false, error: 'Unknown error occurred during processing the answers.' };
         } else {
-            const toEmail = answer[9].email;
-            const userName = answer[6].text;
+            const toEmail = answer[8].email;
+            const userName = answer[5].text;
             const link = await generateLink(token)
             const emailResponse = await sendEmailForResult(toEmail, userName, link);
             if (emailResponse.success) {
                 console.log('Email for result sent successfully.');
-                return res.status(200).json({
-                    success: true,
-                    message: emailResponse.message
-                });
+                return { success: true, message: 'Email for result sent successfully.' };
+
             } else {
-                res.status(500).json({ success: false, error: emailResponse.error });
+                return { success: false, error: 'Unknown error occurred during sending email for result.' };
                 console.log('Unknown error occurred during sending email for result.');
             }
         }
     }
     catch (error) {
         console.error('Error processing answers:', error);
-        res.status(500).json({ success: false, error: 'Failed to process answers' });
+        return { success: false, error: 'Unknown error occurred during sending email for result.' };
     }
 
 }
@@ -77,9 +71,6 @@ async function calculateAndStore(token: string, answer: any) {
         const PvDatas = await response.json();
         console.log("PvDatas", PvDatas);
         /*------Fetch Portfolio Setting Data-------*/
-
-
-
         return { success: true, message: 'Result was calculated and stored successfully.' };
     }
     catch (error: any) {
