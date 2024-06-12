@@ -37,13 +37,18 @@ async function getVariousRate(req: NextApiRequest, res: NextApiResponse) {
         await connectMongo();
 
         const variousRates = await VariousRateModel.findOne();
+        console.log("FGSDSFSDFSD");
         if (!variousRates) {
             // If no settings are found, initialize with given values
             const initialValues = {
                 cashRate: 2.5,
                 expenseRate: 3.5,
-                jAdjustedRate: 0.75
+                jAdjustedRate: 0.75,
+                taxRateForIncome: 30,
+                taxRateForRoth: 0,
+                taxRateForGains: 20,
             };
+            console.log("InitialValues", initialValues);
             const newRates = new VariousRateModel(initialValues);
             await newRates.save();
             res.status(200).json(newRates);
@@ -60,6 +65,10 @@ const VariousRatesZodSchema = z.object({
     cashRate: z.number().optional(),
     expenseRate: z.number().optional(),
     jAdjustedRate: z.number().optional(),
+    taxRateForIncome: z.number().optional(),
+    taxRateForRoth: z.number().optional(),
+    taxRateForGains: z.number().optional(),
+    
 });
 
 

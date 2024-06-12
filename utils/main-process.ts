@@ -39,7 +39,7 @@ export async function mainProcess(answer: any) {
 
 async function calculateAndStore(token: string, answer: any) {
     console.log("answer", answer);
-    console.log ('rateURL', `${process.env.NEXT_PUBLIC_URL}api/variousratesettings`);
+    console.log('rateURL', `${process.env.NEXT_PUBLIC_URL}api/variousratesettings`);
     try {
         /*------Fetch Various Rate-------*/
 
@@ -53,23 +53,45 @@ async function calculateAndStore(token: string, answer: any) {
         const responseForRMD = await fetch(`${process.env.NEXT_PUBLIC_URL}api/rmdsettings`);
         if (!responseForRMD.ok) throw new Error(`HTTP error! Status: ${responseForRMD.status}`);
         const loadedRMDValues = await responseForRMD.json();
-        console.log("loadedRMDValues", loadedRMDValues);
+
+        const rmdMap = loadedRMDValues.reduce((map: { [x: string]: any; }, item: { age: number; percentage: number; }) => {
+            map[item.age] = item.percentage;
+            return map;
+        }, {});
+        const ageToLookup = 100;
+        const percentage = rmdMap[ageToLookup];
+        console.log(`The RMD percentage for age ${ageToLookup} is ${percentage}%`);
+
         /*------Fetch RMD Data-------*/
 
         /*------Fetch IRMAA Data-------*/
         const responseForIRMAA = await fetch(`${process.env.NEXT_PUBLIC_URL}api/irmaasettings`);
         if (!responseForIRMAA.ok) throw new Error(`HTTP error! Status: ${responseForIRMAA.status}`);
         const loadedPremiums = await responseForIRMAA.json();
-        console.log("loadedPremiums", loadedPremiums);
+        try {
+            const individualIncome = 200000; // Example individual income
+            const jointIncome = 500000; // Example joint income
+            const premiumType = 'partB'; // or 'partD' for Part D premium
+
+            const individualPremiumPartB = findPremium(loadedPremiums, 'individual', individualIncome, premiumType);
+            console.log(`The Part B premium for an individual with an income of $${individualIncome} is ${individualPremiumPartB}`);
+
+            const jointPremiumPartB = findPremium(loadedPremiums, 'joint', jointIncome, premiumType);
+            console.log(`The Part B premium for a joint filing with an income of $${jointIncome} is ${jointPremiumPartB}`);
+        } catch (error: any) {
+            console.error(error.message);
+        }
         /*------Fetch IRMAA Data-------*/
 
         /*------Fetch Portfolio Setting Data-------*/
-        const response = await fetch( `${process.env.NEXT_PUBLIC_URL}api/portfoliosettings`, { method: 'GET' });
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/portfoliosettings`, { method: 'GET' });
         console.log(response);
         if (!response.ok) throw new Error('Failed to fetch portfolio settings');
         const PvDatas = await response.json();
         console.log("PvDatas", PvDatas);
         /*------Fetch Portfolio Setting Data-------*/
+
+
         return { success: true, message: 'Result was calculated and stored successfully.' };
     }
     catch (error: any) {
@@ -123,6 +145,30 @@ const generateLink = async (token: String) => {
     console.log(generatedLink, 'generatedLink');
     return generatedLink;
 };
+
+function findPremium(loadedPremiums: any, type = 'individual', income = 0, part = 'partB') {
+    // Helper function to check if income falls within the specified range
+    const isInIncomeRange = (incomeRange: any, income: number) => {
+        const [lowStr, highStr] = incomeRange.split(' - ');
+        const low = parseInt(lowStr.replace(/[$,]+/g, ''));
+        const high = highStr ? parseInt(highStr.replace(/[+$,]+/g, '')) : Infinity;
+        return income >= low && income <= high;
+    };
+
+    // Find the corresponding bracket based on income and type (individual or joint)
+    const premiumInfo = loadedPremiums.find((premium: { [x: string]: string; }) => {
+        const incomeRange = premium[type].replace(' or less', ' - $0'); // Adjust for "or less" cases
+        return isInIncomeRange(incomeRange, income);
+    });
+
+    // Extract the correct Part B or Part D premium
+    if (premiumInfo) {
+        return premiumInfo[part];
+    } else {
+        throw new Error('No matching premium information found for the given criteria.');
+    }
+}
+
 
 const sendEmailForResult = async (
     toEmail: string,

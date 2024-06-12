@@ -8,6 +8,9 @@ const VariousRateSchema = new Schema({
     cashRate: { type: Number,},
     expenseRate: { type: Number },
     jAdjustedRate: { type: Number },
+    taxRateForIncome: { type: Number },
+    taxRateForRoth: { type: Number },
+    taxRateForGains: { type: Number },
 });
 
 // Check if the model exists before creating it to avoid recompilation issues in Next.js

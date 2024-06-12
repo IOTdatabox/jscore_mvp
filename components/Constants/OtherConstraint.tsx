@@ -50,6 +50,9 @@ const OtherConstraint = () => {
                 cashRate,
                 expenseRate,
                 jAdjustedRate,
+                taxRateForIncome,
+                taxRateForRoth,
+                taxRateForGains
             };
             const variousRateResponse = await fetch('/api/variousratesettings', {
                 method: 'POST',
@@ -77,6 +80,10 @@ const OtherConstraint = () => {
     const [expenseRate, setExpenseRate] = useState(0);
     const [jAdjustedRate, setJAdjustedRate] = useState(0);
 
+    const [taxRateForIncome, setTaxRateForIncome] = useState(0);
+    const [taxRateForRoth, setTaxRateForRoth] = useState(0);
+    const [taxRateForGains, setTaxRateForGains] = useState(0);
+
 
     const updateMedicarePremiums = (index: number, key: keyof MedicarePremium, value: string) => {
         const newPremiums = [...(medicarePremiums || [])];
@@ -102,6 +109,22 @@ const OtherConstraint = () => {
         console.log(newJAdjustedRate)
         setJAdjustedRate(newJAdjustedRate);
     };
+
+    const handleTaxRateForIncomeChange = (newTaxRateForIncome: number) => {
+        console.log(newTaxRateForIncome);
+        setTaxRateForIncome(newTaxRateForIncome);
+    };
+
+    const handleTaxRateForRothChange = (newTaxRateForRoth: number) => {
+        console.log(newTaxRateForRoth);
+        setTaxRateForRoth(newTaxRateForRoth);
+    };
+
+    const handleTaxRateForGainsChange = (newTaxRateForGains: number) => {
+        console.log(newTaxRateForGains);
+        setTaxRateForGains(newTaxRateForGains);
+    };
+
 
 
 
@@ -142,6 +165,9 @@ const OtherConstraint = () => {
                 setCashRate(data.cashRate);
                 setExpenseRate(data.expenseRate);
                 setJAdjustedRate(data.jAdjustedRate);
+                setTaxRateForIncome(data.taxRateForIncome);
+                setTaxRateForRoth(data.taxRateForRoth);
+                setTaxRateForGains(data.taxRateForGains);
             } catch (error) {
                 console.error('An error occurred while initializing settings:', error);
             }
@@ -206,6 +232,28 @@ const OtherConstraint = () => {
                                 placeholder="12345"
                                 value={jAdjustedRate}
                                 onValueChange={handleJAdjustedRateChange}
+                            />
+                        </div>
+                    </div>
+                    <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
+                        <div className="flex flex-row mx-3 w-full">
+                            <NumberInput
+                                label="Tax Rate For Earned Income "
+                                placeholder="12345"
+                                value={taxRateForIncome}
+                                onValueChange={handleTaxRateForIncomeChange}
+                            />
+                            <NumberInput
+                                label="Tax Rate For Roth IRA"
+                                placeholder="12345"
+                                value={taxRateForRoth}
+                                onValueChange={handleTaxRateForRothChange}
+                            />
+                            <NumberInput
+                                label="Tax Rate For Capital Gains"
+                                placeholder="12345"
+                                value={taxRateForGains}
+                                onValueChange={handleTaxRateForGainsChange}
                             />
                         </div>
                     </div>
