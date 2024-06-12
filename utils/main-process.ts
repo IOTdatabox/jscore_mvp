@@ -7,7 +7,22 @@ import { getSubsidy } from '@/utils/subsidy';
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? "";
 const SENDGRID_TEMPLATE_ID_RESULT = process.env.SENDGRID_TEMPLATE_ID_RESULT ?? "";
-
+const refToVarMap = {
+    // ... add more mappings based on the refs in your Typeform responses
+    'first_name_ref': 'firstName',
+    'last_name_ref': 'lastName',
+    'phone_number_ref': 'phoneNumber',
+    'email_ref': 'email',
+    'date_of_birth_ref': 'dateOfBirth',
+    'zip_code_ref': 'zipCode',
+    // ... continue for all possible ref identifiers
+    'are_you_married_ref': 'isMarried',
+    'spouses_birth_date_ref': 'spousesBirthDate',
+    'tax_dependents_ref': 'hasTaxDependents',
+    'dependents_birth_date_ref': 'dependentBirthDate',
+    // ... etc.
+  };
+  
 export async function mainProcess(answer: any) {
     console.log("Start main process...");
     try {

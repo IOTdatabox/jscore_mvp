@@ -4,6 +4,10 @@ const genders = {
 } as const;
 export type Gender = typeof genders[keyof typeof genders]; // This will be "male" | "female"
 
+export type TypeformResults = {
+    [key: string]: string | boolean | number | string[] | null;
+  };
+
 export type StateAbbr = 
     'AK' | 'AL' | 'AR' | 'AZ' | 'CA' | 'CO' | 'CT' | 'DC' | 'DE' |
     'FL' | 'GA' | 'HI' | 'IA' | 'ID' | 'IL' | 'IN' | 'KS' | 'KY' |

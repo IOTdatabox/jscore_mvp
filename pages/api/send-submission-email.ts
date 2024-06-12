@@ -5,7 +5,7 @@ import { connectMongo } from "@/utils/dbConnect";
 import { AnswerData } from '@/models/typeformanswer.model';
 import { BAD_REQUEST_MSG, SERVER_ERR_MSG } from "@/config/constants";
 import { mainProcess } from '@/utils/main-process';
-
+import { TypeformResults } from '@/types/backend.type';
 
 // Set the SendGrid API key
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
@@ -13,13 +13,13 @@ const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? "";
 const SENDGRID_TEMPLATE_ID = process.env.SENDGRID_TEMPLATE_ID ?? "";
 
 
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
         await connectMongo();
-        const answers = req.body.form_response.answers;
+        // const answers = req.body.form_response.answers;
+        const resultAnswers = processFormResponse(req.body.form_response)
         try {
-            const answerDoc = new AnswerData({ answers });
+            const answerDoc = new AnswerData({ resultAnswers });
             const result = await answerDoc.save();
             if (!result) {
                 return res.status(500).json({ success: false, err: SERVER_ERR_MSG });
@@ -93,3 +93,65 @@ const sendEmailForSubmission = async (
         return { success: false, error: 'Unknown error occurred' };
     }
 };
+
+function processFormResponse(formResponse: any) {
+    // Extracting definitions and answers from the form response
+    const definitions = formResponse.definition.fields;
+    const answers = formResponse.answers;
+  
+    // Setup an object to hold the result
+    let results: TypeformResults = {};
+  
+    // Define a helper to find the field definition by ID
+    function findFieldDefinitionById(id: any) {
+      return definitions.find((field: { id: any; }) => field.id === id);
+    }
+  
+    // Iterate over each answer
+    for (const answer of answers) {
+      // Find the corresponding field definition
+      const fieldDef = findFieldDefinitionById(answer.field.id);
+  
+      // If a definition is found, process the answer
+      if (fieldDef) {
+        let answerValue;
+  
+        // Determine the type of the answer and extract the actual value
+        switch (answer.type) {
+          case 'choice':
+            answerValue = answer.choice.label;
+            break;
+          case 'choices':
+            answerValue = answer.choices.labels;
+            break;
+          case 'text':
+            answerValue = answer.text;
+            break;
+          case 'boolean':
+            answerValue = answer.boolean;
+            break;
+          case 'number':
+            answerValue = answer.number;
+            break;
+          case 'phone_number':
+            answerValue = answer.phone_number;
+            break;
+          case 'email':
+            answerValue = answer.email;
+            break;
+          case 'date':
+            answerValue = answer.date;
+            break;
+          default:
+            answerValue = null; // Or any other placeholder for unsupported types
+            break;
+        }
+        // Assign the value to the result object using the title as key
+        results[fieldDef.title] = answerValue;
+      }
+    }
+  
+    return results;
+  }
+
+  
