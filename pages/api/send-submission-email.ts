@@ -26,9 +26,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             } else {
                 const userName = resultAnswers['first name'];
                 const toEmail = resultAnswers.email;
-
-                console.log("userName", userName);
-                console.log("toEmail", toEmail);
                 if (typeof userName !== 'string' || typeof toEmail !== 'string') {
                     // Handle the error appropriately, maybe log a message or throw an error
                     console.error('userName and toEmail must be strings');
