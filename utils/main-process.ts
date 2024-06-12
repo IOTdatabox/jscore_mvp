@@ -7,22 +7,7 @@ import { getSubsidy } from '@/utils/subsidy';
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? "";
 const SENDGRID_TEMPLATE_ID_RESULT = process.env.SENDGRID_TEMPLATE_ID_RESULT ?? "";
-const refToVarMap = {
-    // ... add more mappings based on the refs in your Typeform responses
-    'first_name_ref': 'firstName',
-    'last_name_ref': 'lastName',
-    'phone_number_ref': 'phoneNumber',
-    'email_ref': 'email',
-    'date_of_birth_ref': 'dateOfBirth',
-    'zip_code_ref': 'zipCode',
-    // ... continue for all possible ref identifiers
-    'are_you_married_ref': 'isMarried',
-    'spouses_birth_date_ref': 'spousesBirthDate',
-    'tax_dependents_ref': 'hasTaxDependents',
-    'dependents_birth_date_ref': 'dependentBirthDate',
-    // ... etc.
-  };
-  
+
 export async function mainProcess(answer: any) {
     console.log("Start main process...");
     try {
@@ -31,8 +16,8 @@ export async function mainProcess(answer: any) {
         if (!calculatedResults.success) {
             return { success: false, error: 'Unknown error occurred during processing the answers.' };
         } else {
-            const toEmail = answer[8].email;
-            const userName = answer[5].text;
+            const userName = answer['first name'];
+            const toEmail = answer.email;
             const link = await generateLink(token)
             const emailResponse = await sendEmailForResult(toEmail, userName, link);
             if (emailResponse.success) {
