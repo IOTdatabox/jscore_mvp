@@ -85,10 +85,9 @@ async function calculateAndStore(token: string, answer: any) {
 
         /*------Fetch Portfolio Setting Data-------*/
         const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/portfoliosettings`, { method: 'GET' });
-        console.log(response);
         if (!response.ok) throw new Error('Failed to fetch portfolio settings');
         const PvDatas = await response.json();
-        console.log("PvDatas", PvDatas);
+        console.log("inflationOption", PvDatas.inflationOption);
         /*------Fetch Portfolio Setting Data-------*/
 
 
