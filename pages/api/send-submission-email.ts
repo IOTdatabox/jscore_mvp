@@ -19,7 +19,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // const answers = req.body.form_response.answers;
         const resultAnswers = processFormResponse(req.body.form_response)
         try {
-            const answerDoc = new AnswerData({ resultAnswers });
+            const answersArray = Object.entries(resultAnswers).map(([question, answer]) => ({ question, answer }));
+
+            // Create a new AnswerData instance
+            const answerDoc = new AnswerData({ answers: answersArray });
+
             const result = await answerDoc.save();
             if (!result) {
                 return res.status(500).json({ success: false, err: SERVER_ERR_MSG });
