@@ -20,37 +20,44 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const resultAnswers = processFormResponse(req.body.form_response)
         try {
             const answerDoc = new AnswerData({ resultAnswers });
-            console.log('AnswerDoc', answerDoc);
             const result = await answerDoc.save();
             if (!result) {
                 return res.status(500).json({ success: false, err: SERVER_ERR_MSG });
             } else {
-                const userName = answerDoc.answers[5].text;
-                const toEmail = answerDoc.answers[8].email;
+                const userName = resultAnswers['first name'];
+                const toEmail = resultAnswers.email;
 
                 console.log("userName", userName);
                 console.log("toEmail", toEmail);
-                const emailResponse = await sendEmailForSubmission(toEmail, userName);
-                if (emailResponse.success) {
-                    console.log('Email for submission sent successfully.');
-                    const mainProcessResponse = await mainProcess(answerDoc.answers);
-                    if (mainProcessResponse.success) {
-                        console.log('Email for result sent successfully.');
-                        return res.status(200).json({
-                            success: true,
-                            message: emailResponse.message,
-                        });
-                    }
-                    else {
-                        console.log('Unknown error occurred during processing answers.');
+                if (typeof userName !== 'string' || typeof toEmail !== 'string') {
+                    // Handle the error appropriately, maybe log a message or throw an error
+                    console.error('userName and toEmail must be strings');
+                } else {
+                    console.log("userName", userName);
+                    console.log("toEmail", toEmail);
+                    const emailResponse = await sendEmailForSubmission(toEmail, userName);
+                    if (emailResponse.success) {
+                        console.log('Email for submission sent successfully.');
+                        const mainProcessResponse = await mainProcess(answerDoc.answers);
+                        if (mainProcessResponse.success) {
+                            console.log('Email for result sent successfully.');
+                            return res.status(200).json({
+                                success: true,
+                                message: emailResponse.message,
+                            });
+                        }
+                        else {
+                            console.log('Unknown error occurred during processing answers.');
+                            return res.status(500).json({ success: false, error: emailResponse.error });
+                        }
+
+
+                    } else {
+                        console.log('Unknown error occurred during sending email for submssion.');
                         return res.status(500).json({ success: false, error: emailResponse.error });
                     }
-
-
-                } else {
-                    console.log('Unknown error occurred during sending email for submssion.');
-                    return res.status(500).json({ success: false, error: emailResponse.error });
                 }
+
             }
         } catch (error) {
             console.error('Error saving answers:', error);
@@ -99,62 +106,62 @@ function processFormResponse(formResponse: any) {
     // Extracting definitions and answers from the form response
     const definitions = formResponse.definition.fields;
     const answers = formResponse.answers;
-  
+
     // Setup an object to hold the result
     let results: TypeformResults = {};
-  
+
     // Define a helper to find the field definition by ID
     function findFieldDefinitionById(id: any) {
-      return definitions.find((field: { id: any; }) => field.id === id);
+        return definitions.find((field: { id: any; }) => field.id === id);
     }
-  
+
     // Iterate over each answer
     for (const answer of answers) {
-      // Find the corresponding field definition
-      const fieldDef = findFieldDefinitionById(answer.field.id);
-  
-      // If a definition is found, process the answer
-      if (fieldDef) {
-        let answerValue;
-  
-        // Determine the type of the answer and extract the actual value
-        switch (answer.type) {
-          case 'choice':
-            answerValue = answer.choice.label;
-            break;
-          case 'choices':
-            answerValue = answer.choices.labels;
-            break;
-          case 'text':
-            answerValue = answer.text;
-            break;
-          case 'boolean':
-            answerValue = answer.boolean;
-            break;
-          case 'number':
-            answerValue = answer.number;
-            break;
-          case 'phone_number':
-            answerValue = answer.phone_number;
-            break;
-          case 'email':
-            answerValue = answer.email;
-            break;
-          case 'date':
-            answerValue = answer.date;
-            break;
-          default:
-            answerValue = null; // Or any other placeholder for unsupported types
-            break;
+        // Find the corresponding field definition
+        const fieldDef = findFieldDefinitionById(answer.field.id);
+
+        // If a definition is found, process the answer
+        if (fieldDef) {
+            let answerValue;
+
+            // Determine the type of the answer and extract the actual value
+            switch (answer.type) {
+                case 'choice':
+                    answerValue = answer.choice.label;
+                    break;
+                case 'choices':
+                    answerValue = answer.choices.labels;
+                    break;
+                case 'text':
+                    answerValue = answer.text;
+                    break;
+                case 'boolean':
+                    answerValue = answer.boolean;
+                    break;
+                case 'number':
+                    answerValue = answer.number;
+                    break;
+                case 'phone_number':
+                    answerValue = answer.phone_number;
+                    break;
+                case 'email':
+                    answerValue = answer.email;
+                    break;
+                case 'date':
+                    answerValue = answer.date;
+                    break;
+                default:
+                    answerValue = null; // Or any other placeholder for unsupported types
+                    break;
+            }
+            // Assign the value to the result object using the title as key
+            results[fieldDef.title] = answerValue;
         }
-        // Assign the value to the result object using the title as key
-        results[fieldDef.title] = answerValue;
-      }
     }
 
     console.log("Result", results);
-  
-    return results;
-  }
 
-  
+    return results;
+}
+
+
