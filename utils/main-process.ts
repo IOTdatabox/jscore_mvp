@@ -18,6 +18,7 @@ export async function mainProcess(answer: any) {
         } else {
             const userName = answer['first name'];
             const toEmail = answer.email;
+            console.log('Answer', answer)
             console.log("userName", userName);
             console.log("toEmail", toEmail);
             const link = await generateLink(token)
