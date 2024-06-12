@@ -20,6 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const resultAnswers = processFormResponse(req.body.form_response)
         try {
             const answerDoc = new AnswerData({ resultAnswers });
+            console.log('AnswerDoc', answerDoc);
             const result = await answerDoc.save();
             if (!result) {
                 return res.status(500).json({ success: false, err: SERVER_ERR_MSG });
