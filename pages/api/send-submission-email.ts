@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (!result) {
                 return res.status(500).json({ success: false, err: SERVER_ERR_MSG });
             } else {
-                const userName = resultAnswers['first name'];
+                const userName = resultAnswers['First name'];
                 const toEmail = resultAnswers.email;
                 if (typeof userName !== 'string' || typeof toEmail !== 'string') {
                     // Handle the error appropriately, maybe log a message or throw an error
