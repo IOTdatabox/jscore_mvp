@@ -8,6 +8,34 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? "";
 const SENDGRID_TEMPLATE_ID_RESULT = process.env.SENDGRID_TEMPLATE_ID_RESULT ?? "";
 
+interface Answer {
+    question: string;
+    answer: any; // Change this to a more specific type if possible
+}
+
+interface AnswersMap {
+    [key: string]: any; // Change this to a more specific type if applicable
+}
+
+function mapAnswers(answersArray: Answer[]): AnswersMap {
+    const answersMap: AnswersMap = {};
+  
+    for (const { question, answer } of answersArray) {
+      let normalizedQuestion: string = question.trim();
+      // Remove unwanted characters or perform other normalization steps as needed
+      normalizedQuestion = normalizedQuestion.replace('*', ''); // Example of removing asterisks
+  
+      // Map array answers and single-item answers differently if required
+      if (Array.isArray(answer)) {
+        answersMap[normalizedQuestion] = answer.map(item => item.hasOwnProperty('label') ? item.label : item);
+      } else {
+        answersMap[normalizedQuestion] = answer;
+      }
+    }
+    return answersMap;
+  }
+
+
 export async function mainProcess(answer: any) {
     console.log("Start main process...");
     try {
@@ -17,10 +45,15 @@ export async function mainProcess(answer: any) {
             return { success: false, error: 'Unknown error occurred during processing the answers.' };
         } else {
 
-            const firstNameObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'First name');
-            const firstName = firstNameObj ? firstNameObj.answer : 'Not provided';
-            const emailObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'Email');
-            const toEmail = emailObj ? emailObj.answer : 'Not provided';
+            const answerObj = mapAnswers(answer.answers);
+            const firstName = answerObj['First name'] ?? 'Not provided';
+            const toEmail = answerObj['Email'] ?? 'Not provided';
+
+
+            // const firstNameObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'First name');
+            // const firstName = firstNameObj ? firstNameObj.answer : 'Not provided';
+            // const emailObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'Email');
+            // const toEmail = emailObj ? emailObj.answer : 'Not provided';
             console.log('Answer', answer);
             console.log("userName", firstName);
             console.log("toEmail", toEmail);
