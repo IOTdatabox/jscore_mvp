@@ -1,4 +1,4 @@
-// pages/api/send-email.js
+// pages/api/send-submission-email.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 import sgMail from '@sendgrid/mail';
 import { connectMongo } from "@/utils/dbConnect";

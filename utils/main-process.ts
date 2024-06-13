@@ -16,13 +16,16 @@ export async function mainProcess(answer: any) {
         if (!calculatedResults.success) {
             return { success: false, error: 'Unknown error occurred during processing the answers.' };
         } else {
-            const userName = answer['first name'];
-            const toEmail = answer.email;
+
+            const firstNameObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'first name');
+            const firstName = firstNameObj ? firstNameObj.answer : 'Not provided';
+            const emailObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'email');
+            const toEmail = emailObj ? emailObj.answer : 'Not provided';
             console.log('Answer', answer);
-            console.log("userName", userName);
+            console.log("userName", firstName);
             console.log("toEmail", toEmail);
             const link = await generateLink(token)
-            const emailResponse = await sendEmailForResult(toEmail, userName, link);
+            const emailResponse = await sendEmailForResult(toEmail, firstName, link);
             if (emailResponse.success) {
                 console.log('Email for result sent successfully.');
                 return { success: true, message: 'Email for result sent successfully.' };
