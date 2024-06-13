@@ -54,7 +54,7 @@ export async function mainProcess(answer: any) {
             // const firstName = firstNameObj ? firstNameObj.answer : 'Not provided';
             // const emailObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'Email');
             // const toEmail = emailObj ? emailObj.answer : 'Not provided';
-            console.log('Answer', answer);
+            console.log('Answer', answerObj);
             console.log("userName", firstName);
             console.log("toEmail", toEmail);
             const link = await generateLink(token)
