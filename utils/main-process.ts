@@ -17,9 +17,9 @@ export async function mainProcess(answer: any) {
             return { success: false, error: 'Unknown error occurred during processing the answers.' };
         } else {
 
-            const firstNameObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'first name');
+            const firstNameObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'First name');
             const firstName = firstNameObj ? firstNameObj.answer : 'Not provided';
-            const emailObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'email');
+            const emailObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'Email');
             const toEmail = emailObj ? emailObj.answer : 'Not provided';
             console.log('Answer', answer);
             console.log("userName", firstName);
