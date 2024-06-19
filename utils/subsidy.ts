@@ -1,22 +1,14 @@
 // File: /util/subsidy.ts
-
+import { ApplicantData } from "@/types/backend.type";
 type SubsidyResponse = {
     eligibility: {
       subsidy: number;
     }
   }
   
-  type ApplicantData = {
-    relationship?: string;
-    gender?: string;
-    age?: number | string;
-    smoker?: boolean;
-  }
-  
   export async function getSubsidy(
     state: string,
     zipCode: string,
-    fipCode: string,
     householdSize: number,
     householdIncome: number,
     dependentsCount: number,
@@ -31,7 +23,7 @@ type SubsidyResponse = {
     }).join('');
   
     // Construct the final URL with all parameters
-    let targetURL = `${baseURL}?zip_code=${zipCode}&fip_code=${fipCode.split(',')[1]}&state=${state}&household_size=${householdSize}&household_income=${householdIncome}&dependents_count=${dependentsCount}&apply_for_subsidy=true&is_default_scenario=false&custom_usage[usage]=custom&custom_usage[doctor_visits]=0&custom_usage[er_visits]=0&custom_usage[hospital_visits]=0&custom_usage[labs]=0&custom_usage[prescriptions]=0&custom_usage[specialist_visits]=0&off_ex=false&utilization=medium&csr_type=none&sort=premium_asc&hsa=false&easy_pricing=false&all_benefits=false&add_attributes=false&shopping_scenario=finding_plan&health_subsidy_used=0&dental_search=false&v2=true&is_hra_flow=false${applicantsQuery}`;
+    let targetURL = `${baseURL}?zip_code=${zipCode}&state=${state}&household_size=${householdSize}&household_income=${householdIncome}&dependents_count=${dependentsCount}&apply_for_subsidy=true&is_default_scenario=false&custom_usage[usage]=custom&custom_usage[doctor_visits]=0&custom_usage[er_visits]=0&custom_usage[hospital_visits]=0&custom_usage[labs]=0&custom_usage[prescriptions]=0&custom_usage[specialist_visits]=0&off_ex=false&utilization=medium&csr_type=none&sort=premium_asc&hsa=false&easy_pricing=false&all_benefits=false&add_attributes=false&shopping_scenario=finding_plan&health_subsidy_used=0&dental_search=false&v2=true&is_hra_flow=false${applicantsQuery}`;
   
     try {
       const response = await fetch(targetURL, {

@@ -47,6 +47,7 @@ export async function getOSSForSeveralFiledDate(personAGender: string, personADo
         mainArray[0][i - firstYear] = mainResult[0][1];
         mainArray[1][i - firstYear] = mainResult[1][1];
     }
+    return mainArray;
     console.log('OpenScocialSecurityValues', mainArray);
 }
 

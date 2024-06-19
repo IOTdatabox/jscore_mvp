@@ -3,7 +3,10 @@ import sgMail from '@sendgrid/mail';
 import { connectMongo } from "@/utils/dbConnect";
 
 import { getSubsidy } from '@/utils/subsidy';
-
+import { getDateComponents, calculateAge, getState } from './utils';
+import { getOSSForSeveralFiledDate } from './openSocialSecurity';
+import { ApplicantData } from '@/types/backend.type';
+import { ifError } from 'assert';
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? "";
 const SENDGRID_TEMPLATE_ID_RESULT = process.env.SENDGRID_TEMPLATE_ID_RESULT ?? "";
@@ -19,42 +22,35 @@ interface AnswersMap {
 
 function mapAnswers(answersArray: Answer[]): AnswersMap {
     const answersMap: AnswersMap = {};
-  
+
     for (const { question, answer } of answersArray) {
-      let normalizedQuestion: string = question.trim();
-      // Remove unwanted characters or perform other normalization steps as needed
-      normalizedQuestion = normalizedQuestion.replace('*', ''); // Example of removing asterisks
-  
-      // Map array answers and single-item answers differently if required
-      if (Array.isArray(answer)) {
-        answersMap[normalizedQuestion] = answer.map(item => item.hasOwnProperty('label') ? item.label : item);
-      } else {
-        answersMap[normalizedQuestion] = answer;
-      }
+        let normalizedQuestion: string = question.trim();
+        // Remove unwanted characters or perform other normalization steps as needed
+        normalizedQuestion = normalizedQuestion.replace('*', ''); // Example of removing asterisks
+
+        // Map array answers and single-item answers differently if required
+        if (Array.isArray(answer)) {
+            answersMap[normalizedQuestion] = answer.map(item => item.hasOwnProperty('label') ? item.label : item);
+        } else {
+            answersMap[normalizedQuestion] = answer;
+        }
     }
     return answersMap;
-  }
+}
 
 
 export async function mainProcess(answer: any) {
     console.log("Start main process...");
     try {
         const token = generateRandomToken();
-        const calculatedResults = await calculateAndStore(token, answer);
+        const answerObj = mapAnswers(answer.answers);
+        const calculatedResults = await calculateAndStore(token, answerObj);
         if (!calculatedResults.success) {
             return { success: false, error: 'Unknown error occurred during processing the answers.' };
         } else {
 
-            const answerObj = mapAnswers(answer.answers);
             const firstName = answerObj['First name'] ?? 'Not provided';
             const toEmail = answerObj['Email'] ?? 'Not provided';
-
-
-            // const firstNameObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'First name');
-            // const firstName = firstNameObj ? firstNameObj.answer : 'Not provided';
-            // const emailObj = answer.answers.find((answerObj: { question: string; }) => answerObj.question === 'Email');
-            // const toEmail = emailObj ? emailObj.answer : 'Not provided';
-            console.log('Answer', answerObj);
             console.log("userName", firstName);
             console.log("toEmail", toEmail);
             const link = await generateLink(token)
@@ -76,9 +72,7 @@ export async function mainProcess(answer: any) {
 
 }
 
-async function calculateAndStore(token: string, answer: any) {
-    console.log("answer", answer);
-    console.log('rateURL', `${process.env.NEXT_PUBLIC_URL}api/variousratesettings`);
+async function calculateAndStore(token: string, answerObj: any) {
     try {
         /*------Fetch Various Rate-------*/
 
@@ -129,6 +123,192 @@ async function calculateAndStore(token: string, answer: any) {
         console.log("inflationOption", PvDatas.inflationOption);
         /*------Fetch Portfolio Setting Data-------*/
 
+        /*------Define Const-------*/
+        // Mr X
+        const currentAge = calculateAge(answerObj['Your Date Of Birth']);
+        const calculationEndAge = 68;
+        const totalYears = calculationEndAge - currentAge;
+        const birthDate = getDateComponents(answerObj['Your Date Of Birth']);
+        const birthDateSpouse = getDateComponents(answerObj["Your Spouse's Date Of Birth"]);
+        // Cash Flow Sources
+        let income = answerObj['Annual Earned Income?'] ?? 0;
+        let incomeSpouse = answerObj["Spouse's Annual Income?"] ?? 0;
+        let socialSecurity: any[][];
+        if (answerObj['Do You Currently Receive Social Security benefits?']) {
+            socialSecurity = answerObj['Monthly Social Security Amount'] ?? 0;
+        }
+        else {
+            const PIAAmount = answerObj['What Is Your Primary Insured Amount (PIA)'] ?? 0;
+            socialSecurity = await getOSSForSeveralFiledDate('male', birthDate.month, birthDate.day, birthDate.year, PIAAmount);
+        }
+        let socialSecuritySouse: any[][];
+        if (answerObj['Are You Married?']) {
+            socialSecuritySouse = answerObj["Your Spouse's Monthly Social Security Amount"] ?? 0;
+        }
+        else {
+            const PIAAmountSpouse = answerObj["What Is Your Spouse's Primary Insured Amount (PIA)"] ?? 0;
+            socialSecuritySouse = await getOSSForSeveralFiledDate('male', birthDateSpouse.month, birthDateSpouse.day, birthDateSpouse.year, PIAAmountSpouse);
+        }
+
+        const pensionIncome = answerObj["Monthly Pension Amount"] ?? 0;
+        let interestPreTax;
+        const annuityIncome = answerObj["Monthly Annuity Income Amount"] ?? 0;
+        const rentalIncome = answerObj["Monthly Rental Income"] ?? 0;
+        const mortgageIncome = answerObj["Monthly Reverse Mortgage Payment"] ?? 0;
+        const otherCashSources = (annuityIncome + rentalIncome + mortgageIncome) * 12;
+        let semiTotalCash;
+        let totalCash;
+
+        // Balances
+        const balanceCash = answerObj["Cash, Savings, CDs"] ?? 0;;
+        const balanceQ = answerObj["Qualified Fund Balances"] ?? 0;
+        const balanceQSpouse = 0;
+        const balanceNQ = answerObj["Non-Qualified Fund Balances"] ?? 0;
+        const balanceRoth = answerObj["Roth IRA Balance"] ?? 0;
+        const balanceAnnuity = 0;
+        const balanceLifeInsurance = 0;
+
+        let totalBalances;
+
+        // Expenses
+        let dailyExpenses;
+        let housing;
+        if (answerObj["Housing"] == 'Own') {
+            housing = answerObj["Mortgage Payment?"] ?? 0 + answerObj["Mortgage Monthly Payment?"] ?? 0;
+        }
+        else {
+            housing = answerObj["Monthly Rent?"] ?? 0;
+        }
+
+        let transportation;
+        if (answerObj["Transportation"] == 'Lease') {
+            transportation = answerObj["Auto Lease Amount?"] ?? 0;
+        }
+        else {
+            transportation = answerObj["Auto Loan Principal Balance?"] ?? 0 + answerObj["Auto Loan Payment Amount?"];
+        }
+        let zipCode = answerObj['Your Residential Zip Code'] ?? '00000';
+        let householdSize = 1;
+        let dependentsCount = 0;
+        let applicantDetails: ApplicantData[] = [
+            {
+                relationship: 'primary',
+                gender: 'male',
+                age: currentAge,
+            },
+        ];
+        if (birthDateSpouse) {
+            householdSize += 1;
+            const spouseAge = calculateAge(answerObj["Your Spouse's Date Of Birth"]); // You need to define the getAgeFromBirthDate() function
+            applicantDetails.push({
+                relationship: 'spouse',
+                gender: 'female', // or 'male' depending on your application's requirements
+                age: spouseAge,
+            });
+        }
+        const addDependentIfApplicable = (dependentDOBKey: string) => {
+            const dob = getDateComponents(answerObj[dependentDOBKey]);
+            if (dob) {
+                // Assuming you have a way to calculate the age from the date components
+                const dependentAge = calculateAge(answerObj[dependentDOBKey]); // Define this function based on your logic to calculate age
+                applicantDetails.push({
+                    relationship: 'dependent',
+                    gender: 'male',
+                    age: dependentAge,
+                });
+                householdSize += 1;
+                dependentsCount += 1;
+            }
+        };
+
+        for (let i = 1; i <= 5; i++) {
+            addDependentIfApplicable(`Tax Dependent #${i} Date of Birth`);
+        }
+
+        let householdIncome = 0;
+        householdIncome = income + incomeSpouse + pensionIncome +
+            answerObj['What is the TOTAL amount of taxable income earned by all of your dependents?'] ?? 0;
+        try {
+            let aptc = getSubsidy(
+                zipCode,
+                (answerObj['Your Residential Zip Code'] ?? '00000'),
+                householdSize,
+                householdIncome,
+                dependentsCount,
+                applicantDetails,
+            );
+            console.log(`The subsidy amount is ${aptc}`);
+
+        } catch (error) {
+            console.error(error);
+        }
+
+        let irmaa: any;
+        if (answerObj['Are You Married?']) {
+            irmaa = findPremium(loadedPremiums, 'individual', income, 'partB');
+        }
+        else {
+            irmaa = findPremium(loadedPremiums, 'joint', income, 'partB');
+        }
+        let totalExpenses;
+        let sources = [
+            { name: 'Cash', balance: balanceCash },
+            { name: 'NQ', balance: balanceNQ },
+            { name: 'Q', balance: balanceQ },
+            { name: 'QSpouse', balance: balanceQSpouse },
+            { name: 'Roth', balance: balanceRoth },
+            { name: 'Annuity', balance: balanceAnnuity },
+            { name: 'LifeInsurance', balance: balanceLifeInsurance },
+        ];
+
+        let withdrawAmount = {
+            Cash: 0,
+            NQ: 0,
+            Q: 0,
+            QSpouse: 0,
+            Roth: 0,
+            Annuity: 0,
+            LifeInsurance: 0,
+        };
+
+        // Array of Cash
+        let valueOfIncome = [];
+        let valueOfSocialSecurity = [];
+        let valueOfSocialSecuritySpouse = [];
+        let valueOfPensionIncome = [];
+        let valueOfInterestPreTax = [];
+        let valueOfOtherCashSources = [];
+        let valueOfTotalCash = [];
+
+        // Array of Expense
+        let valueOfDailyExpenses = [];
+        let valueOfHousing = [];
+        let valueOfTaxes = [];
+        let valueOfHealthExpenses = [];
+        let valueOfAPTC = [];
+        let valueOfIRMAA = [];
+        let valueOfTotalExpenses = [];
+
+        // Array of Coupon Bond
+        let expoentialNoAdjusted = [];
+        let expoentialJaeAdjusted = [];
+
+        // Consts
+        const countOfBalances = 7;
+        const percentageAdjustedCash = variousRateData.cashRate;
+        const percentageAdjustedExpense = variousRateData.expenseRate;
+        const jaeExtraInput = variousRateData.jAdjustedRate;
+        const taxRateForIncome = variousRateData.taxRateForIncome;
+        const taxRateForRoth = variousRateData.taxRateForRoth;
+        const taxRateForGains = variousRateData.taxRateForGains;
+
+        
+
+
+
+
+
+
 
         return { success: true, message: 'Result was calculated and stored successfully.' };
     }
@@ -142,27 +322,6 @@ async function calculateAndStore(token: string, answer: any) {
         return { success: false, error: 'Unknown error occurred during processing the answers.' };
     }
 }
-
-async function showSubsidy() {
-    const state = 'CA'; // Sample values
-    const zipCode = '90210';
-    const fipCode = '12345,6789';
-    const householdSize = 4;
-    const householdIncome = 50000;
-    const dependentsCount = 2;
-    const applicantDetails = [
-        { relationship: 'primary', age: 35, smoker: false, gender: 'male' },
-        // Add more applicant details as needed...
-    ];
-
-    try {
-        const subsidyAmount = await getSubsidy(state, zipCode, fipCode, householdSize, householdIncome, dependentsCount, applicantDetails);
-        console.log(`The subsidy amount is ${subsidyAmount}`);
-    } catch (error) {
-        console.error(error);
-    }
-}
-
 
 function generateRandomToken() {
     const characters =
@@ -180,7 +339,6 @@ function generateRandomToken() {
 
 const generateLink = async (token: String) => {
     const generatedLink: string = `${process.env.NEXT_PUBLIC_URL}results?token=${token}`;
-    console.log(generatedLink, 'generatedLink');
     return generatedLink;
 };
 

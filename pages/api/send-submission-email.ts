@@ -159,9 +159,6 @@ function processFormResponse(formResponse: any) {
             results[fieldDef.title] = answerValue;
         }
     }
-
-    console.log("Result", results);
-
     return results;
 }
 
