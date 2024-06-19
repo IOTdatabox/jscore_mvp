@@ -128,43 +128,60 @@ async function calculateAndStore(token: string, answerObj: any) {
         const currentAge = calculateAge(answerObj['Your Date Of Birth']);
         const calculationEndAge = 68;
         const totalYears = calculationEndAge - currentAge;
+        console.log('currentAge', currentAge);
         const birthDate = getDateComponents(answerObj['Your Date Of Birth']);
+        console.log('birthDate', birthDate);
         const birthDateSpouse = getDateComponents(answerObj["Your Spouse's Date Of Birth"]);
+        console.log('birthDateSpouse', birthDateSpouse);
+
         // Cash Flow Sources
         let income = answerObj['Annual Earned Income?'] ?? 0;
+        console.log('income', income);
         let incomeSpouse = answerObj["Spouse's Annual Income?"] ?? 0;
+        console.log('incomeSpouse', incomeSpouse);
         let socialSecurity: any[][];
         if (answerObj['Do You Currently Receive Social Security benefits?']) {
             socialSecurity = answerObj['Monthly Social Security Amount'] ?? 0;
         }
         else {
             const PIAAmount = answerObj['What Is Your Primary Insured Amount (PIA)'] ?? 0;
+            console.log('PIA', PIAAmount);
             socialSecurity = await getOSSForSeveralFiledDate('male', birthDate.month, birthDate.day, birthDate.year, PIAAmount);
         }
+        console.log('socialSecurity', socialSecurity);
         let socialSecuritySouse: any[][];
         if (answerObj['Are You Married?']) {
             socialSecuritySouse = answerObj["Your Spouse's Monthly Social Security Amount"] ?? 0;
         }
         else {
             const PIAAmountSpouse = answerObj["What Is Your Spouse's Primary Insured Amount (PIA)"] ?? 0;
+            console.log('PIAAmountSpouse', PIAAmountSpouse);
             socialSecuritySouse = await getOSSForSeveralFiledDate('male', birthDateSpouse.month, birthDateSpouse.day, birthDateSpouse.year, PIAAmountSpouse);
         }
+        console.log('socialSecuritySouse', socialSecuritySouse);
+
 
         const pensionIncome = answerObj["Monthly Pension Amount"] ?? 0;
+        console.log('pensionIncome', pensionIncome);
         let interestPreTax;
         const annuityIncome = answerObj["Monthly Annuity Income Amount"] ?? 0;
         const rentalIncome = answerObj["Monthly Rental Income"] ?? 0;
         const mortgageIncome = answerObj["Monthly Reverse Mortgage Payment"] ?? 0;
         const otherCashSources = (annuityIncome + rentalIncome + mortgageIncome) * 12;
+        console.log('otherCashSources', otherCashSources);
         let semiTotalCash;
         let totalCash;
 
         // Balances
-        const balanceCash = answerObj["Cash, Savings, CDs"] ?? 0;;
+        const balanceCash = answerObj["Cash, Savings, CDs"] ?? 0;
+        console.log('balanceCash', balanceCash);
         const balanceQ = answerObj["Qualified Fund Balances"] ?? 0;
+        console.log('balanceQ', balanceQ);
         const balanceQSpouse = 0;
         const balanceNQ = answerObj["Non-Qualified Fund Balances"] ?? 0;
+        console.log('balanceNQ', balanceNQ);
         const balanceRoth = answerObj["Roth IRA Balance"] ?? 0;
+        console.log('balanceRoth', balanceRoth);
         const balanceAnnuity = 0;
         const balanceLifeInsurance = 0;
 
@@ -179,7 +196,7 @@ async function calculateAndStore(token: string, answerObj: any) {
         else {
             housing = answerObj["Monthly Rent?"] ?? 0;
         }
-
+        console.log('housing', housing);
         let transportation;
         if (answerObj["Transportation"] == 'Lease') {
             transportation = answerObj["Auto Lease Amount?"] ?? 0;
@@ -187,6 +204,7 @@ async function calculateAndStore(token: string, answerObj: any) {
         else {
             transportation = answerObj["Auto Loan Principal Balance?"] ?? 0 + answerObj["Auto Loan Payment Amount?"];
         }
+        console.log('transportation', transportation);
         let zipCode = answerObj['Your Residential Zip Code'] ?? '00000';
         let householdSize = 1;
         let dependentsCount = 0;
@@ -250,6 +268,7 @@ async function calculateAndStore(token: string, answerObj: any) {
         else {
             irmaa = findPremium(loadedPremiums, 'joint', income, 'partB');
         }
+        console.log('IRMAA', irmaa);
         let totalExpenses;
         let sources = [
             { name: 'Cash', balance: balanceCash },
@@ -302,10 +321,7 @@ async function calculateAndStore(token: string, answerObj: any) {
         const taxRateForRoth = variousRateData.taxRateForRoth;
         const taxRateForGains = variousRateData.taxRateForGains;
 
-        
-
-
-
+        console.log('taxRateForGains', taxRateForGains);
 
 
 
