@@ -324,8 +324,6 @@ async function calculateAndStore(token: string, answerObj: any) {
         console.log('taxRateForGains', taxRateForGains);
 
 
-
-
         return { success: true, message: 'Result was calculated and stored successfully.' };
     }
     catch (error: any) {
