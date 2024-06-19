@@ -102,8 +102,8 @@ async function calculateAndStore(token: string, answerObj: any) {
         if (!responseForIRMAA.ok) throw new Error(`HTTP error! Status: ${responseForIRMAA.status}`);
         const loadedPremiums = await responseForIRMAA.json();
         try {
-            const individualIncome = 200000; // Example individual income
-            const jointIncome = 500000; // Example joint income
+            const individualIncome = 0; // Example individual income
+            const jointIncome = 0; // Example joint income
             const premiumType = 'partB'; // or 'partD' for Part D premium
 
             const individualPremiumPartB = findPremium(loadedPremiums, 'individual', individualIncome, premiumType);
@@ -173,12 +173,12 @@ async function calculateAndStore(token: string, answerObj: any) {
         let totalCash;
 
         // Balances
-        const balanceCash = answerObj["Cash, Savings, CDs"] ?? 0;
+        const balanceCash = answerObj["*Cash, Savings, CDs*"] ?? 0;
         console.log('balanceCash', balanceCash);
-        const balanceQ = answerObj["Qualified Fund Balances"] ?? 0;
+        const balanceQ = answerObj["*Qualified Fund Balances*"] ?? 0;
         console.log('balanceQ', balanceQ);
         const balanceQSpouse = 0;
-        const balanceNQ = answerObj["Non-Qualified Fund Balances"] ?? 0;
+        const balanceNQ = answerObj["*Non-Qualified Fund Balances*"] ?? 0;
         console.log('balanceNQ', balanceNQ);
         const balanceRoth = answerObj["Roth IRA Balance"] ?? 0;
         console.log('balanceRoth', balanceRoth);
@@ -191,18 +191,18 @@ async function calculateAndStore(token: string, answerObj: any) {
         let dailyExpenses;
         let housing;
         if (answerObj["Housing"] == 'Own') {
-            housing = answerObj["Mortgage Payment?"] ?? 0 + answerObj["Mortgage Monthly Payment?"] ?? 0;
+            housing = answerObj["*Mortgage Payment?*"] ?? 0 + answerObj["*Mortgage Monthly Payment?*"] ?? 0;
         }
         else {
-            housing = answerObj["Monthly Rent?"] ?? 0;
+            housing = answerObj["*Monthly Rent?*"] ?? 0;
         }
         console.log('housing', housing);
         let transportation;
         if (answerObj["Transportation"] == 'Lease') {
-            transportation = answerObj["Auto Lease Amount?"] ?? 0;
+            transportation = answerObj["*Auto Lease Amount?*"] ?? 0;
         }
         else {
-            transportation = answerObj["Auto Loan Principal Balance?"] ?? 0 + answerObj["Auto Loan Payment Amount?"];
+            transportation = answerObj["*Auto Loan Principal Balance?*"] ?? 0 + answerObj["*Auto Loan Payment Amount?*"] ?? 0;
         }
         console.log('transportation', transportation);
         let zipCode = answerObj['Your Residential Zip Code'] ?? '00000';
@@ -263,10 +263,10 @@ async function calculateAndStore(token: string, answerObj: any) {
 
         let irmaa: any;
         if (answerObj['Are You Married?']) {
-            irmaa = findPremium(loadedPremiums, 'individual', income, 'partB');
+            irmaa = findPremium(loadedPremiums, 'individual', householdIncome, 'partB');
         }
         else {
-            irmaa = findPremium(loadedPremiums, 'joint', income, 'partB');
+            irmaa = findPremium(loadedPremiums, 'joint', householdIncome, 'partB');
         }
         console.log('IRMAA', irmaa);
         let totalExpenses;
