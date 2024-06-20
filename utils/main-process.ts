@@ -111,6 +111,8 @@ async function calculateAndStore(token: string, answerObj: any) {
 
             const jointPremiumPartB = findPremium(loadedPremiums, 'joint', jointIncome, premiumType);
             console.log(`The Part B premium for a joint filing with an income of $${jointIncome} is ${jointPremiumPartB}`);
+
+
         } catch (error: any) {
             console.error(error.message);
         }
@@ -261,12 +263,12 @@ async function calculateAndStore(token: string, answerObj: any) {
             console.error(error);
         }
 
-        let irmaa: any;
+        let irmaa;
         if (answerObj['Are You Married?']) {
-            irmaa = findPremium(loadedPremiums, 'individual', householdIncome, 'partB');
+            irmaa = findPremium(loadedPremiums, 'individual', 0, 'partB');
         }
         else {
-            irmaa = findPremium(loadedPremiums, 'joint', householdIncome, 'partB');
+            irmaa = findPremium(loadedPremiums, 'joint', 0, 'partB');
         }
         console.log('IRMAA', irmaa);
         let totalExpenses;
