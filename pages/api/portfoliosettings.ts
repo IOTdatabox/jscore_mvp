@@ -55,7 +55,6 @@ async function upsertPortfolioSettings(req: NextApiRequest, res: NextApiResponse
         try {
             // Validate input data against the Zod schema
             inputData = PortfolioSettingsZodSchema.parse(req.body);
-            console.log('Input Data', inputData);
         } catch (err) {
             console.error(err); // Log the specific error for debugging purposes.
             if (err instanceof z.ZodError) {
@@ -92,7 +91,6 @@ async function getPortfolioSettings(req: NextApiRequest, res: NextApiResponse) {
         await connectMongo();
 
         const settings = await PortfolioSetting.findOne();
-        console.log('Setting', settings);
         if (!settings) {
             // If no settings are found, initialize with given values
             const initialValues = {

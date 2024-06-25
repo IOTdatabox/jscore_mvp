@@ -27,7 +27,7 @@ export default function handler(
             break;
         default:
             res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE'])
-            res.status(405).end(`Method ${method} Not Allowed`)
+            res.status(405).send(`Method ${method} Not Allowed`)
     }
 }
 
@@ -37,7 +37,6 @@ async function getVariousRate(req: NextApiRequest, res: NextApiResponse) {
         await connectMongo();
 
         const variousRates = await VariousRateModel.findOne();
-        console.log("FGSDSFSDFSD");
         if (!variousRates) {
             // If no settings are found, initialize with given values
             const initialValues = {

@@ -1,16 +1,11 @@
 // util/main-process.ts
-import sgMail from '@sendgrid/mail';
 import { connectMongo } from "@/utils/dbConnect";
-
-import { getSubsidy } from '@/utils/subsidy';
 import { getDateComponents, calculateAge, getState } from './utils';
 import { getOSSForSeveralFiledDate } from './openSocialSecurity';
 import { ApplicantData } from '@/types/backend.type';
 import { ifError } from 'assert';
-sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
-const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? "";
-const SENDGRID_TEMPLATE_ID_RESULT = process.env.SENDGRID_TEMPLATE_ID_RESULT ?? "";
-
+import { getInterestRate } from "./zerocouponbond";
+import { get50thPercentileDataFromResponse, getMonteCarloSimulation } from "./portfolio-visualizer";
 interface Answer {
     question: string;
     answer: any; // Change this to a more specific type if possible
@@ -20,17 +15,22 @@ interface AnswersMap {
     [key: string]: any; // Change this to a more specific type if applicable
 }
 
+function normalizeQuestion(question: string): string {
+    return question.trim().replace(/[*]/g, ''); // Remove all asterisks
+}
+
+
 function mapAnswers(answersArray: Answer[]): AnswersMap {
     const answersMap: AnswersMap = {};
 
     for (const { question, answer } of answersArray) {
-        let normalizedQuestion: string = question.trim();
-        // Remove unwanted characters or perform other normalization steps as needed
-        normalizedQuestion = normalizedQuestion.replace('*', ''); // Example of removing asterisks
+        const normalizedQuestion = normalizeQuestion(question);
 
         // Map array answers and single-item answers differently if required
         if (Array.isArray(answer)) {
-            answersMap[normalizedQuestion] = answer.map(item => item.hasOwnProperty('label') ? item.label : item);
+            answersMap[normalizedQuestion] = answer.map(item =>
+                item.hasOwnProperty('label') ? item.label : item
+            );
         } else {
             answersMap[normalizedQuestion] = answer;
         }
@@ -42,9 +42,9 @@ function mapAnswers(answersArray: Answer[]): AnswersMap {
 export async function mainProcess(answer: any) {
     console.log("Start main process...");
     try {
-        const token = generateRandomToken();
+        const token = answer._id;
         const answerObj = mapAnswers(answer.answers);
-        const calculatedResults = await calculateAndStore(token, answerObj);
+        const calculatedResults = await calculateAndStore(answerObj);
         if (!calculatedResults.success) {
             return { success: false, error: 'Unknown error occurred during processing the answers.' };
         } else {
@@ -54,8 +54,20 @@ export async function mainProcess(answer: any) {
             console.log("userName", firstName);
             console.log("toEmail", toEmail);
             const link = await generateLink(token)
-            const emailResponse = await sendEmailForResult(toEmail, firstName, link);
-            if (emailResponse.success) {
+            const emailResponse = await fetch('/api/send-result-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ toEmail, userName: firstName, link })
+            });
+            if (!emailResponse.ok) {
+                console.log('Network response was not ok.');
+                return { success: false, error: 'Failed to send result email' };
+            }
+            const emailData = await emailResponse.json();
+
+            if (emailData.success) {
                 console.log('Email for result sent successfully.');
                 return { success: true, message: 'Email for result sent successfully.' };
 
@@ -72,18 +84,19 @@ export async function mainProcess(answer: any) {
 
 }
 
-async function calculateAndStore(token: string, answerObj: any) {
+async function calculateAndStore(answerObj: any) {
     try {
         /*------Fetch Various Rate-------*/
-
-        const responseForVariousRate = await fetch(`${process.env.NEXT_PUBLIC_URL}api/variousratesettings`, { method: 'GET' });
+        console.log(answerObj);
+        const responseForVariousRate = await fetch('/api/variousratesettings', { method: 'GET' });
         if (!responseForVariousRate.ok) throw new Error('Failed to fetch portfolio settings');
         const variousRateData = await responseForVariousRate.json();
         console.log("variousRateData", variousRateData);
         /*------Fetch Various Rate-------*/
 
         /*------Fetch RMD Data-------*/
-        const responseForRMD = await fetch(`${process.env.NEXT_PUBLIC_URL}api/rmdsettings`);
+        // const responseForRMD = await fetch(`${process.env.NEXT_PUBLIC_URL}api/rmdsettings`);
+        const responseForRMD = await fetch('/api/rmdsettings');
         if (!responseForRMD.ok) throw new Error(`HTTP error! Status: ${responseForRMD.status}`);
         const loadedRMDValues = await responseForRMD.json();
 
@@ -93,24 +106,24 @@ async function calculateAndStore(token: string, answerObj: any) {
         }, {});
         const ageToLookup = 100;
         const percentage = rmdMap[ageToLookup];
-        console.log(`The RMD percentage for age ${ageToLookup} is ${percentage}%`);
+        // console.log(`The RMD percentage for age ${ageToLookup} is ${percentage}%`);
 
         /*------Fetch RMD Data-------*/
 
         /*------Fetch IRMAA Data-------*/
-        const responseForIRMAA = await fetch(`${process.env.NEXT_PUBLIC_URL}api/irmaasettings`);
+        const responseForIRMAA = await fetch('/api/irmaasettings');
         if (!responseForIRMAA.ok) throw new Error(`HTTP error! Status: ${responseForIRMAA.status}`);
         const loadedPremiums = await responseForIRMAA.json();
         try {
-            const individualIncome = 0; // Example individual income
+            const individualIncome = 123; // Example individual income
             const jointIncome = 0; // Example joint income
             const premiumType = 'partB'; // or 'partD' for Part D premium
 
             const individualPremiumPartB = findPremium(loadedPremiums, 'individual', individualIncome, premiumType);
-            console.log(`The Part B premium for an individual with an income of $${individualIncome} is ${individualPremiumPartB}`);
+            // console.log(`The Part B premium for an individual with an income of $${individualIncome} is ${individualPremiumPartB}`);
 
             const jointPremiumPartB = findPremium(loadedPremiums, 'joint', jointIncome, premiumType);
-            console.log(`The Part B premium for a joint filing with an income of $${jointIncome} is ${jointPremiumPartB}`);
+            // console.log(`The Part B premium for a joint filing with an income of $${jointIncome} is ${jointPremiumPartB}`);
 
 
         } catch (error: any) {
@@ -119,7 +132,7 @@ async function calculateAndStore(token: string, answerObj: any) {
         /*------Fetch IRMAA Data-------*/
 
         /*------Fetch Portfolio Setting Data-------*/
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/portfoliosettings`, { method: 'GET' });
+        const response = await fetch('/api/portfoliosettings', { method: 'GET' });
         if (!response.ok) throw new Error('Failed to fetch portfolio settings');
         const PvDatas = await response.json();
         console.log("inflationOption", PvDatas.inflationOption);
@@ -128,8 +141,7 @@ async function calculateAndStore(token: string, answerObj: any) {
         /*------Define Const-------*/
         // Mr X
         const currentAge = calculateAge(answerObj['Your Date Of Birth']);
-        const calculationEndAge = 68;
-        const totalYears = calculationEndAge - currentAge;
+        const totalYears = 9;
         console.log('currentAge', currentAge);
         const birthDate = getDateComponents(answerObj['Your Date Of Birth']);
         console.log('birthDate', birthDate);
@@ -141,29 +153,36 @@ async function calculateAndStore(token: string, answerObj: any) {
         console.log('income', income);
         let incomeSpouse = answerObj["Spouse's Annual Income?"] ?? 0;
         console.log('incomeSpouse', incomeSpouse);
-        let socialSecurity: any[][];
+        let socialSecurity = 1500;
+        let socialSecurityArray: any[][];
+
         if (answerObj['Do You Currently Receive Social Security benefits?']) {
             socialSecurity = answerObj['Monthly Social Security Amount'] ?? 0;
         }
         else {
             const PIAAmount = answerObj['What Is Your Primary Insured Amount (PIA)'] ?? 0;
             console.log('PIA', PIAAmount);
-            socialSecurity = await getOSSForSeveralFiledDate('male', birthDate.month, birthDate.day, birthDate.year, PIAAmount);
+            // socialSecurityArray = await getOSSForSeveralFiledDate('male', birthDate.month, birthDate.day, birthDate.year, PIAAmount);
+            // socialSecurity = parseInt(socialSecurityArray[0][0].replace(/[$,]/g, ''));
+            socialSecurity = 8850;
         }
-        console.log('socialSecurity', socialSecurity);
-        let socialSecuritySouse: any[][];
-        if (answerObj['Are You Married?']) {
+
+
+        let socialSecuritySouse = 1000;
+        let socialSecuritySouseArray: any[][];
+        if (answerObj['Do You Currently Receive Social Security benefits?']) {
             socialSecuritySouse = answerObj["Your Spouse's Monthly Social Security Amount"] ?? 0;
         }
         else {
             const PIAAmountSpouse = answerObj["What Is Your Spouse's Primary Insured Amount (PIA)"] ?? 0;
             console.log('PIAAmountSpouse', PIAAmountSpouse);
-            socialSecuritySouse = await getOSSForSeveralFiledDate('male', birthDateSpouse.month, birthDateSpouse.day, birthDateSpouse.year, PIAAmountSpouse);
+            // socialSecuritySouseArray = await getOSSForSeveralFiledDate('male', birthDateSpouse.month, birthDateSpouse.day, birthDateSpouse.year, PIAAmountSpouse);
+            // socialSecuritySouse = parseInt(socialSecuritySouseArray[0][0].replace(/[$,]/g, ''));
+            socialSecuritySouse = 10260;
         }
-        console.log('socialSecuritySouse', socialSecuritySouse);
 
 
-        const pensionIncome = answerObj["Monthly Pension Amount"] ?? 0;
+        const pensionIncome = (answerObj["Monthly Pension Amount"] ?? 0) * 12;
         console.log('pensionIncome', pensionIncome);
         let interestPreTax;
         const annuityIncome = answerObj["Monthly Annuity Income Amount"] ?? 0;
@@ -175,39 +194,53 @@ async function calculateAndStore(token: string, answerObj: any) {
         let totalCash;
 
         // Balances
-        const balanceCash = answerObj["*Cash, Savings, CDs*"] ?? 0;
+        const balanceCash = answerObj["Cash, Savings, CDs"] ?? 0;
         console.log('balanceCash', balanceCash);
-        const balanceQ = answerObj["*Qualified Fund Balances*"] ?? 0;
+        const balanceQ = answerObj["Qualified Fund Balances"] ?? 0;
         console.log('balanceQ', balanceQ);
         const balanceQSpouse = 0;
-        const balanceNQ = answerObj["*Non-Qualified Fund Balances*"] ?? 0;
+        const balanceNQ = answerObj["Non-Qualified Fund Balances"] ?? 0;
         console.log('balanceNQ', balanceNQ);
         const balanceRoth = answerObj["Roth IRA Balance"] ?? 0;
         console.log('balanceRoth', balanceRoth);
-        const balanceAnnuity = 0;
-        const balanceLifeInsurance = 0;
+        const balanceAnnuity = answerObj['Please find the most recent Fixed Annuity statement, and enter the original amount that you deposited here'] ?? 0 +
+            answerObj['Please find the most recent Deferred Income Annuity statement, and enter the Liquidation Value of your deferred annuity.'] ?? 0 +
+            answerObj['Please find the most recent Variable Annuity statement, and enter the Liquidation Value of your deferred annuity.'] ?? 0;
+        console.log('balanceAnnuity', balanceAnnuity);
+
+        const balanceLifeInsurance = answerObj['Please find the most recent Whole Life Insurance statement, and enter the Liquidation Value.'] ?? 0 +
+            answerObj['Please find the most recent Universal Life Insurance statement, and enter the Liquidation Value.'] ?? 0 +
+            answerObj['Please find the most recent Variable Life Insurance statement, and enter the Liquidation Value.'] ?? 0;
+        console.log('balanceLifeInsurance', balanceLifeInsurance);
 
         let totalBalances;
 
         // Expenses
-        let dailyExpenses;
         let housing;
         if (answerObj["Housing"] == 'Own') {
-            housing = answerObj["*Mortgage Payment?*"] ?? 0 + answerObj["*Mortgage Monthly Payment?*"] ?? 0;
+            housing = (answerObj["Mortgage Payment?"] ?? 0) + (answerObj["Mortgage Monthly Payment?"] ?? 0) * 12;
         }
         else {
-            housing = answerObj["*Monthly Rent?*"] ?? 0;
+            housing = (answerObj["Monthly Rent?"] ?? 0) * 12;
         }
         console.log('housing', housing);
         let transportation;
         if (answerObj["Transportation"] == 'Lease') {
-            transportation = answerObj["*Auto Lease Amount?*"] ?? 0;
-        }
-        else {
-            transportation = answerObj["*Auto Loan Principal Balance?*"] ?? 0 + answerObj["*Auto Loan Payment Amount?*"] ?? 0;
+            transportation = answerObj["Auto Lease Amount?"] ?? 0;
+        } else {
+            transportation = (answerObj["Auto Loan Principal Balance?"] ?? 0) + (answerObj["Auto Loan Payment Amount?"] ?? 0) * 12;
         }
         console.log('transportation', transportation);
-        let zipCode = answerObj['Your Residential Zip Code'] ?? '00000';
+
+        let dailyExpenses;
+
+        dailyExpenses = (answerObj['Food, Utilities, Gas'] ?? 0) * 12;
+
+        let healthExpenses;
+        healthExpenses = (answerObj['Health Insurance Premium'] ?? 0) * 12;
+        /* aptc */
+        let aptc = 0;
+        let zipCode: string = String(answerObj['Your Residential Zip Code']) ?? '00000';
         let householdSize = 1;
         let dependentsCount = 0;
         let applicantDetails: ApplicantData[] = [
@@ -215,6 +248,7 @@ async function calculateAndStore(token: string, answerObj: any) {
                 relationship: 'primary',
                 gender: 'male',
                 age: currentAge,
+                smoker: true,
             },
         ];
         if (birthDateSpouse) {
@@ -224,17 +258,20 @@ async function calculateAndStore(token: string, answerObj: any) {
                 relationship: 'spouse',
                 gender: 'female', // or 'male' depending on your application's requirements
                 age: spouseAge,
+                smoker: true,
             });
         }
         const addDependentIfApplicable = (dependentDOBKey: string) => {
             const dob = getDateComponents(answerObj[dependentDOBKey]);
-            if (dob) {
+            if (dob && (!Number.isNaN(dob.year) && !Number.isNaN(dob.month) && !Number.isNaN(dob.day))) {
+                console.log('dob', dob);
                 // Assuming you have a way to calculate the age from the date components
                 const dependentAge = calculateAge(answerObj[dependentDOBKey]); // Define this function based on your logic to calculate age
                 applicantDetails.push({
                     relationship: 'dependent',
                     gender: 'male',
                     age: dependentAge,
+                    smoker: true,
                 });
                 householdSize += 1;
                 dependentsCount += 1;
@@ -246,31 +283,65 @@ async function calculateAndStore(token: string, answerObj: any) {
         }
 
         let householdIncome = 0;
-        householdIncome = income + incomeSpouse + pensionIncome +
-            answerObj['What is the TOTAL amount of taxable income earned by all of your dependents?'] ?? 0;
+        // householdIncome = income + incomeSpouse + pensionIncome +
+        //     answerObj['What is the TOTAL amount of taxable income earned by all of your dependents?'] ?? 0;
+        householdIncome = 5000;
+        console.log('householdSize', householdSize);
+        console.log('householdIncome', householdIncome);
+        console.log('dependentsCount', dependentsCount);
+        console.log('applicantDetails', applicantDetails);
+
+        console.log('zipcode', zipCode);
+
+        console.log('state', getState(zipCode));
         try {
-            let aptc = getSubsidy(
-                zipCode,
-                (answerObj['Your Residential Zip Code'] ?? '00000'),
-                householdSize,
-                householdIncome,
-                dependentsCount,
-                applicantDetails,
-            );
-            console.log(`The subsidy amount is ${aptc}`);
+            const response = await fetch('/api/subsidy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    state: getState(zipCode),
+                    zipCode: zipCode,
+                    householdSize: householdSize,
+                    householdIncome: householdIncome,
+                    dependentsCount: dependentsCount,
+                    applicantDetails: applicantDetails,
+                }),
+                // body: JSON.stringify({
+                //     state: "MI",
+                //     zipCode: "48103",
+                //     householdSize: 4,
+                //     householdIncome: 188800,
+                //     dependentsCount: 2,
+                //     applicantDetails: [
+                //         { age: 60, smoker: true, relationship: "primary", gender: "male" },
+                //         { age: 55, smoker: false, relationship: "spouse", gender: "female" },
+                //         { age: 8, smoker: false, relationship: "dependent", gender: "male" },
+                //         { age: 6, smoker: false, relationship: "dependent", gender: "female" }
+                //     ],
+                // }),
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok.');
+            }
+            const data = await response.json();
+            aptc = data.subsidy * 12;
 
         } catch (error) {
+            console.error("Error calling /api/subsidy:", error);
+
             console.error(error);
         }
+        /* aptc */
 
         let irmaa;
         if (answerObj['Are You Married?']) {
-            irmaa = findPremium(loadedPremiums, 'individual', 0, 'partB');
+            irmaa = findPremium(loadedPremiums, 'individual', 0, 'partB') * 12;
         }
         else {
-            irmaa = findPremium(loadedPremiums, 'joint', 0, 'partB');
+            irmaa = findPremium(loadedPremiums, 'joint', 0, 'partB') * 12;
         }
-        console.log('IRMAA', irmaa);
         let totalExpenses;
         let sources = [
             { name: 'Cash', balance: balanceCash },
@@ -293,21 +364,10 @@ async function calculateAndStore(token: string, answerObj: any) {
         };
 
         // Array of Cash
-        let valueOfIncome = [];
-        let valueOfSocialSecurity = [];
-        let valueOfSocialSecuritySpouse = [];
-        let valueOfPensionIncome = [];
-        let valueOfInterestPreTax = [];
-        let valueOfOtherCashSources = [];
+        let valueOfSemiTotalCash = [];
         let valueOfTotalCash = [];
 
         // Array of Expense
-        let valueOfDailyExpenses = [];
-        let valueOfHousing = [];
-        let valueOfTaxes = [];
-        let valueOfHealthExpenses = [];
-        let valueOfAPTC = [];
-        let valueOfIRMAA = [];
         let valueOfTotalExpenses = [];
 
         // Array of Coupon Bond
@@ -322,9 +382,119 @@ async function calculateAndStore(token: string, answerObj: any) {
         const taxRateForIncome = variousRateData.taxRateForIncome;
         const taxRateForRoth = variousRateData.taxRateForRoth;
         const taxRateForGains = variousRateData.taxRateForGains;
+        let propotionAdjustedExpense = 1 + percentageAdjustedExpense / 100;
+        let propotionAdjustedCash = 1 + percentageAdjustedCash / 100;
 
-        console.log('taxRateForGains', taxRateForGains);
 
+
+        if (!answerObj['Do You Currently Receive Social Security benefits?']) {
+            console.log('Optimized') // Non-Optimized
+            console.log('income', income);
+            console.log('incomeSpouse', incomeSpouse);
+            console.log('socialSecurity', socialSecurity);
+            console.log('socialSecuritySpouse', socialSecuritySouse);
+            console.log('pensionIncome', pensionIncome);
+            console.log('otherCashSource', otherCashSources);
+            semiTotalCash = income + + incomeSpouse + socialSecurity + socialSecuritySouse + pensionIncome + otherCashSources;
+            console.log('SemiTotalCash', semiTotalCash);
+            totalExpenses = housing + transportation + dailyExpenses + healthExpenses - aptc + irmaa;
+
+            console.log('housing', housing);
+            console.log('transportation', transportation);
+            console.log('dailyExpenses', dailyExpenses);
+            console.log('healthExpenses', healthExpenses);
+            console.log('aptc', aptc);
+            console.log('irmaa', irmaa);
+            console.log('totalExpense', totalExpenses);
+
+            let portfolioForEachYears = new Array(countOfBalances);
+            let withdrawalAmount = new Array(countOfBalances);
+            let totalNetWorth = [];
+            for (var i = 0; i < countOfBalances; i++) {
+                portfolioForEachYears[i] = [];
+                withdrawalAmount[i] = [];
+                for (var j = 0; j < totalYears; j++) {
+                    portfolioForEachYears[i][j] = 0;
+                    withdrawalAmount[i][j] = 0;
+                }
+                portfolioForEachYears[i][0] = sources[i].balance;
+                console.log('portfolioForEachYears', i, portfolioForEachYears[i][0]);
+            }
+
+            /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
+            let interpolatedRates = await getInterestRate(totalYears);
+            if (Array.isArray(interpolatedRates)) {
+                interpolatedRates.unshift(0);
+                for (var i = 0; i <= totalYears; i++) {
+                    expoentialNoAdjusted.push(Math.pow(1 + interpolatedRates[i] / 200, i * 2));
+                    expoentialJaeAdjusted.push(Math.pow(1 + (interpolatedRates[i] + jaeExtraInput) / 200, i * 2));
+                }
+            }
+
+            console.log('expoentialJaeAdjusted', expoentialJaeAdjusted);
+            /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
+
+            for (let i = 0; i < totalYears; i++) {
+                totalNetWorth[i] = 0;
+
+                valueOfTotalExpenses.push(totalExpenses);
+                totalExpenses *= propotionAdjustedExpense;
+                /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
+                valueOfSemiTotalCash.push(semiTotalCash);
+                semiTotalCash *= propotionAdjustedCash
+                if (totalExpenses <= semiTotalCash) {
+                    for (var j = 0; j < countOfBalances; j++) {
+                        withdrawalAmount[j][i] = 0;
+                    }
+                }
+                else {
+                    let remainingExpenses = totalExpenses - semiTotalCash;
+                    for (var j = 0; j < countOfBalances; j++) {
+                        if (remainingExpenses <= 0) break; // No further withdrawAmount needed
+                        const withdrawal = Math.min(remainingExpenses, portfolioForEachYears[j][i]);
+                        withdrawalAmount[j][i] = withdrawal;
+                        remainingExpenses -= withdrawal;
+                    }
+                }
+                /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
+                for (var j = 0; j < countOfBalances; j++) {
+                    totalNetWorth[i] += portfolioForEachYears[j][i];
+                    const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
+                    const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
+                    portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
+                    console.log('portfolioForEachYears', portfolioForEachYears);
+                }
+            }
+            let lastNetworth = 0;
+            for (var i = 0; i < countOfBalances; i++) {
+                lastNetworth += portfolioForEachYears[i][totalYears];
+            }
+            totalNetWorth.push(lastNetworth);
+            console.log('totalNetWorth', totalNetWorth);
+            let divisionResults = totalNetWorth.map((value, index) => {
+                return expoentialJaeAdjusted[index] !== 0 ? value / expoentialJaeAdjusted[index] : 0;
+            });
+            console.log('divisionResults', divisionResults)
+            let presentValue = divisionResults.reduce((sum, currentValue) => sum + currentValue, 0);
+            console.log('Present Value', presentValue);
+
+            const resultData = {
+                questionID: '667380cd3fa93a1df66b0018',
+                totalYears: totalYears,
+                valueOfSemiTotalCash: valueOfSemiTotalCash,
+                valueOfTotalExpenses: valueOfTotalExpenses,
+                withdrawalAmount: withdrawalAmount,
+                portfolioForEachYears: portfolioForEachYears,
+                totalNetWorth: totalNetWorth,
+                divisionResults: divisionResults,
+                presentValue: presentValue
+            };
+
+            await saveResult(resultData);
+
+        } else {
+
+        }
 
         return { success: true, message: 'Result was calculated and stored successfully.' };
     }
@@ -339,80 +509,81 @@ async function calculateAndStore(token: string, answerObj: any) {
     }
 }
 
-function generateRandomToken() {
-    const characters =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const tokenLength = 32;
-    let token = '';
+// function generateRandomToken() {
+//     const characters =
+//         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+//     const tokenLength = 32;
+//     let token = '';
 
-    for (let i = 0; i < tokenLength; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        token += characters.charAt(randomIndex);
-    }
-
-    return token;
-}
+//     for (let i = 0; i < tokenLength; i++) {
+//         const randomIndex = Math.floor(Math.random() * characters.length);
+//         token += characters.charAt(randomIndex);
+//     }
+//     return token;
+// }
 
 const generateLink = async (token: String) => {
-    const generatedLink: string = `${process.env.NEXT_PUBLIC_URL}results?token=${token}`;
+    const generatedLink: string = `${process.env.NEXT_PUBLIC_URL}result?token=${token}`;
     return generatedLink;
 };
 
 function findPremium(loadedPremiums: any, type = 'individual', income = 0, part = 'partB') {
     // Helper function to check if income falls within the specified range
-    const isInIncomeRange = (incomeRange: any, income: number) => {
+    const isInIncomeRange = (incomeRange: string, income: number) => {
+        if (incomeRange.includes('or less')) {
+            const upperLimit = parseInt(incomeRange.replace(/[$,]+| or less/g, ''), 10);
+            // console.log(`Checking if ${income} <= ${upperLimit}`);
+            return income <= upperLimit;
+        }
+
+        if (incomeRange.includes('+')) {
+            const lowerLimit = parseInt(incomeRange.replace(/[$,]+|\+/g, ''), 10);
+            // console.log(`Checking if ${income} >= ${lowerLimit}`);
+            return income >= lowerLimit;
+        }
+
         const [lowStr, highStr] = incomeRange.split(' - ');
-        const low = parseInt(lowStr.replace(/[$,]+/g, ''));
-        const high = highStr ? parseInt(highStr.replace(/[+$,]+/g, '')) : Infinity;
+        const low = parseInt(lowStr.replace(/[$,]+/g, ''), 10);
+        const high = highStr ? parseInt(highStr.replace(/[+$,]+/g, ''), 10) : Infinity;
+
+        // console.log(`Checking if ${income} between ${low} and ${high}`);
         return income >= low && income <= high;
     };
 
     // Find the corresponding bracket based on income and type (individual or joint)
-    const premiumInfo = loadedPremiums.find((premium: { [x: string]: string; }) => {
-        const incomeRange = premium[type].replace(' or less', ' - $0'); // Adjust for "or less" cases
+    const premiumInfo = loadedPremiums.find((premium: { [x: string]: string }) => {
+        const incomeRange = premium[type];
         return isInIncomeRange(incomeRange, income);
     });
 
     // Extract the correct Part B or Part D premium
     if (premiumInfo) {
-        return premiumInfo[part];
+        return parseFloat(premiumInfo[part].replace('$', ''));
     } else {
         throw new Error('No matching premium information found for the given criteria.');
     }
 }
 
-
-const sendEmailForResult = async (
-    toEmail: string,
-    userName: string,
-    link: string
-) => {
-    const msg = {
-        to: toEmail, // Recipient email address
-        from: {
-            email: EMAIL_FROM_ADDRESS,
-            name: 'GH2 Benefits',
-        },
-        templateId: SENDGRID_TEMPLATE_ID_RESULT,
-        dynamicTemplateData: {
-            subject: `We received your submission successfully.`,
-            username: userName,
-            link: link,
-        },
-        isMultiple: false,
-    };
-
+const saveResult = async (data: any) => {
     try {
-        await sgMail.send(msg);
-        console.log('❤❤❤');
-        return { success: true, message: 'Email sent successfully' };
-    } catch (error: any) {
-        // Log detailed error response from SendGrid
-        if (error.response) {
-            console.error('ResponseError', error.response.body);
-        } else {
-            console.error(error);
+        const response = await fetch(`/api/result`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.statusText}`);
         }
-        return { success: false, error: 'Unknown error occurred' };
+
+        const savedResult = await response.json();
+        console.log('Saved result:', savedResult);
+        return savedResult;
+    } catch (error) {
+        console.error('Failed to save result:', error);
     }
 };
+
+

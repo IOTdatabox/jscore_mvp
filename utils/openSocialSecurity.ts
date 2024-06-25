@@ -8,7 +8,6 @@ export async function getOSSForSeveralFiledDate(personAGender: string, personADo
     const lastYear = personADobY + 70;
     let magicString;
     let mainArray = new Array(2); // 2*9, if month is Dec, 2*8
-    let subArray = [];
     for (var i = 0; i < 2; i++) {
         mainArray[i] = [];
     }
@@ -47,8 +46,8 @@ export async function getOSSForSeveralFiledDate(personAGender: string, personADo
         mainArray[0][i - firstYear] = mainResult[0][1];
         mainArray[1][i - firstYear] = mainResult[1][1];
     }
-    return mainArray;
     console.log('OpenScocialSecurityValues', mainArray);
+    return mainArray;
 }
 
 

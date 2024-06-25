@@ -27,6 +27,7 @@ import UserImage from '@/public/static/images/user.svg'
 import PageBanner from "@/components/PageBanner";
 import Spinner from '@/components/Spinner';
 import { formatDate } from '@/utils/utils';
+import { mainProcess } from '@/utils/main-process';
 
 const FormsTable = ({
     data,
@@ -475,6 +476,32 @@ const FormList = () => {
         pageIndex: 0
     };
 
+    const temporary = async () => {
+        try {
+            console.log("Main process started...");
+    
+            // Call answers API with specific id
+            const response = await fetch('/api/answers?id=667380cd3fa93a1df66b0018', {
+                method: 'GET',
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to fetch answer data');
+            }
+            
+            const answer = await response.json();
+            console.log('API Response:', answer);
+    
+            // Call mainProcess with the result
+            const result = await mainProcess(answer);
+            console.log('Main Process Result:', result);
+    
+            console.log("Main process finished.");
+        } catch (error) {
+            console.error('Error in main process:', error);
+        }
+    };
+
     return (
         <>
             {
@@ -506,7 +533,9 @@ const FormList = () => {
                                                 onChange={handleSearchChange}
                                             />
                                             <button className="flex items-center justify-center text-white bg-primary-cyan hover:bg-secondary-cyan focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-cyan dark:hover:bg-secondary-cyan focus:outline-none dark:focus:ring-secondary-cyan"
-                                                onClick={() => {
+                                                onClick={async() => {
+                                                    // Call main - process
+                                                    await temporary();
                                                     router.push(`/formcreator/create`);
                                                 }}>
                                                 <svg className="h-3.5 w-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

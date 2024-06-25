@@ -125,9 +125,6 @@ const OtherConstraint = () => {
         setTaxRateForGains(newTaxRateForGains);
     };
 
-
-
-
     useEffect(() => {
         async function fetchMedicarePremiums() {
             try {
