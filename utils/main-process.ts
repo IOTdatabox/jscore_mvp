@@ -203,14 +203,17 @@ async function calculateAndStore(answerObj: any) {
         console.log('balanceNQ', balanceNQ);
         const balanceRoth = answerObj["Roth IRA Balance"] ?? 0;
         console.log('balanceRoth', balanceRoth);
-        const balanceAnnuity = answerObj['Please find the most recent Fixed Annuity statement, and enter the original amount that you deposited here'] ?? 0 +
-            answerObj['Please find the most recent Deferred Income Annuity statement, and enter the Liquidation Value of your deferred annuity.'] ?? 0 +
-            answerObj['Please find the most recent Variable Annuity statement, and enter the Liquidation Value of your deferred annuity.'] ?? 0;
+        const balanceAnnuity =
+            (answerObj['Please find the most recent Fixed Annuity statement, and enter the original amount that you deposited here'] ?? 0) +
+            (answerObj['Please find the most recent Deferred Income Annuity statement, and enter the Liquidation Value of your deferred annuity.'] ?? 0) +
+            (answerObj['Please find the most recent Variable Annuity statement, and enter the Liquidation Value of your deferred annuity.'] ?? 0);
+
         console.log('balanceAnnuity', balanceAnnuity);
 
-        const balanceLifeInsurance = answerObj['Please find the most recent Whole Life Insurance statement, and enter the Liquidation Value.'] ?? 0 +
-            answerObj['Please find the most recent Universal Life Insurance statement, and enter the Liquidation Value.'] ?? 0 +
-            answerObj['Please find the most recent Variable Life Insurance statement, and enter the Liquidation Value.'] ?? 0;
+        const balanceLifeInsurance =
+            (answerObj['Please find the most recent Whole Life Insurance statement, and enter the Liquidation Value.'] ?? 0) +
+            (answerObj['Please find the most recent Universal Life Insurance statement, and enter the Liquidation Value.'] ?? 0) +
+            (answerObj['Please find the most recent Variable Life Insurance statement, and enter the Liquidation Value.'] ?? 0);
         console.log('balanceLifeInsurance', balanceLifeInsurance);
 
         let totalBalances;
@@ -323,10 +326,11 @@ async function calculateAndStore(answerObj: any) {
                 // }),
             });
             if (!response.ok) {
+                console.log('AAAA')
                 throw new Error('Network response was not ok.');
             }
             const data = await response.json();
-            aptc = data.subsidy * 12;
+            aptc = (data.subsidy ?? 0) * 12;
 
         } catch (error) {
             console.error("Error calling /api/subsidy:", error);

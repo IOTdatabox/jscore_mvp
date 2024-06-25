@@ -180,7 +180,7 @@ export async function getMonteCarloSimulation(initialAmountInput: number, withdr
   sequenceStressTest = valueMap['No Adjustments'];
   rebalanceType = valueMap['No Rebalancing']; // Rebalance Type: 0=No Rebalancing, 1=Rebalance Annually, 2=Rebalance semi-annually, 3=Rebalance quarterly, 4=Rebalance monthly
 
-  const response = await fetch('/api/portfoliosettings', { method: 'GET' });
+  const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/portfoliosettings`, { method: 'GET' });
   if (!response.ok) throw new Error('Failed to fetch portfolio settings');
   const existingSettings = await response.json();
   const { assetAllocations, allocationAmounts } = existingSettings;
