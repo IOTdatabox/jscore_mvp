@@ -235,7 +235,6 @@ export async function getMonteCarloSimulation(initialAmountInput: number, withdr
     '&initialAmount=' + initialAmount +
     '&adjustmentAmount=' + adjustmentAmount +
     '&years=' + years;
-  console.log(url);
 
   let testURL = 'https://www.portfoliovisualizer.com/monte-carlo-simulation?s=y&adjustmentType=2&smoothingRate=75&historicalVolatility=true&volatility=12&investmentHorizon=1&endYear=2023&frequency=4&mode=1&inflationAdjusted=true&inflationVolatility=3&sequenceStressTest=0&inflationMean=4&startYear=1972&bootstrapModel=1&inflationModel=1&taxTreatment=false&customIntervals=false&adjustmentPercentage=4&incomeTax=37&rebalanceType=1&capitalGainsTax=20&dof=30&circularBootstrap=true&stateTax=0&simulationModel=1&distribution=1&currentAge=70&timeSeries=1&bootstrapMaxYears=20&historicalCorrelations=true&dividendTax=20&returnList=0,2.5,5,7.5,10,12.5&affordableCareActTax=3.8&lifeExpectancyModel=0&bootstrapMinYears=1&meanReturn=7&percentileList=10,25,50,75,90&rollingAveragePeriods=3&fullHistory=true&asset1=LargeCapGrowth&allocation1_1=80&asset2=LargeCapBlend&allocation2_1=10&asset3=MidCapBlend&allocation3_1=10&asset4=undefined&allocation4_1=0&asset5=MidCapGrowth&allocation5_1=0&asset6=MidCapValue&allocation6_1=0&asset7=LargeCapValue&allocation7_1=0&asset8=LargeCapGrowth&allocation8_1=0&asset9=TotalStockMarket&allocation9_1=0&asset10=ShortTreasury&allocation10_1=0' + '&initialAmount=' + initialAmountInput + '&adjustmentAmount=' + withdrawAmountInput + '&years=' + periodInYearsInput;
 

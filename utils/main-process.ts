@@ -286,9 +286,8 @@ async function calculateAndStore(answerObj: any) {
         }
 
         let householdIncome = 0;
-        // householdIncome = income + incomeSpouse + pensionIncome +
-        //     answerObj['What is the TOTAL amount of taxable income earned by all of your dependents?'] ?? 0;
-        householdIncome = 5000;
+        householdIncome = income + incomeSpouse + pensionIncome +
+            (answerObj['What is the TOTAL amount of taxable income earned by all of your dependents?'] ?? 0);
         console.log('householdSize', householdSize);
         console.log('householdIncome', householdIncome);
         console.log('dependentsCount', dependentsCount);
@@ -326,7 +325,6 @@ async function calculateAndStore(answerObj: any) {
                 // }),
             });
             if (!response.ok) {
-                console.log('AAAA')
                 throw new Error('Network response was not ok.');
             }
             const data = await response.json();
@@ -334,8 +332,6 @@ async function calculateAndStore(answerObj: any) {
 
         } catch (error) {
             console.error("Error calling /api/subsidy:", error);
-
-            console.error(error);
         }
         /* aptc */
 
