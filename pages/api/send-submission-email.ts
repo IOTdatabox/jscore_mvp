@@ -41,7 +41,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         console.log('Email for submission sent successfully.');
                         const mainProcessResponse = await mainProcess(answerDoc);
                         if (mainProcessResponse.success) {
-                            console.log('Email for submission sent successfully.');
                             return res.status(200).json({
                                 success: true,
                                 message: emailResponse.message,

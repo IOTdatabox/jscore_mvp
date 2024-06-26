@@ -30,7 +30,7 @@ export default async function handler(req : NextApiRequest, res : NextApiRespons
 
     try {
         await sgMail.send(msg);
-        console.log('Email sent');
+        console.log('❤❤❤');
         return res.status(200).json({ success: true, message: 'Email sent successfully' });
     } catch (error: any) {
         // Log detailed error response from SendGrid
