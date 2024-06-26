@@ -141,7 +141,7 @@ async function calculateAndStore(answerObj: any) {
         /*------Define Const-------*/
         // Mr X
         const currentAge = calculateAge(answerObj['Your Date Of Birth']);
-        const totalYears = 9;
+        const totalYears = 2;
         console.log('currentAge', currentAge);
         const birthDate = getDateComponents(answerObj['Your Date Of Birth']);
         console.log('birthDate', birthDate);
@@ -243,96 +243,95 @@ async function calculateAndStore(answerObj: any) {
         healthExpenses = (answerObj['Health Insurance Premium'] ?? 0) * 12;
         /* aptc */
         let aptc = 0;
-        let zipCode: string = String(answerObj['Your Residential Zip Code']) ?? '00000';
-        let householdSize = 1;
-        let dependentsCount = 0;
-        let applicantDetails: ApplicantData[] = [
-            {
-                relationship: 'primary',
-                gender: 'male',
-                age: currentAge,
-                smoker: true,
-            },
-        ];
-        if (birthDateSpouse) {
-            householdSize += 1;
-            const spouseAge = calculateAge(answerObj["Your Spouse's Date Of Birth"]); // You need to define the getAgeFromBirthDate() function
-            applicantDetails.push({
-                relationship: 'spouse',
-                gender: 'female', // or 'male' depending on your application's requirements
-                age: spouseAge,
-                smoker: true,
-            });
-        }
-        const addDependentIfApplicable = (dependentDOBKey: string) => {
-            const dob = getDateComponents(answerObj[dependentDOBKey]);
-            if (dob && (!Number.isNaN(dob.year) && !Number.isNaN(dob.month) && !Number.isNaN(dob.day))) {
-                console.log('dob', dob);
-                // Assuming you have a way to calculate the age from the date components
-                const dependentAge = calculateAge(answerObj[dependentDOBKey]); // Define this function based on your logic to calculate age
-                applicantDetails.push({
-                    relationship: 'dependent',
-                    gender: 'male',
-                    age: dependentAge,
-                    smoker: true,
-                });
-                householdSize += 1;
-                dependentsCount += 1;
-            }
-        };
+        // let zipCode: string = String(answerObj['Your Residential Zip Code']) ?? '00000';
+        // let householdSize = 1;
+        // let dependentsCount = 0;
+        // let applicantDetails: ApplicantData[] = [
+        //     {
+        //         relationship: 'primary',
+        //         gender: 'male',
+        //         age: currentAge,
+        //         smoker: true,
+        //     },
+        // ];
+        // if (birthDateSpouse) {
+        //     householdSize += 1;
+        //     const spouseAge = calculateAge(answerObj["Your Spouse's Date Of Birth"]); // You need to define the getAgeFromBirthDate() function
+        //     applicantDetails.push({
+        //         relationship: 'spouse',
+        //         gender: 'female', // or 'male' depending on your application's requirements
+        //         age: spouseAge,
+        //         smoker: true,
+        //     });
+        // }
+        // const addDependentIfApplicable = (dependentDOBKey: string) => {
+        //     const dob = getDateComponents(answerObj[dependentDOBKey]);
+        //     if (dob && (!Number.isNaN(dob.year) && !Number.isNaN(dob.month) && !Number.isNaN(dob.day))) {
+        //         console.log('dob', dob);
+        //         // Assuming you have a way to calculate the age from the date components
+        //         const dependentAge = calculateAge(answerObj[dependentDOBKey]); // Define this function based on your logic to calculate age
+        //         applicantDetails.push({
+        //             relationship: 'dependent',
+        //             gender: 'male',
+        //             age: dependentAge,
+        //             smoker: true,
+        //         });
+        //         householdSize += 1;
+        //         dependentsCount += 1;
+        //     }
+        // };
 
-        for (let i = 1; i <= 5; i++) {
-            addDependentIfApplicable(`Tax Dependent #${i} Date of Birth`);
-        }
+        // for (let i = 1; i <= 5; i++) {
+        //     addDependentIfApplicable(`Tax Dependent #${i} Date of Birth`);
+        // }
+        // let householdIncome = 0;
+        // householdIncome = income + incomeSpouse + pensionIncome +
+        //     (answerObj['What is the TOTAL amount of taxable income earned by all of your dependents?'] ?? 0);
+        // console.log('householdSize', householdSize);
+        // console.log('householdIncome', householdIncome);
+        // console.log('dependentsCount', dependentsCount);
+        // console.log('applicantDetails', applicantDetails);
 
-        let householdIncome = 0;
-        householdIncome = income + incomeSpouse + pensionIncome +
-            (answerObj['What is the TOTAL amount of taxable income earned by all of your dependents?'] ?? 0);
-        console.log('householdSize', householdSize);
-        console.log('householdIncome', householdIncome);
-        console.log('dependentsCount', dependentsCount);
-        console.log('applicantDetails', applicantDetails);
+        // console.log('zipcode', zipCode);
 
-        console.log('zipcode', zipCode);
+        // console.log('state', getState(zipCode));
+        // try {
+        //     const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/subsidy`, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({
+        //             state: getState(zipCode),
+        //             zipCode: zipCode,
+        //             householdSize: householdSize,
+        //             householdIncome: householdIncome,
+        //             dependentsCount: dependentsCount,
+        //             applicantDetails: applicantDetails,
+        //         }),
+        //         // body: JSON.stringify({
+        //         //     state: "MI",
+        //         //     zipCode: "48103",
+        //         //     householdSize: 4,
+        //         //     householdIncome: 188800,
+        //         //     dependentsCount: 2,
+        //         //     applicantDetails: [
+        //         //         { age: 60, smoker: true, relationship: "primary", gender: "male" },
+        //         //         { age: 55, smoker: false, relationship: "spouse", gender: "female" },
+        //         //         { age: 8, smoker: false, relationship: "dependent", gender: "male" },
+        //         //         { age: 6, smoker: false, relationship: "dependent", gender: "female" }
+        //         //     ],
+        //         // }),
+        //     });
+        //     if (!response.ok) {
+        //         throw new Error('Network response was not ok.');
+        //     }
+        //     const data = await response.json();
+        //     aptc = (data.subsidy ?? 0) * 12;
 
-        console.log('state', getState(zipCode));
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/subsidy`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    state: getState(zipCode),
-                    zipCode: zipCode,
-                    householdSize: householdSize,
-                    householdIncome: householdIncome,
-                    dependentsCount: dependentsCount,
-                    applicantDetails: applicantDetails,
-                }),
-                // body: JSON.stringify({
-                //     state: "MI",
-                //     zipCode: "48103",
-                //     householdSize: 4,
-                //     householdIncome: 188800,
-                //     dependentsCount: 2,
-                //     applicantDetails: [
-                //         { age: 60, smoker: true, relationship: "primary", gender: "male" },
-                //         { age: 55, smoker: false, relationship: "spouse", gender: "female" },
-                //         { age: 8, smoker: false, relationship: "dependent", gender: "male" },
-                //         { age: 6, smoker: false, relationship: "dependent", gender: "female" }
-                //     ],
-                // }),
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok.');
-            }
-            const data = await response.json();
-            aptc = (data.subsidy ?? 0) * 12;
-
-        } catch (error) {
-            console.error("Error calling /api/subsidy:", error);
-        }
+        // } catch (error) {
+        //     console.error("Error calling /api/subsidy:", error);
+        // }
         /* aptc */
 
         let irmaa;
@@ -386,216 +385,110 @@ async function calculateAndStore(answerObj: any) {
         let propotionAdjustedCash = 1 + percentageAdjustedCash / 100;
 
 
+        console.log('Optimized') // Optimized
+        console.log('income', income);
+        console.log('incomeSpouse', incomeSpouse);
+        console.log('socialSecurity', socialSecurity);
+        console.log('socialSecuritySpouse', socialSecuritySouse);
+        console.log('pensionIncome', pensionIncome);
+        console.log('otherCashSource', otherCashSources);
+        semiTotalCash = income + + incomeSpouse + socialSecurity + socialSecuritySouse + pensionIncome + otherCashSources;
+        console.log('SemiTotalCash', semiTotalCash);
+        totalExpenses = housing + transportation + dailyExpenses + healthExpenses - aptc + irmaa;
 
-        if (!answerObj['Do You Currently Receive Social Security benefits?']) {
-            console.log('Optimized') // Optimized
-            console.log('income', income);
-            console.log('incomeSpouse', incomeSpouse);
-            console.log('socialSecurity', socialSecurity);
-            console.log('socialSecuritySpouse', socialSecuritySouse);
-            console.log('pensionIncome', pensionIncome);
-            console.log('otherCashSource', otherCashSources);
-            semiTotalCash = income + + incomeSpouse + socialSecurity + socialSecuritySouse + pensionIncome + otherCashSources;
-            console.log('SemiTotalCash', semiTotalCash);
-            totalExpenses = housing + transportation + dailyExpenses + healthExpenses - aptc + irmaa;
+        console.log('housing', housing);
+        console.log('transportation', transportation);
+        console.log('dailyExpenses', dailyExpenses);
+        console.log('healthExpenses', healthExpenses);
+        console.log('aptc', aptc);
+        console.log('irmaa', irmaa);
+        console.log('totalExpense', totalExpenses);
 
-            console.log('housing', housing);
-            console.log('transportation', transportation);
-            console.log('dailyExpenses', dailyExpenses);
-            console.log('healthExpenses', healthExpenses);
-            console.log('aptc', aptc);
-            console.log('irmaa', irmaa);
-            console.log('totalExpense', totalExpenses);
-
-            let portfolioForEachYears = new Array(countOfBalances);
-            let withdrawalAmount = new Array(countOfBalances);
-            let totalNetWorth = [];
-            for (var i = 0; i < countOfBalances; i++) {
-                portfolioForEachYears[i] = [];
-                withdrawalAmount[i] = [];
-                for (var j = 0; j < totalYears; j++) {
-                    portfolioForEachYears[i][j] = 0;
-                    withdrawalAmount[i][j] = 0;
-                }
-                portfolioForEachYears[i][0] = sources[i].balance;
-                console.log('portfolioForEachYears', i, portfolioForEachYears[i][0]);
+        let portfolioForEachYears = new Array(countOfBalances);
+        let withdrawalAmount = new Array(countOfBalances);
+        let totalNetWorth = [];
+        for (var i = 0; i < countOfBalances; i++) {
+            portfolioForEachYears[i] = [];
+            withdrawalAmount[i] = [];
+            for (var j = 0; j < totalYears; j++) {
+                portfolioForEachYears[i][j] = 0;
+                withdrawalAmount[i][j] = 0;
             }
-
-            /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
-            let interpolatedRates = await getInterestRate(totalYears);
-            if (Array.isArray(interpolatedRates)) {
-                interpolatedRates.unshift(0);
-                for (var i = 0; i <= totalYears; i++) {
-                    expoentialNoAdjusted.push(Math.pow(1 + interpolatedRates[i] / 200, i * 2));
-                    expoentialJaeAdjusted.push(Math.pow(1 + (interpolatedRates[i] + jaeExtraInput) / 200, i * 2));
-                }
-            }
-
-            console.log('expoentialJaeAdjusted', expoentialJaeAdjusted);
-            /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
-
-            for (let i = 0; i < totalYears; i++) {
-                totalNetWorth[i] = 0;
-
-                valueOfTotalExpenses.push(totalExpenses);
-                totalExpenses *= propotionAdjustedExpense;
-                /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
-                valueOfSemiTotalCash.push(semiTotalCash);
-                semiTotalCash *= propotionAdjustedCash
-                if (totalExpenses <= semiTotalCash) {
-                    for (var j = 0; j < countOfBalances; j++) {
-                        withdrawalAmount[j][i] = 0;
-                    }
-                }
-                else {
-                    let remainingExpenses = totalExpenses - semiTotalCash;
-                    for (var j = 0; j < countOfBalances; j++) {
-                        if (remainingExpenses <= 0) break; // No further withdrawAmount needed
-                        const withdrawal = Math.min(remainingExpenses, portfolioForEachYears[j][i]);
-                        withdrawalAmount[j][i] = withdrawal;
-                        remainingExpenses -= withdrawal;
-                    }
-                }
-                /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
-                for (var j = 0; j < countOfBalances; j++) {
-                    totalNetWorth[i] += portfolioForEachYears[j][i];
-                    const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
-                    const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
-                    portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
-                    console.log('portfolioForEachYears', portfolioForEachYears);
-                }
-            }
-            let lastNetworth = 0;
-            for (var i = 0; i < countOfBalances; i++) {
-                lastNetworth += portfolioForEachYears[i][totalYears];
-            }
-            totalNetWorth.push(lastNetworth);
-            console.log('totalNetWorth', totalNetWorth);
-            let divisionResults = totalNetWorth.map((value, index) => {
-                return expoentialJaeAdjusted[index] !== 0 ? value / expoentialJaeAdjusted[index] : 0;
-            });
-            console.log('divisionResults', divisionResults)
-            let presentValue = divisionResults.reduce((sum, currentValue) => sum + currentValue, 0);
-            console.log('Present Value', presentValue);
-
-            const resultData = {
-                questionID: '667380cd3fa93a1df66b0018',
-                totalYears: totalYears,
-                valueOfSemiTotalCash: valueOfSemiTotalCash,
-                valueOfTotalExpenses: valueOfTotalExpenses,
-                withdrawalAmount: withdrawalAmount,
-                portfolioForEachYears: portfolioForEachYears,
-                totalNetWorth: totalNetWorth,
-                divisionResults: divisionResults,
-                presentValue: presentValue
-            };
-            await saveResult(resultData);
-            return { success: true, message: 'Result was calculated and stored successfully.' };
-        } else {
-            console.log('Non-Optimized') // Optimized
-            console.log('income', income);
-            console.log('incomeSpouse', incomeSpouse);
-            console.log('socialSecurity', socialSecurity);
-            console.log('socialSecuritySpouse', socialSecuritySouse);
-            console.log('pensionIncome', pensionIncome);
-            console.log('otherCashSource', otherCashSources);
-            semiTotalCash = income + + incomeSpouse + socialSecurity + socialSecuritySouse + pensionIncome + otherCashSources;
-            console.log('SemiTotalCash', semiTotalCash);
-            totalExpenses = housing + transportation + dailyExpenses + healthExpenses - aptc + irmaa;
-
-            console.log('housing', housing);
-            console.log('transportation', transportation);
-            console.log('dailyExpenses', dailyExpenses);
-            console.log('healthExpenses', healthExpenses);
-            console.log('aptc', aptc);
-            console.log('irmaa', irmaa);
-            console.log('totalExpense', totalExpenses);
-
-            let portfolioForEachYears = new Array(countOfBalances);
-            let withdrawalAmount = new Array(countOfBalances);
-            let totalNetWorth = [];
-            for (var i = 0; i < countOfBalances; i++) {
-                portfolioForEachYears[i] = [];
-                withdrawalAmount[i] = [];
-                for (var j = 0; j < totalYears; j++) {
-                    portfolioForEachYears[i][j] = 0;
-                    withdrawalAmount[i][j] = 0;
-                }
-                portfolioForEachYears[i][0] = sources[i].balance;
-                console.log('portfolioForEachYears', i, portfolioForEachYears[i][0]);
-            }
-
-            /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
-            let interpolatedRates = await getInterestRate(totalYears);
-            if (Array.isArray(interpolatedRates)) {
-                interpolatedRates.unshift(0);
-                for (var i = 0; i <= totalYears; i++) {
-                    expoentialNoAdjusted.push(Math.pow(1 + interpolatedRates[i] / 200, i * 2));
-                    expoentialJaeAdjusted.push(Math.pow(1 + (interpolatedRates[i] + jaeExtraInput) / 200, i * 2));
-                }
-            }
-
-            console.log('expoentialJaeAdjusted', expoentialJaeAdjusted);
-            /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
-
-            for (let i = 0; i < totalYears; i++) {
-                totalNetWorth[i] = 0;
-
-                valueOfTotalExpenses.push(totalExpenses);
-                totalExpenses *= propotionAdjustedExpense;
-                /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
-                valueOfSemiTotalCash.push(semiTotalCash);
-                semiTotalCash *= propotionAdjustedCash
-                if (totalExpenses <= semiTotalCash) {
-                    for (var j = 0; j < countOfBalances; j++) {
-                        withdrawalAmount[j][i] = 0;
-                    }
-                }
-                else {
-                    let remainingExpenses = totalExpenses - semiTotalCash;
-                    for (var j = 0; j < countOfBalances; j++) {
-                        if (remainingExpenses <= 0) break; // No further withdrawAmount needed
-                        const withdrawal = Math.min(remainingExpenses, portfolioForEachYears[j][i]);
-                        withdrawalAmount[j][i] = withdrawal;
-                        remainingExpenses -= withdrawal;
-                    }
-                }
-                /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
-                for (var j = 0; j < countOfBalances; j++) {
-                    totalNetWorth[i] += portfolioForEachYears[j][i];
-                    const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
-                    const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
-                    portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
-                    console.log('portfolioForEachYears', portfolioForEachYears);
-                }
-            }
-            let lastNetworth = 0;
-            for (var i = 0; i < countOfBalances; i++) {
-                lastNetworth += portfolioForEachYears[i][totalYears];
-            }
-            totalNetWorth.push(lastNetworth);
-            console.log('totalNetWorth', totalNetWorth);
-            let divisionResults = totalNetWorth.map((value, index) => {
-                return expoentialJaeAdjusted[index] !== 0 ? value / expoentialJaeAdjusted[index] : 0;
-            });
-            console.log('divisionResults', divisionResults)
-            let presentValue = divisionResults.reduce((sum, currentValue) => sum + currentValue, 0);
-            console.log('Present Value', presentValue);
-
-            const resultData = {
-                questionID: '667380cd3fa93a1df66b0018',
-                totalYears: totalYears,
-                valueOfSemiTotalCash: valueOfSemiTotalCash,
-                valueOfTotalExpenses: valueOfTotalExpenses,
-                withdrawalAmount: withdrawalAmount,
-                portfolioForEachYears: portfolioForEachYears,
-                totalNetWorth: totalNetWorth,
-                divisionResults: divisionResults,
-                presentValue: presentValue
-            };
-            await saveResult(resultData);
-            return { success: true, message: 'Result was calculated and stored successfully.' };
+            portfolioForEachYears[i][0] = sources[i].balance;
+            console.log('portfolioForEachYears', i, portfolioForEachYears[i][0]);
         }
+
+        /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
+        let interpolatedRates = await getInterestRate(totalYears);
+        if (Array.isArray(interpolatedRates)) {
+            interpolatedRates.unshift(0);
+            for (var i = 0; i <= totalYears; i++) {
+                expoentialNoAdjusted.push(Math.pow(1 + interpolatedRates[i] / 200, i * 2));
+                expoentialJaeAdjusted.push(Math.pow(1 + (interpolatedRates[i] + jaeExtraInput) / 200, i * 2));
+            }
+        }
+
+        console.log('expoentialJaeAdjusted', expoentialJaeAdjusted);
+        /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
+
+        for (let i = 0; i < totalYears; i++) {
+            totalNetWorth[i] = 0;
+
+            valueOfTotalExpenses.push(totalExpenses);
+            totalExpenses *= propotionAdjustedExpense;
+            /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
+            valueOfSemiTotalCash.push(semiTotalCash);
+            semiTotalCash *= propotionAdjustedCash
+            if (totalExpenses <= semiTotalCash) {
+                for (var j = 0; j < countOfBalances; j++) {
+                    withdrawalAmount[j][i] = 0;
+                }
+            }
+            else {
+                let remainingExpenses = totalExpenses - semiTotalCash;
+                for (var j = 0; j < countOfBalances; j++) {
+                    if (remainingExpenses <= 0) break; // No further withdrawAmount needed
+                    const withdrawal = Math.min(remainingExpenses, portfolioForEachYears[j][i]);
+                    withdrawalAmount[j][i] = withdrawal;
+                    remainingExpenses -= withdrawal;
+                }
+            }
+            /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
+            for (var j = 0; j < countOfBalances; j++) {
+                totalNetWorth[i] += portfolioForEachYears[j][i];
+                const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
+                const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
+                portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
+                console.log('portfolioForEachYears', portfolioForEachYears);
+            }
+        }
+        let lastNetworth = 0;
+        for (var i = 0; i < countOfBalances; i++) {
+            lastNetworth += portfolioForEachYears[i][totalYears];
+        }
+        totalNetWorth.push(lastNetworth);
+        console.log('totalNetWorth', totalNetWorth);
+        let divisionResults = totalNetWorth.map((value, index) => {
+            return expoentialJaeAdjusted[index] !== 0 ? value / expoentialJaeAdjusted[index] : 0;
+        });
+        console.log('divisionResults', divisionResults)
+        let presentValue = divisionResults.reduce((sum, currentValue) => sum + currentValue, 0);
+        console.log('Present Value', presentValue);
+
+        const resultData = {
+            questionID: '667380cd3fa93a1df66b0018',
+            totalYears: totalYears,
+            valueOfSemiTotalCash: valueOfSemiTotalCash,
+            valueOfTotalExpenses: valueOfTotalExpenses,
+            withdrawalAmount: withdrawalAmount,
+            portfolioForEachYears: portfolioForEachYears,
+            totalNetWorth: totalNetWorth,
+            divisionResults: divisionResults,
+            presentValue: presentValue
+        };
+        await saveResult(resultData);
+        return { success: true, message: 'Result was calculated and stored successfully.' };
+
     }
     catch (error: any) {
         // Log detailed error response from SendGrid
