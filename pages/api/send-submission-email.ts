@@ -11,11 +11,24 @@ import { TypeformResults } from '@/types/backend.type';
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? "";
 const SENDGRID_TEMPLATE_ID = process.env.SENDGRID_TEMPLATE_ID ?? "";
+const MAX_SUBMISSION_AGE = 30 * 1000;
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
         console.log("Current version: 1.0.1");
+        const submissionTimestamp = req.body.form_response.submitted_at;
+        if (!submissionTimestamp) {
+            return res.status(400).json({ success: false, error: BAD_REQUEST_MSG });
+        }
+        const currentTimestamp = new Date().getTime();
+        const submissionTime = new Date(submissionTimestamp).getTime();
+    
+        // Check if the submission is too old
+        if ((currentTimestamp - submissionTime) > MAX_SUBMISSION_AGE) {
+            return res.status(400).json({ success: false, error: "Submission too old" });
+        }
+        
         await connectMongo();
         // const answers = req.body.form_response.answers;
         const resultAnswers = processFormResponse(req.body.form_response)
