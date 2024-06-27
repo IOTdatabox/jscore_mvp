@@ -49,33 +49,33 @@ export async function mainProcess(answer: any) {
             return { success: false, error: 'Unknown error occurred during processing the answers.' };
         } else {
 
-            // const firstName = answerObj['First name'] ?? 'Not provided';
-            // const toEmail = answerObj['Email'] ?? 'Not provided';
-            // console.log("userName", firstName);
-            // console.log("toEmail", toEmail);
-            // const link = await generateLink(token)
-            // const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}api/send-result-email`, {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify({ toEmail, userName: firstName, link })
-            // });
-            // if (!emailResponse.ok) {
-            //     console.log('Network response was not ok.');
-            //     return { success: false, error: 'Failed to send result email' };
-            // }
-            // const emailData = await emailResponse.json();
+            const firstName = answerObj['First name'] ?? 'Not provided';
+            const toEmail = answerObj['Email'] ?? 'Not provided';
+            console.log("userName", firstName);
+            console.log("toEmail", toEmail);
+            const link = await generateLink(token)
+            const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}api/send-result-email`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ toEmail, userName: firstName, link })
+            });
+            if (!emailResponse.ok) {
+                console.log('Email Response for result was not ok.');
+                return { success: false, error: 'Failed to send result email' };
+            }
+            const emailData = await emailResponse.json();
 
-            // if (emailData.success) {
-            //     console.log('Email for result sent successfully.');
-            //     return { success: true, message: 'Email for result sent successfully.' };
+            if (emailData.success) {
+                console.log('Email for result sent successfully.');
+                return { success: true, message: 'Email for result sent successfully.' };
 
-            // } else {
-            //     return { success: false, error: 'Unknown error occurred during sending email for result.' };
-            //     console.log('Unknown error occurred during sending email for result.');
-            // }
-            return { success: true, message: 'Calculation performed successfully.' };
+            } else {
+                console.log('Unknown error occurred during sending email for result.');
+                return { success: false, error: 'Unknown error occurred during sending email for result.' };
+            }
+            // return { success: true, message: 'Calculation performed successfully.' };
         }
     }
     catch (error) {
@@ -353,16 +353,6 @@ async function calculateAndStore(answerObj: any) {
             { name: 'LifeInsurance', balance: balanceLifeInsurance },
         ];
 
-        let withdrawAmount = {
-            Cash: 0,
-            NQ: 0,
-            Q: 0,
-            QSpouse: 0,
-            Roth: 0,
-            Annuity: 0,
-            LifeInsurance: 0,
-        };
-
         // Array of Cash
         let valueOfSemiTotalCash = [];
         let valueOfTotalCash = [];
@@ -416,7 +406,6 @@ async function calculateAndStore(answerObj: any) {
                 withdrawalAmount[i][j] = 0;
             }
             portfolioForEachYears[i][0] = sources[i].balance;
-            console.log('portfolioForEachYears', i, portfolioForEachYears[i][0]);
         }
 
         /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
@@ -460,8 +449,8 @@ async function calculateAndStore(answerObj: any) {
                 const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
                 const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
                 portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
-                console.log('portfolioForEachYears', portfolioForEachYears);
             }
+            console.log('portfolioForEachYears', i, portfolioForEachYears[i]);
         }
         let lastNetworth = 0;
         for (var i = 0; i < countOfBalances; i++) {
