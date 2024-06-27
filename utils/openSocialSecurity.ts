@@ -17,7 +17,12 @@ export async function getOSSForSeveralFiledDate(personAGender: string, personADo
             // console.log(`${i}th:`, magicString);
         }
         else if (i == lastYear) {
-            magicString = `&aFixedRBm=${lastMonth}&aFixedRBy=${lastYear}`;
+            if (personADobD != 1) {
+                magicString = `&aFixedRBm=${lastMonth}&aFixedRBy=${lastYear}`;
+            }
+            else{
+                magicString = `&aFixedRBm=1&aFixedRBy=${i-1}`;
+            }
             // console.log(`${i}th:`, magicString);
         }
         else {
