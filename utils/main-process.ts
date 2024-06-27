@@ -494,7 +494,7 @@ async function calculateAndStore(answerObj: any) {
     catch (error: any) {
         // Log detailed error response from SendGrid
         if (error.response) {
-            console.error('ResponseError', error.response.body);
+            console.error('ResponseErrorInMainProcess', error.response.body);
         } else {
             console.error(error);
         }

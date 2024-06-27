@@ -108,7 +108,7 @@ const sendEmailForSubmission = async (
     } catch (error: any) {
         // Log detailed error response from SendGrid
         if (error.response) {
-            console.error('ResponseError', error.response.body);
+            console.error('ResponseErrorInSendSubmissionEmail', error.response.body);
         } else {
             console.error(error);
         }

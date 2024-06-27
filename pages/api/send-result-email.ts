@@ -35,7 +35,7 @@ export default async function handler(req : NextApiRequest, res : NextApiRespons
     } catch (error: any) {
         // Log detailed error response from SendGrid
         if (error.response) {
-            console.error('ResponseError', error.response.body);
+            console.error('ResponseErrorInSendResultEmail', error.response.body);
         } else {
             console.error(error);
         }
