@@ -15,6 +15,7 @@ const SENDGRID_TEMPLATE_ID = process.env.SENDGRID_TEMPLATE_ID ?? "";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
+        console.log("Current version: 1.0.1");
         await connectMongo();
         // const answers = req.body.form_response.answers;
         const resultAnswers = processFormResponse(req.body.form_response)
