@@ -163,9 +163,9 @@ async function calculateAndStore(answerObj: any, token: any) {
         else {
             const PIAAmount = answerObj['What Is Your Primary Insured Amount (PIA)'] ?? 0;
             console.log('PIA', PIAAmount);
-            // socialSecurityArray = await getOSSForSeveralFiledDate('male', birthDate.month, birthDate.day, birthDate.year, PIAAmount);
-            // socialSecurity = parseInt(socialSecurityArray[0][0].replace(/[$,]/g, ''));
-            socialSecurity = 8850;
+            socialSecurityArray = await getOSSForSeveralFiledDate('male', birthDate.month, birthDate.day, birthDate.year, PIAAmount);
+            socialSecurity = parseInt(socialSecurityArray[0][0].replace(/[$,]/g, ''));
+            // socialSecurity = 8850;
         }
 
 
@@ -177,9 +177,9 @@ async function calculateAndStore(answerObj: any, token: any) {
         else {
             const PIAAmountSpouse = answerObj["What Is Your Spouse's Primary Insured Amount (PIA)"] ?? 0;
             console.log('PIAAmountSpouse', PIAAmountSpouse);
-            // socialSecuritySouseArray = await getOSSForSeveralFiledDate('male', birthDateSpouse.month, birthDateSpouse.day, birthDateSpouse.year, PIAAmountSpouse);
-            // socialSecuritySouse = parseInt(socialSecuritySouseArray[0][0].replace(/[$,]/g, ''));
-            socialSecuritySouse = 10260;
+            socialSecuritySouseArray = await getOSSForSeveralFiledDate('male', birthDateSpouse.month, birthDateSpouse.day, birthDateSpouse.year, PIAAmountSpouse);
+            socialSecuritySouse = parseInt(socialSecuritySouseArray[0][0].replace(/[$,]/g, ''));
+            // socialSecuritySouse = 10260;
         }
 
 
@@ -244,95 +244,95 @@ async function calculateAndStore(answerObj: any, token: any) {
         healthExpenses = (answerObj['Health Insurance Premium'] ?? 0) * 12;
         /* aptc */
         let aptc = 0;
-        // let zipCode: string = String(answerObj['Your Residential Zip Code']) ?? '00000';
-        // let householdSize = 1;
-        // let dependentsCount = 0;
-        // let applicantDetails: ApplicantData[] = [
-        //     {
-        //         relationship: 'primary',
-        //         gender: 'male',
-        //         age: currentAge,
-        //         smoker: true,
-        //     },
-        // ];
-        // if (birthDateSpouse) {
-        //     householdSize += 1;
-        //     const spouseAge = calculateAge(answerObj["Your Spouse's Date Of Birth"]); // You need to define the getAgeFromBirthDate() function
-        //     applicantDetails.push({
-        //         relationship: 'spouse',
-        //         gender: 'female', // or 'male' depending on your application's requirements
-        //         age: spouseAge,
-        //         smoker: true,
-        //     });
-        // }
-        // const addDependentIfApplicable = (dependentDOBKey: string) => {
-        //     const dob = getDateComponents(answerObj[dependentDOBKey]);
-        //     if (dob && (!Number.isNaN(dob.year) && !Number.isNaN(dob.month) && !Number.isNaN(dob.day))) {
-        //         console.log('dob', dob);
-        //         // Assuming you have a way to calculate the age from the date components
-        //         const dependentAge = calculateAge(answerObj[dependentDOBKey]); // Define this function based on your logic to calculate age
-        //         applicantDetails.push({
-        //             relationship: 'dependent',
-        //             gender: 'male',
-        //             age: dependentAge,
-        //             smoker: true,
-        //         });
-        //         householdSize += 1;
-        //         dependentsCount += 1;
-        //     }
-        // };
+        let zipCode: string = String(answerObj['Your Residential Zip Code']) ?? '00000';
+        let householdSize = 1;
+        let dependentsCount = 0;
+        let applicantDetails: ApplicantData[] = [
+            {
+                relationship: 'primary',
+                gender: 'male',
+                age: currentAge,
+                smoker: true,
+            },
+        ];
+        if (birthDateSpouse) {
+            householdSize += 1;
+            const spouseAge = calculateAge(answerObj["Your Spouse's Date Of Birth"]); // You need to define the getAgeFromBirthDate() function
+            applicantDetails.push({
+                relationship: 'spouse',
+                gender: 'female', // or 'male' depending on your application's requirements
+                age: spouseAge,
+                smoker: true,
+            });
+        }
+        const addDependentIfApplicable = (dependentDOBKey: string) => {
+            const dob = getDateComponents(answerObj[dependentDOBKey]);
+            if (dob && (!Number.isNaN(dob.year) && !Number.isNaN(dob.month) && !Number.isNaN(dob.day))) {
+                console.log('dob', dob);
+                // Assuming you have a way to calculate the age from the date components
+                const dependentAge = calculateAge(answerObj[dependentDOBKey]); // Define this function based on your logic to calculate age
+                applicantDetails.push({
+                    relationship: 'dependent',
+                    gender: 'male',
+                    age: dependentAge,
+                    smoker: true,
+                });
+                householdSize += 1;
+                dependentsCount += 1;
+            }
+        };
 
-        // for (let i = 1; i <= 5; i++) {
-        //     addDependentIfApplicable(`Tax Dependent #${i} Date of Birth`);
-        // }
-        // let householdIncome = 0;
-        // householdIncome = income + incomeSpouse + pensionIncome +
-        //     (answerObj['What is the TOTAL amount of taxable income earned by all of your dependents?'] ?? 0);
-        // console.log('householdSize', householdSize);
-        // console.log('householdIncome', householdIncome);
-        // console.log('dependentsCount', dependentsCount);
-        // console.log('applicantDetails', applicantDetails);
+        for (let i = 1; i <= 5; i++) {
+            addDependentIfApplicable(`Tax Dependent #${i} Date of Birth`);
+        }
+        let householdIncome = 0;
+        householdIncome = income + incomeSpouse + pensionIncome +
+            (answerObj['What is the TOTAL amount of taxable income earned by all of your dependents?'] ?? 0);
+        console.log('householdSize', householdSize);
+        console.log('householdIncome', householdIncome);
+        console.log('dependentsCount', dependentsCount);
+        console.log('applicantDetails', applicantDetails);
 
-        // console.log('zipcode', zipCode);
+        console.log('zipcode', zipCode);
 
-        // console.log('state', getState(zipCode));
-        // try {
-        //     const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/subsidy`, {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify({
-        //             state: getState(zipCode),
-        //             zipCode: zipCode,
-        //             householdSize: householdSize,
-        //             householdIncome: householdIncome,
-        //             dependentsCount: dependentsCount,
-        //             applicantDetails: applicantDetails,
-        //         }),
-        //         // body: JSON.stringify({
-        //         //     state: "MI",
-        //         //     zipCode: "48103",
-        //         //     householdSize: 4,
-        //         //     householdIncome: 188800,
-        //         //     dependentsCount: 2,
-        //         //     applicantDetails: [
-        //         //         { age: 60, smoker: true, relationship: "primary", gender: "male" },
-        //         //         { age: 55, smoker: false, relationship: "spouse", gender: "female" },
-        //         //         { age: 8, smoker: false, relationship: "dependent", gender: "male" },
-        //         //         { age: 6, smoker: false, relationship: "dependent", gender: "female" }
-        //         //     ],
-        //         // }),
-        //     });
-        //     if (!response.ok) {
-        //         throw new Error('Network response was not ok.');
-        //     }
-        //     const data = await response.json();
-        //     aptc = (data.subsidy ?? 0) * 12;
+        console.log('state', getState(zipCode));
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/subsidy`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    state: getState(zipCode),
+                    zipCode: zipCode,
+                    householdSize: householdSize,
+                    householdIncome: householdIncome,
+                    dependentsCount: dependentsCount,
+                    applicantDetails: applicantDetails,
+                }),
+                // body: JSON.stringify({
+                //     state: "MI",
+                //     zipCode: "48103",
+                //     householdSize: 4,
+                //     householdIncome: 188800,
+                //     dependentsCount: 2,
+                //     applicantDetails: [
+                //         { age: 60, smoker: true, relationship: "primary", gender: "male" },
+                //         { age: 55, smoker: false, relationship: "spouse", gender: "female" },
+                //         { age: 8, smoker: false, relationship: "dependent", gender: "male" },
+                //         { age: 6, smoker: false, relationship: "dependent", gender: "female" }
+                //     ],
+                // }),
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok.');
+            }
+            const data = await response.json();
+            aptc = (data.subsidy ?? 0) * 12;
 
-        // } catch (error) {
-        //     console.error("Error calling /api/subsidy:", error);
-        // }
+        } catch (error) {
+            console.error("Error calling /api/subsidy:", error);
+        }
         /* aptc */
 
         let irmaa;
