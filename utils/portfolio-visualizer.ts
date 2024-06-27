@@ -301,8 +301,6 @@ export async function getMonteCarloSimulation(initialAmountInput: number, withdr
 // }
 
 export function get50thPercentileDataFromResponse(responseData: any) {
-
-  console.log('responseData', responseData);
   // Check if responseData is an array
   if (!Array.isArray(responseData)) {
     console.error("Invalid response data; expected an array.");
