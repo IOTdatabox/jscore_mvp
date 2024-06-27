@@ -25,6 +25,7 @@ export async function getOSSForSeveralFiledDate(personAGender: string, personADo
             // console.log(`${i}th:`, magicString);
         }
         const targetURL = `${baseURL}?aGender=${personAGender}&aDOBm=${personADobM}&aDOBd=${personADobD}&aDOBy=${personADobY}&aPIA=${personAPIA}&aFiled=true${magicString}`;
+        console.log('targetURL of open social security', i, targetURL);
         const response = await fetch(`https://api.apify.com/v2/actor-tasks/sOa6Rge6OlaxJs5TR/run-sync-get-dataset-items/`, {
             method: 'post',
             body: JSON.stringify({
