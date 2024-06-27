@@ -44,7 +44,7 @@ export async function mainProcess(answer: any) {
     try {
         const token = answer._id;
         const answerObj = mapAnswers(answer.answers);
-        const calculatedResults = await calculateAndStore(answerObj);
+        const calculatedResults = await calculateAndStore(answerObj, token);
         if (!calculatedResults.success) {
             return { success: false, error: 'Unknown error occurred during processing the answers.' };
         } else {
@@ -85,7 +85,7 @@ export async function mainProcess(answer: any) {
 
 }
 
-async function calculateAndStore(answerObj: any) {
+async function calculateAndStore(answerObj: any, token: any) {
     try {
         /*------Fetch Various Rate-------*/
         console.log(answerObj);
@@ -466,7 +466,7 @@ async function calculateAndStore(answerObj: any) {
         console.log('Present Value', presentValue);
 
         const resultData = {
-            questionID: '667380cd3fa93a1df66b0018',
+            questionID: token,
             totalYears: totalYears,
             valueOfSemiTotalCash: valueOfSemiTotalCash,
             valueOfTotalExpenses: valueOfTotalExpenses,
@@ -567,14 +567,4 @@ const saveResult = async (data: any) => {
         console.error('Failed to save result:', error);
     }
 };
-
-export const config = {
-    api: {
-        bodyParser: {
-            sizeLimit: '4mb', // Set desired value here
-        },
-    },
-    maxDuration: 120,
-};
-
 
