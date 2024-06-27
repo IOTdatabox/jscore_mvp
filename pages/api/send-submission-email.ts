@@ -36,26 +36,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 } else {
                     console.log("userName", userName);
                     console.log("toEmail", toEmail);
-                    const emailResponse = await sendEmailForSubmission(toEmail, userName);
-                    if (emailResponse.success) {
-                        console.log('Email for submission sent successfully.');
-                        const mainProcessResponse = await mainProcess(answerDoc);
-                        if (mainProcessResponse.success) {
-                            return res.status(200).json({
-                                success: true,
-                                message: emailResponse.message,
-                            });
-                        }
-                        else {
-                            console.log('Unknown error occurred during processing answers.');
-                            return res.status(500).json({ success: false, error: emailResponse.error });
-                        }
+                    // const emailResponse = await sendEmailForSubmission(toEmail, userName);
+                    // if (emailResponse.success) {
+                    //     console.log('Email for submission sent successfully.');
+                    //     const mainProcessResponse = await mainProcess(answerDoc);
+                    //     if (mainProcessResponse.success) {
+                    //         return res.status(200).json({
+                    //             success: true,
+                    //             message: emailResponse.message,
+                    //         });
+                    //     }
+                    //     else {
+                    //         console.log('Unknown error occurred during processing answers.');
+                    //         return res.status(500).json({ success: false, error: emailResponse.error });
+                    //     }
 
 
-                    } else {
-                        console.log('Unknown error occurred during sending email for submssion.');
-                        return res.status(500).json({ success: false, error: emailResponse.error });
+                    // } else {
+                    //     console.log('Unknown error occurred during sending email for submssion.');
+                    //     return res.status(500).json({ success: false, error: emailResponse.error });
+                    // }
+
+                    console.log('Email for submission sent successfully.');
+                    const mainProcessResponse = await mainProcess(answerDoc);
+                    if (mainProcessResponse.success) {
+                        return res.status(200).json({
+                            success: true,
+                            message: mainProcessResponse.message,
+                        });
                     }
+                    else {
+                        console.log('Unknown error occurred during processing answers.');
+                        return res.status(500).json({ success: false, error: mainProcessResponse.error });
+                    }
+
                 }
 
             }

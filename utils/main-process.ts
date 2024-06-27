@@ -49,32 +49,33 @@ export async function mainProcess(answer: any) {
             return { success: false, error: 'Unknown error occurred during processing the answers.' };
         } else {
 
-            const firstName = answerObj['First name'] ?? 'Not provided';
-            const toEmail = answerObj['Email'] ?? 'Not provided';
-            console.log("userName", firstName);
-            console.log("toEmail", toEmail);
-            const link = await generateLink(token)
-            const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}api/send-result-email`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ toEmail, userName: firstName, link })
-            });
-            if (!emailResponse.ok) {
-                console.log('Network response was not ok.');
-                return { success: false, error: 'Failed to send result email' };
-            }
-            const emailData = await emailResponse.json();
+            // const firstName = answerObj['First name'] ?? 'Not provided';
+            // const toEmail = answerObj['Email'] ?? 'Not provided';
+            // console.log("userName", firstName);
+            // console.log("toEmail", toEmail);
+            // const link = await generateLink(token)
+            // const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}api/send-result-email`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({ toEmail, userName: firstName, link })
+            // });
+            // if (!emailResponse.ok) {
+            //     console.log('Network response was not ok.');
+            //     return { success: false, error: 'Failed to send result email' };
+            // }
+            // const emailData = await emailResponse.json();
 
-            if (emailData.success) {
-                console.log('Email for result sent successfully.');
-                return { success: true, message: 'Email for result sent successfully.' };
+            // if (emailData.success) {
+            //     console.log('Email for result sent successfully.');
+            //     return { success: true, message: 'Email for result sent successfully.' };
 
-            } else {
-                return { success: false, error: 'Unknown error occurred during sending email for result.' };
-                console.log('Unknown error occurred during sending email for result.');
-            }
+            // } else {
+            //     return { success: false, error: 'Unknown error occurred during sending email for result.' };
+            //     console.log('Unknown error occurred during sending email for result.');
+            // }
+            return { success: true, message: 'Calculation performed successfully.' };
         }
     }
     catch (error) {
