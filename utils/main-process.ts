@@ -154,7 +154,7 @@ async function calculateAndStore(answerObj: any, token: any) {
         console.log('income', income);
         let incomeSpouse = answerObj["Spouse's Annual Income?"] ?? 0;
         console.log('incomeSpouse', incomeSpouse);
-        let socialSecurity = 1500;
+        let socialSecurity = 10000;
         let socialSecurityArray: any[][];
 
         if (answerObj['Do You Currently Receive Social Security benefits?']) {
@@ -163,13 +163,17 @@ async function calculateAndStore(answerObj: any, token: any) {
         else {
             const PIAAmount = answerObj['What Is Your Primary Insured Amount (PIA)'] ?? 0;
             console.log('PIA', PIAAmount);
-            socialSecurityArray = await getOSSForSeveralFiledDate('male', birthDate.month, birthDate.day, birthDate.year, PIAAmount);
-            socialSecurity = parseInt(socialSecurityArray[0][0].replace(/[$,]/g, ''));
-            // socialSecurity = 8850;
+            // try {
+            //     socialSecurityArray = await getOSSForSeveralFiledDate('male', birthDate.month, birthDate.day, birthDate.year, PIAAmount);
+            //     socialSecurity = parseInt(socialSecurityArray[0][0].replace(/[$,]/g, ''));
+            // } catch (error) {
+            //     console.error('Error fetching social security data:', error);
+            // }
+            socialSecurity = 8850;
         }
 
 
-        let socialSecuritySouse = 1000;
+        let socialSecuritySouse = 10000;
         let socialSecuritySouseArray: any[][];
         if (answerObj['Do You Currently Receive Social Security benefits?']) {
             socialSecuritySouse = answerObj["Your Spouse's Monthly Social Security Amount"] ?? 0;
@@ -177,8 +181,12 @@ async function calculateAndStore(answerObj: any, token: any) {
         else {
             const PIAAmountSpouse = answerObj["What Is Your Spouse's Primary Insured Amount (PIA)"] ?? 0;
             console.log('PIAAmountSpouse', PIAAmountSpouse);
-            socialSecuritySouseArray = await getOSSForSeveralFiledDate('male', birthDateSpouse.month, birthDateSpouse.day, birthDateSpouse.year, PIAAmountSpouse);
-            socialSecuritySouse = parseInt(socialSecuritySouseArray[0][0].replace(/[$,]/g, ''));
+            try {
+                socialSecuritySouseArray = await getOSSForSeveralFiledDate('female', birthDateSpouse.month, birthDateSpouse.day, birthDateSpouse.year, PIAAmountSpouse);
+                socialSecuritySouse = parseInt(socialSecuritySouseArray[0][0].replace(/[$,]/g, ''));
+            } catch (error) {
+                console.error('Error fetching social security data:', error);
+            }
             // socialSecuritySouse = 10260;
         }
 
