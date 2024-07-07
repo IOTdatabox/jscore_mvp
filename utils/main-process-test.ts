@@ -247,7 +247,8 @@ async function calculateAndStore(token: any) {
         }
 
         /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
-        let interpolatedRates = await getInterestRate(totalYears);
+        // let interpolatedRates = await getInterestRate(totalYears);
+        let interpolatedRates = new Array(totalYears).fill(1);
         if (Array.isArray(interpolatedRates)) {
             interpolatedRates.unshift(0);
             for (var i = 0; i <= totalYears; i++) {
