@@ -1,6 +1,3 @@
-import Layout from "@/components/Layouts/Layout";
-
-import OtherConstraint from "@/components/Constants/OtherConstraint";
 
 import Result from "@/components/Result/Result";
 const Index = () => {

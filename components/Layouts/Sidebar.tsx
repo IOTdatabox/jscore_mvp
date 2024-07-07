@@ -46,7 +46,7 @@ const Sidebar = () => {
                     <li>
                         <div className={`flex items-center justify-start md:justify-center pl-3 w-14 md:w-64 h-14`}>
                             <a className='flex items-center gap-x-2'>
-                                <span className='hidden md:block text-[24px] text-white '><strong>Form</strong> Builder</span>
+                                <span className='hidden md:block text-[24px] text-white '><strong>Jsocre</strong> MVP</span>
                             </a>
                         </div>
                     </li>

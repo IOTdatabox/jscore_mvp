@@ -83,7 +83,7 @@ async function upsertVariousRate(req: NextApiRequest, res: NextApiResponse) {
             console.error(err); // Log the specific error for debugging purposes.
             if (err instanceof z.ZodError) {
                 return res.status(400).json({
-                    err: "Validation failed for portfolio settings",
+                    err: "Validation failed for variouse rates settings",
                     validationErrors: err.errors,
                 });
             }

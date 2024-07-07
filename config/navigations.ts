@@ -14,4 +14,9 @@ export const navigations = [
         show: [],
         href: '/otherconstraint'
     },
+    {
+        label: 'Input For Testing',
+        show: [],
+        href: '/inputfortesting'
+    },
 ]
