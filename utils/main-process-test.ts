@@ -112,6 +112,7 @@ async function calculateAndStore(token: any) {
         const totalYears = 2;
 
         // Cash Flow Sources
+        console.log('Income-----------------');
         let incomeSelf = data.incomeSelf;
         console.log('income', incomeSelf);
         let incomeSpouse = data.incomeSpouse;
@@ -129,6 +130,7 @@ async function calculateAndStore(token: any) {
         let totalIncome;
 
         // Balances
+        console.log('Balance-----------------');
         const balanceCash = data.balanceCash;
         console.log('balanceCash', balanceCash);
         const balanceQ = data.balanceQ;
@@ -148,6 +150,7 @@ async function calculateAndStore(token: any) {
         let totalBalances;
 
         // Expenses
+        console.log('Expense-----------------');
         let expenseHousing = data.expenseHousing
         console.log('expenseHousing', expenseHousing);
         let expenseTransportation = data.expenseTransportation
@@ -172,7 +175,7 @@ async function calculateAndStore(token: any) {
                     householdSize: 3,
                     householdIncome: householdIncome,
                     dependentsCount: 1,
-                    applicantDetails: 
+                    applicantDetails:
                         [
                             { age: ageSelf, smoker: false, relationship: "primary", gender: "male" },
                             { age: ageSpouse, smoker: false, relationship: "spouse", gender: "female" },
@@ -289,7 +292,6 @@ async function calculateAndStore(token: any) {
                 const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
                 portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
             }
-            console.log('portfolioForEachYears', i, portfolioForEachYears[i]);
         }
         let lastNetworth = 0;
         for (var i = 0; i < countOfBalances; i++) {
@@ -303,20 +305,24 @@ async function calculateAndStore(token: any) {
         console.log('divisionResults', divisionResults)
         let presentValue = divisionResults.reduce((sum, currentValue) => sum + currentValue, 0);
         console.log('Present Value', presentValue);
-
-        const resultData = {
-            questionID: token,
-            totalYears: totalYears,
-            valueOfTotalIncome: valueOfTotalIncome,
-            valueOfTotalExpenses: valueOfTotalExpenses,
-            withdrawalAmount: withdrawalAmount,
-            portfolioForEachYears: portfolioForEachYears,
-            totalNetWorth: totalNetWorth,
-            divisionResults: divisionResults,
-            presentValue: presentValue
-        };
-        await saveResult(resultData);
-        return { success: true, message: 'Result was calculated and stored successfully.' };
+        try {
+            const resultData = {
+                questionID: token,
+                totalYears: totalYears,
+                valueOfTotalIncome: valueOfTotalIncome,
+                valueOfTotalExpenses: valueOfTotalExpenses,
+                withdrawalAmount: withdrawalAmount,
+                portfolioForEachYears: portfolioForEachYears,
+                totalNetWorth: totalNetWorth,
+                divisionResults: divisionResults,
+                presentValue: presentValue
+            };
+            console.log('resultData', resultData);
+            await saveResult(resultData);
+            return { success: true, message: 'Result was calculated and stored successfully.' };
+        } catch (error) {
+            return { success: false, error: 'Unknown error occurred during processing the answers.' };
+        }
 
     }
     catch (error: any) {
