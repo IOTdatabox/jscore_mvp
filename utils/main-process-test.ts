@@ -9,7 +9,7 @@ import { get50thPercentileDataFromResponse, getMonteCarloSimulation } from "./po
 
 
 export async function mainProcessForTest() {
-    console.log("Start main process...");
+    console.log("Start main process for test...");
     try {
         const token = '0xff';
         const calculatedResults = await calculateAndStore(token);

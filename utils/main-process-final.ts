@@ -40,7 +40,7 @@ function mapAnswers(answersArray: Answer[]): AnswersMap {
 
 
 export async function mainProcessFinal(answer: any) {
-    console.log("Start main process...");
+    console.log("Start main process for final...");
     try {
         const token = answer._id;
         const answerObj = mapAnswers(answer.answers);
