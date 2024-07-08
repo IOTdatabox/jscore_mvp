@@ -106,7 +106,7 @@ async function calculateAndStore(answerObj: any, token: any) {
             return map;
         }, {});
         const ageToLookup = 100;
-        const percentage = rmdMap[ageToLookup];
+        const RMDpercentage = rmdMap[ageToLookup];
         // console.log(`The RMD percentage for age ${ageToLookup} is ${percentage}%`);
         /*------Fetch RMD Data-------*/
 
@@ -211,14 +211,21 @@ async function calculateAndStore(answerObj: any, token: any) {
             (answerObj['Please find the most recent Fixed Annuity statement, and enter the original amount that you deposited here'] ?? 0) +
             (answerObj['Please find the most recent Deferred Income Annuity statement, and enter the Liquidation Value of your deferred annuity.'] ?? 0) +
             (answerObj['Please find the most recent Variable Annuity statement, and enter the Liquidation Value of your deferred annuity.'] ?? 0);
-
         console.log('balanceAnnuity', balanceAnnuity);
-
         const balanceLifeInsurance =
             (answerObj['Please find the most recent Whole Life Insurance statement, and enter the Liquidation Value.'] ?? 0) +
             (answerObj['Please find the most recent Universal Life Insurance statement, and enter the Liquidation Value.'] ?? 0) +
             (answerObj['Please find the most recent Variable Life Insurance statement, and enter the Liquidation Value.'] ?? 0);
         console.log('balanceLifeInsurance', balanceLifeInsurance);
+        let sources = [
+            { name: 'Cash', balance: balanceCash },
+            { name: 'NQ', balance: balanceNQ },
+            { name: 'Q', balance: balanceQ },
+            { name: 'QSpouse', balance: balanceQSpouse },
+            { name: 'Roth', balance: balanceRoth },
+            { name: 'Annuity', balance: balanceAnnuity },
+            { name: 'LifeInsurance', balance: balanceLifeInsurance },
+        ];
 
         let totalBalances;
 
@@ -346,15 +353,6 @@ async function calculateAndStore(answerObj: any, token: any) {
             irmaa = findPremium(loadedPremiums, 'individual', householdIncome, 'partB') * 12;
         }
         let totalExpenses;
-        let sources = [
-            { name: 'Cash', balance: balanceCash },
-            { name: 'NQ', balance: balanceNQ },
-            { name: 'Q', balance: balanceQ },
-            { name: 'QSpouse', balance: balanceQSpouse },
-            { name: 'Roth', balance: balanceRoth },
-            { name: 'Annuity', balance: balanceAnnuity },
-            { name: 'LifeInsurance', balance: balanceLifeInsurance },
-        ];
 
         // Array of Cash
         let valueOfTotalIncome = [];
@@ -436,12 +434,12 @@ async function calculateAndStore(answerObj: any, token: any) {
                 }
             }
             else {
-                let remainingExpenses = totalExpenses - totalIncome;
+                let shouldZeroValue = totalExpenses - totalIncome;
                 for (var j = 0; j < countOfBalances; j++) {
-                    if (remainingExpenses <= 0) break; // No further withdrawAmount needed
-                    const withdrawal = Math.min(remainingExpenses, portfolioForEachYears[j][i]);
+                    if (shouldZeroValue <= 0) break; // No further withdrawAmount needed
+                    const withdrawal = Math.min(shouldZeroValue, portfolioForEachYears[j][i]);
                     withdrawalAmount[j][i] = withdrawal;
-                    remainingExpenses -= withdrawal;
+                    shouldZeroValue -= withdrawal;
                 }
             }
             /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */

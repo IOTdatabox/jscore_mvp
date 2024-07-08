@@ -8,7 +8,7 @@ import { getInterestRate } from "./zerocouponbond";
 import { get50thPercentileDataFromResponse, getMonteCarloSimulation } from "./portfolio-visualizer";
 
 
-export async function mainProcessForTest() {
+export async function mainProcessForFinalTest() {
     console.log("Start main process...");
     try {
         const token = '0xff';
@@ -69,7 +69,7 @@ async function calculateAndStore(token: any) {
             return map;
         }, {});
         const ageToLookup = 100;
-        const percentage = rmdMap[ageToLookup];
+        const RMDpercentage = rmdMap[ageToLookup];
         // console.log(`The RMD percentage for age ${ageToLookup} is ${percentage}%`);
         /*------Fetch RMD Data-------*/
 
@@ -143,11 +143,18 @@ async function calculateAndStore(token: any) {
         console.log('balanceRoth', balanceRoth);
         const balanceAnnuity = data.balanceAnnuity
         console.log('balanceAnnuity', balanceAnnuity);
-
         const balanceLifeInsurance = data.balanceLifeInsurance
         console.log('balanceLifeInsurance', balanceLifeInsurance);
-
-        let totalBalances;
+        let sources = [
+            { name: 'Cash', balance: balanceCash },
+            { name: 'NQ', balance: balanceNQ },
+            { name: 'Q', balance: balanceQ },
+            { name: 'QSpouse', balance: balanceQSpouse },
+            { name: 'Roth', balance: balanceRoth },
+            { name: 'Annuity', balance: balanceAnnuity },
+            { name: 'LifeInsurance', balance: balanceLifeInsurance },
+        ];
+        
 
         // Expenses
         console.log('Expense-----------------');
@@ -155,7 +162,6 @@ async function calculateAndStore(token: any) {
         console.log('expenseHousing', expenseHousing);
         let expenseTransportation = data.expenseTransportation
         console.log('expenseTransportation', expenseTransportation);
-
         let expenseDaily = data.expenseDaily;
         console.log('expenseDaily', expenseDaily);
         let expenseHealth = data.expenseHealth;
@@ -197,29 +203,18 @@ async function calculateAndStore(token: any) {
 
         let irmaa = findPremium(loadedPremiums, 'joint', householdIncome, 'partB') * 12;
         console.log('irmaa', irmaa);
-
         let totalExpenses;
-        let sources = [
-            { name: 'Cash', balance: balanceCash },
-            { name: 'NQ', balance: balanceNQ },
-            { name: 'Q', balance: balanceQ },
-            { name: 'QSpouse', balance: balanceQSpouse },
-            { name: 'Roth', balance: balanceRoth },
-            { name: 'Annuity', balance: balanceAnnuity },
-            { name: 'LifeInsurance', balance: balanceLifeInsurance },
-        ];
 
-        // Array of Cash
+        // Arrays Per Year
         let valueOfTotalIncome = [];
-        // Array of Expense
         let valueOfTotalExpenses = [];
-
-        // Array of Coupon Bond
         let expoentialNoAdjusted = [];
         let expoentialJaeAdjusted = [];
-
-        // Array of Taxable Income
         let valueofTaxableIncome = [];
+        let valueofAPTC = [];
+        let valueofIRMAA = [];
+        let netIncomePerYear;
+
 
         // Consts
         const countOfBalances = 7;
@@ -233,7 +228,7 @@ async function calculateAndStore(token: any) {
         let propotionAdjustedCash = 1 + percentageAdjustedCash / 100;
 
 
-        console.log('Optimized') // Optimized
+        console.log('Optimized---------------->>>>>>>>>>>>') // Optimized
         totalIncome = incomeSelf + incomeSpouse + incomeDependent + incomeSocialSecurity + incomeSocialSecuritySpouse + incomePension + incomeOther;
         console.log('totalIncome', totalIncome);
         totalExpenses = expenseHousing + expenseTransportation + expenseDaily + expenseHealth - aptc + irmaa;
@@ -262,28 +257,28 @@ async function calculateAndStore(token: any) {
                 expoentialJaeAdjusted.push(Math.pow(1 + (interpolatedRates[i] + jaeExtraInput) / 200, i * 2));
             }
         }
-
         console.log('expoentialJaeAdjusted', expoentialJaeAdjusted);
         /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
 
         for (let i = 0; i < totalYears; i++) {
             totalNetWorth[i] = 0;
-
             valueOfTotalExpenses.push(totalExpenses);
             valueOfTotalIncome.push(totalIncome);
+            netIncomePerYear = totalIncome * (1-taxRateForIncome/100);
+            console.log('netIncomePerYear', netIncomePerYear);
+
             /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
-            if (totalExpenses <= totalIncome) {
+            if (totalExpenses <= netIncomePerYear) {
                 for (var j = 0; j < countOfBalances; j++) {
                     withdrawalAmount[j][i] = 0;
                 }
             }
             else {
-                let remainingExpenses = totalExpenses - totalIncome;
+                let shouldZeroValue = totalExpenses - totalIncome;
+                const currentPortfolioForEachYear = portfolioForEachYears.map(portfolio => portfolio[i]);
+                const withdrawals = determineWithdrawal(shouldZeroValue, currentPortfolioForEachYear);
                 for (var j = 0; j < countOfBalances; j++) {
-                    if (remainingExpenses <= 0) break; // No further withdrawAmount needed
-                    const withdrawal = Math.min(remainingExpenses, portfolioForEachYears[j][i]);
-                    withdrawalAmount[j][i] = withdrawal;
-                    remainingExpenses -= withdrawal;
+                    withdrawalAmount[j][i] = withdrawals[j];
                 }
             }
             /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
@@ -416,4 +411,18 @@ const saveResult = async (data: any) => {
         console.error('Failed to save result:', error);
     }
 };
+
+const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: number[]): number[] => {
+    const withdrawalAmount: number[] = new Array(portfolioForEachYear.length).fill(0);
+
+    for (let j = 0; j < portfolioForEachYear.length; j++) {
+        if (shouldZeroValue <= 0) break; // No further withdrawAmount needed
+        const withdrawal = Math.min(shouldZeroValue, portfolioForEachYear[j]);
+        withdrawalAmount[j] = withdrawal;
+        shouldZeroValue -= withdrawal;
+    }
+
+    return withdrawalAmount;
+};
+
 

@@ -4,6 +4,7 @@ import { TableCellsIcon } from '@heroicons/react/24/outline';
 import Spinner from '../Spinner';
 import NumberInput from './NumberInput';
 import { mainProcessForTest } from '@/utils/main-process-test';
+import { mainProcessForFinalTest } from '@/utils/main-process-final-test';
 
 const InputForTesting = () => {
     const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -57,7 +58,8 @@ const InputForTesting = () => {
             setIsSaving(false);
         }
 
-        const result = await mainProcessForTest();
+        // const result = await mainProcessForTest();
+        const result = await mainProcessForFinalTest();
         console.log('Main Process For Test Result:', result);
     };
 

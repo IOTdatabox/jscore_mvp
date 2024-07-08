@@ -143,9 +143,17 @@ async function calculateAndStore(token: any) {
         console.log('balanceRoth', balanceRoth);
         const balanceAnnuity = data.balanceAnnuity
         console.log('balanceAnnuity', balanceAnnuity);
-
         const balanceLifeInsurance = data.balanceLifeInsurance
         console.log('balanceLifeInsurance', balanceLifeInsurance);
+        let sources = [
+            { name: 'Cash', balance: balanceCash },
+            { name: 'NQ', balance: balanceNQ },
+            { name: 'Q', balance: balanceQ },
+            { name: 'QSpouse', balance: balanceQSpouse },
+            { name: 'Roth', balance: balanceRoth },
+            { name: 'Annuity', balance: balanceAnnuity },
+            { name: 'LifeInsurance', balance: balanceLifeInsurance },
+        ];
 
         let totalBalances;
 
@@ -199,15 +207,6 @@ async function calculateAndStore(token: any) {
         console.log('irmaa', irmaa);
 
         let totalExpenses;
-        let sources = [
-            { name: 'Cash', balance: balanceCash },
-            { name: 'NQ', balance: balanceNQ },
-            { name: 'Q', balance: balanceQ },
-            { name: 'QSpouse', balance: balanceQSpouse },
-            { name: 'Roth', balance: balanceRoth },
-            { name: 'Annuity', balance: balanceAnnuity },
-            { name: 'LifeInsurance', balance: balanceLifeInsurance },
-        ];
 
         // Array of Cash
         let valueOfTotalIncome = [];
@@ -275,12 +274,12 @@ async function calculateAndStore(token: any) {
                 }
             }
             else {
-                let remainingExpenses = totalExpenses - totalIncome;
+                let shouldZeroValue = totalExpenses - totalIncome;
                 for (var j = 0; j < countOfBalances; j++) {
-                    if (remainingExpenses <= 0) break; // No further withdrawAmount needed
-                    const withdrawal = Math.min(remainingExpenses, portfolioForEachYears[j][i]);
+                    if (shouldZeroValue <= 0) break; // No further withdrawAmount needed
+                    const withdrawal = Math.min(shouldZeroValue, portfolioForEachYears[j][i]);
                     withdrawalAmount[j][i] = withdrawal;
-                    remainingExpenses -= withdrawal;
+                    shouldZeroValue -= withdrawal;
                 }
             }
             /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
