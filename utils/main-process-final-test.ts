@@ -252,7 +252,7 @@ async function calculateAndStore(token: any) {
                 throw new Error('Network response was not ok.');
             }
             const subsidyData = await response.json();
-            aptc = (subsidyData ?? 0) * 12;
+            aptc = (subsidyData.subsidy ?? 0) * 12;
 
         } catch (error) {
             console.error("Error calling /api/subsidy:", error);
