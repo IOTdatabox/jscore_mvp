@@ -6,6 +6,7 @@ import { ApplicantData } from '@/types/backend.type';
 import { ifError } from 'assert';
 import { getInterestRate } from "./zerocouponbond";
 import { get50thPercentileDataFromResponse, getMonteCarloSimulation } from "./portfolio-visualizer";
+import { array } from "zod";
 
 
 export async function mainProcessForFinalTest() {
@@ -56,13 +57,14 @@ async function fetchRMDSettings() {
     if (!responseForRMD.ok) throw new Error(`HTTP error! Status: ${responseForRMD.status}`);
     loadedRMDValues = await responseForRMD.json();
 }
-function getRMDPercentage(ageToLookup: number): number | undefined {
+function getRMDPercentage(ageToLookup: number): number {
     const rmdMap = loadedRMDValues.reduce((map, item) => {
         map[item.age] = item.percentage;
         return map;
     }, {} as { [x: string]: any });
 
-    return rmdMap[ageToLookup];
+    // Return the percentage or 0 if undefined
+    return rmdMap[ageToLookup] ?? 0;
 }
 /*------Fetch RMD Data-------*/
 
@@ -421,17 +423,55 @@ const saveResult = async (data: any) => {
     }
 };
 
+
+interface PortfolioItem {
+    value: number;
+    taxRate: number;
+}
+
 const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: number[], ageSelf: number, ageSpouse: number): number[] => {
     const withdrawalAmount: number[] = new Array(portfolioForEachYear.length).fill(0);
-
-    for (let j = 0; j < portfolioForEachYear.length; j++) {
-        if (shouldZeroValue <= 0) break; // No further withdrawAmount needed
-        const withdrawal = Math.min(shouldZeroValue, portfolioForEachYear[j]);
-        withdrawalAmount[j] = withdrawal;
-        shouldZeroValue -= withdrawal;
+    const taxAmount: number[] = new Array(portfolioForEachYear.length).fill(0);
+    taxAmount[0] = variousRateData.taxRateForIncome;    //Cash
+    taxAmount[1] = variousRateData.taxRateForGains;     //NQ
+    taxAmount[2] = variousRateData.taxRateForIncome;    //Q
+    taxAmount[3] = variousRateData.taxRateForIncome;    //QSpouse
+    taxAmount[4] = variousRateData.taxRateForRoth;      //Roth
+    taxAmount[5] = 0;                                   //Annuity
+    taxAmount[6] = 0;                                   //LifeInsurance
+    const withdrawQMust = portfolioForEachYear[2] * getRMDPercentage(ageSelf);
+    const withdrawQSpouseMust = portfolioForEachYear[3] * getRMDPercentage(ageSpouse);
+    const netwithdrawQAllMust = withdrawQMust * (1 - taxAmount[2]) + withdrawQSpouseMust * (1 - taxAmount[3]);
+    if (netwithdrawQAllMust >= shouldZeroValue) {
+        for (let j = 0; j < portfolioForEachYear.length; j++) {
+            withdrawalAmount[j] = 0;
+        }
     }
-
+    else {
+        let adjustedPortfolioForEachYear = [...portfolioForEachYear];
+        adjustedPortfolioForEachYear[2] -= withdrawQMust;
+        adjustedPortfolioForEachYear[3] -= withdrawQSpouseMust;
+        let portfolioWithTaxRates: PortfolioItem[] = adjustedPortfolioForEachYear.map((value, index) => ({
+            value,
+            taxRate: taxAmount[index]
+        }));
+        portfolioWithTaxRates.sort((a, b) => a.taxRate - b.taxRate);
+        let reorderedPortfolio: number[] = portfolioWithTaxRates.map(item => item.value);
+        let reorderedTaxRates: number[] = portfolioWithTaxRates.map(pair => pair.taxRate);
+        console.log('Original Portfolio:', portfolioForEachYear);
+        console.log('Adjusted Portfolio:', adjustedPortfolioForEachYear);
+        console.log('Reordered Portfolio (by increasing tax rate):', reorderedPortfolio);
+        console.log('Tax Amount:', reorderedTaxRates);
+        let remaining = netwithdrawQAllMust - shouldZeroValue;
+        for (let j = 0; j < reorderedPortfolio.length; j++) {
+            if (remaining <= 0) break; // No further withdrawAmount needed
+            const maxWithdrawable = remaining / (1 - reorderedTaxRates[j]);
+            const withdrawal = Math.min(maxWithdrawable, reorderedPortfolio[j]);
+            withdrawalAmount[j] = withdrawal;
+            remaining -= withdrawal * (1 - reorderedTaxRates[j]);
+        }
+    }
+    withdrawalAmount[2] = withdrawalAmount[2] + withdrawQMust;
+    withdrawalAmount[3] = withdrawalAmount[3] + withdrawQSpouseMust;
     return withdrawalAmount;
 };
-
-
