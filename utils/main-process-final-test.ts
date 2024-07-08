@@ -468,7 +468,7 @@ const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: numb
         for (let j = 0; j < reorderedPortfolio.length; j++) {
             console.log('remaining', remaining)
             if (remaining <= 0) break; // No further withdrawAmount needed
-            const maxWithdrawable = remaining / (1 - reorderedTaxRates[j]);
+            const maxWithdrawable = remaining / (1 - reorderedTaxRates[j]/100);
             const withdrawal = Math.min(maxWithdrawable, reorderedPortfolio[j]);
             withdrawalAmount[portfolioWithTaxRates[j].originalIndex] = withdrawal;
             remaining -= withdrawal * (1 - reorderedTaxRates[j]);
