@@ -91,7 +91,7 @@ const Result = () => {
                                                 <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                                     Total Cash
                                                 </td>
-                                                {data.valueOfSemiTotalCash && data.valueOfSemiTotalCash.map((value: number, index: Key) => (
+                                                {data.valueOfTotalIncome && data.valueOfTotalIncome.map((value: number, index: Key) => (
                                                     <td key={index} className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                                         {Math.round(value)}
                                                     </td>
