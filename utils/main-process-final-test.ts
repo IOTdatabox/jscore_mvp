@@ -462,7 +462,7 @@ const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: numb
         console.log('Adjusted Portfolio:', adjustedPortfolioForEachYear);
         console.log('Reordered Portfolio (by increasing tax rate):', reorderedPortfolio);
         console.log('Tax Amount:', reorderedTaxRates);
-        let remaining = netwithdrawQAllMust - shouldZeroValue;
+        let remaining = shouldZeroValue - netwithdrawQAllMust;
         for (let j = 0; j < reorderedPortfolio.length; j++) {
             if (remaining <= 0) break; // No further withdrawAmount needed
             const maxWithdrawable = remaining / (1 - reorderedTaxRates[j]);
