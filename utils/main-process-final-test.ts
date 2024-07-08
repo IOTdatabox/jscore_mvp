@@ -427,6 +427,7 @@ const saveResult = async (data: any) => {
 interface PortfolioItem {
     value: number;
     taxRate: number;
+    originalIndex: number;
 }
 
 const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: number[], ageSelf: number, ageSpouse: number): number[] => {
@@ -453,7 +454,8 @@ const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: numb
         adjustedPortfolioForEachYear[3] -= withdrawQSpouseMust;
         let portfolioWithTaxRates: PortfolioItem[] = adjustedPortfolioForEachYear.map((value, index) => ({
             value,
-            taxRate: taxAmount[index]
+            taxRate: taxAmount[index],
+            originalIndex: index
         }));
         portfolioWithTaxRates.sort((a, b) => a.taxRate - b.taxRate);
         let reorderedPortfolio: number[] = portfolioWithTaxRates.map(item => item.value);
@@ -464,10 +466,12 @@ const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: numb
         console.log('Tax Amount:', reorderedTaxRates);
         let remaining = shouldZeroValue - netwithdrawQAllMust;
         for (let j = 0; j < reorderedPortfolio.length; j++) {
+            console.log('remaining', remaining)
             if (remaining <= 0) break; // No further withdrawAmount needed
             const maxWithdrawable = remaining / (1 - reorderedTaxRates[j]);
             const withdrawal = Math.min(maxWithdrawable, reorderedPortfolio[j]);
             withdrawalAmount[j] = withdrawal;
+            withdrawalAmount[portfolioWithTaxRates[j].originalIndex] = withdrawal;
             remaining -= withdrawal * (1 - reorderedTaxRates[j]);
         }
     }
