@@ -138,12 +138,14 @@ async function calculateAndStore(answerObj: any, token: any) {
         /*------Define Const-------*/
         // Mr X
         const ageSelf = calculateAge(answerObj['Your Date Of Birth']);
-        const totalYears = 2;
         console.log('ageSelf', ageSelf);
+        const ageSpouse = calculateAge(answerObj["Your Spouse's Date Of Birth"]);
+        console.log('ageSpouse', ageSpouse);
         const birthDate = getDateComponents(answerObj['Your Date Of Birth']);
         console.log('birthDate', birthDate);
         const birthDateSpouse = getDateComponents(answerObj["Your Spouse's Date Of Birth"]);
         console.log('birthDateSpouse', birthDateSpouse);
+        const totalYears = 2;
 
         // Cash Flow Sources
         let incomeSelf = answerObj['Annual Earned Income?'] ?? 0;

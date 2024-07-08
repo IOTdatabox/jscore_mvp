@@ -69,7 +69,7 @@ async function calculateAndStore(token: any) {
             return map;
         }, {});
         const ageToLookup = 100;
-        const RMDpercentage = rmdMap[ageToLookup];
+        const percentage = rmdMap[ageToLookup];
         // console.log(`The RMD percentage for age ${ageToLookup} is ${percentage}%`);
         /*------Fetch RMD Data-------*/
 
@@ -217,6 +217,9 @@ async function calculateAndStore(token: any) {
         // Array of Coupon Bond
         let expoentialNoAdjusted = [];
         let expoentialJaeAdjusted = [];
+
+        // Array of Taxable Income
+        let valueofTaxableIncome = [];
 
         // Consts
         const countOfBalances = 7;
