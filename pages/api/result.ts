@@ -51,21 +51,20 @@ async function getResult(req: NextApiRequest, res: NextApiResponse) {
 
 // Function to handle POST requests
 async function saveResult(req: NextApiRequest, res: NextApiResponse) {
-    const { questionID, totalYears, valueOfSemiTotalCash, valueOfTotalExpenses, withdrawalAmount, 
+    const { questionID, totalYears, valueOfTotalIncome, valueOfTotalExpenses, withdrawalAmount, 
         portfolioForEachYears, totalNetWorth, divisionResults, presentValue } = req.body;
     console.log('Inside Saveresult', questionID);
-    if (!questionID || !totalYears || !valueOfSemiTotalCash || !valueOfTotalExpenses || !withdrawalAmount ||
+    if (!questionID || !totalYears || !valueOfTotalIncome || !valueOfTotalExpenses || !withdrawalAmount ||
         !portfolioForEachYears|| !totalNetWorth || !divisionResults || !presentValue ) {
             console.log('Missing required fields')
         return res.status(400).json({ err: 'Missing required fields' });
     }
-
     try {
         await connectMongo();
         const newEntry = {
             questionID,
             totalYears,
-            valueOfSemiTotalCash,
+            valueOfTotalIncome,
             valueOfTotalExpenses,
             withdrawalAmount,
             portfolioForEachYears,

@@ -267,10 +267,8 @@ async function calculateAndStore(token: any) {
             totalNetWorth[i] = 0;
 
             valueOfTotalExpenses.push(totalExpenses);
-            totalExpenses *= propotionAdjustedExpense;
-            /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
             valueOfTotalIncome.push(totalIncome);
-            totalIncome *= propotionAdjustedCash
+            /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
             if (totalExpenses <= totalIncome) {
                 for (var j = 0; j < countOfBalances; j++) {
                     withdrawalAmount[j][i] = 0;
@@ -292,6 +290,9 @@ async function calculateAndStore(token: any) {
                 const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
                 portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
             }
+            totalExpenses *= propotionAdjustedExpense;
+            totalIncome *= propotionAdjustedCash;
+
         }
         let lastNetworth = 0;
         for (var i = 0; i < countOfBalances; i++) {
