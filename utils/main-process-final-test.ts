@@ -182,7 +182,7 @@ async function calculateAndStore(token: any) {
         console.log('ageSelf', ageSelf);
         let ageSpouse = testingData.ageSpouse;
         console.log('ageSpouse', ageSpouse);
-        const totalYears = 2;
+        const totalYears = 9;
 
         // Cash Flow Sources
         console.log('Income-----------------');
