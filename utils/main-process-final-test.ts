@@ -442,7 +442,7 @@ const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: numb
     taxAmount[6] = 0;                                   //LifeInsurance
     const withdrawQMust = portfolioForEachYear[2] * getRMDPercentage(ageSelf);
     const withdrawQSpouseMust = portfolioForEachYear[3] * getRMDPercentage(ageSpouse);
-    const netwithdrawQAllMust = withdrawQMust * (1 - taxAmount[2]) + withdrawQSpouseMust * (1 - taxAmount[3]);
+    const netwithdrawQAllMust = withdrawQMust * (1 - taxAmount[2]/100) + withdrawQSpouseMust * (1 - taxAmount[3]/100);
     if (netwithdrawQAllMust >= shouldZeroValue) {
         for (let j = 0; j < portfolioForEachYear.length; j++) {
             withdrawalAmount[j] = 0;
@@ -471,7 +471,7 @@ const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: numb
             const maxWithdrawable = remaining / (1 - reorderedTaxRates[j]/100);
             const withdrawal = Math.min(maxWithdrawable, reorderedPortfolio[j]);
             withdrawalAmount[portfolioWithTaxRates[j].originalIndex] = withdrawal;
-            remaining -= withdrawal * (1 - reorderedTaxRates[j]);
+            remaining -= withdrawal * (1 - reorderedTaxRates[j]/100);
         }
     }
     withdrawalAmount[2] = withdrawalAmount[2] + withdrawQMust;
