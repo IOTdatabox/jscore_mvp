@@ -8,11 +8,23 @@ import { getInterestRate } from "./zerocouponbond";
 import { get50thPercentileDataFromResponse, getMonteCarloSimulation } from "./portfolio-visualizer";
 import { array } from "zod";
 
+function generateRandomToken() {
+    const characters =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const tokenLength = 32;
+    let token = '';
+
+    for (let i = 0; i < tokenLength; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        token += characters.charAt(randomIndex);
+    }
+    return token;
+}
 
 export async function mainProcessForFinalTest() {
     console.log("Start main process for final test...");
     try {
-        const token = '0xff';
+        const token = generateRandomToken();
         const calculatedResults = await calculateAndStore(token);
         if (!calculatedResults.success) {
             return { success: false, error: 'Unknown error occurred during processing the answers.' };
