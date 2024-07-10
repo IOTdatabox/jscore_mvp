@@ -135,7 +135,7 @@ const Result = () => {
                                             </tr>
                                             <tr>
                                                 <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                                    Spouse's Social Security
+                                                    Social Security Spouse
                                                 </td>
                                                 {data.valueofSocialSecuritySpouse && data.valueofSocialSecuritySpouse.map((value: number, index: Key) => (
                                                     <td key={index} className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
