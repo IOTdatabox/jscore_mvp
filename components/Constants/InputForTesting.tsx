@@ -388,7 +388,7 @@ const InputForTesting = () => {
                             className="sm:w-fit w-full flex items-center justify-center text-white bg-primary-cyan hover:bg-secondary-cyan focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-cyan dark:hover:bg-secondary-cyan focus:outline-none dark:focus:ring-secondary-cyan"
                             onClick={handleSaveClick}
                         >
-                            {isSaving ? <Spinner text='Saving ...' size={'5'} /> : 'Save'}
+                            {isSaving ? <Spinner text='Saving ...' size={'5'} /> : 'Save & Run'}
                         </button>
                     </div>
                 </div>

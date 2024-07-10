@@ -7,6 +7,7 @@ import { ifError } from 'assert';
 import { getInterestRate } from "./zerocouponbond";
 import { get50thPercentileDataFromResponse, getMonteCarloSimulation } from "./portfolio-visualizer";
 import { array } from "zod";
+const EMAIL_TO_ADDRESS = process.env.EMAIL_TO_ADDRESS ?? "";
 
 function generateRandomToken() {
     const characters =
@@ -30,7 +31,7 @@ export async function mainProcessForFinalTest() {
             return { success: false, error: 'Unknown error occurred during processing the answers.' };
         } else {
             const firstName = 'Jae';
-            const toEmail = 'uo0901576@gmail.com';
+            const toEmail = EMAIL_TO_ADDRESS;
             const link = await generateLink(token)
             const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}api/send-result-email`, {
                 method: 'POST',
