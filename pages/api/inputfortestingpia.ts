@@ -3,7 +3,7 @@ import { z } from "zod";
 // ... other imports ...
 import { BAD_REQUEST_MSG, SERVER_ERR_MSG } from "@/config/constants";
 import { connectMongo } from "@/utils/dbConnect";
-import { InputForTestingModel } from "@/models/inputfortesting.model";
+import { InputForTestingPIAModel } from "@/models/inputfortestingpia.model";
 export default function handler(
     req: NextApiRequest,
     res: NextApiResponse
@@ -13,11 +13,11 @@ export default function handler(
     switch (method) {
         case 'GET':
             // Handle GET request
-            getInputForTesting(req, res);
+            getInputForTestingPIA(req, res);
             break;
         case 'POST':
             // Handle POST request specific to Portfolio Settings
-            upsertInputForTesting(req, res);
+            upsertInputForTestingPIA(req, res);
             break;
         case 'PUT':
             // Handle PUT request
@@ -31,11 +31,10 @@ export default function handler(
     }
 }
 
-
-async function getInputForTesting(req: NextApiRequest, res: NextApiResponse) {
+async function getInputForTestingPIA(req: NextApiRequest, res: NextApiResponse) {
     try {
         await connectMongo();
-        const inputfortesting = await InputForTestingModel.findOne();
+        const inputfortesting = await InputForTestingPIAModel.findOne();
         if (!inputfortesting) {
             // If no settings are found, initialize with given values
             const initialValues = {
@@ -46,10 +45,11 @@ async function getInputForTesting(req: NextApiRequest, res: NextApiResponse) {
                 incomeSelf: 150000,
                 incomeSpouse: 45000,
                 incomeDependent: 10000,
-                incomeSocialSecurity: 10000,
-                incomeSocialSecuritySpouse: 8000,
                 incomePension: 6000,
                 incomeOther: 12000,
+                //pia
+                pia: 3000,
+                piaSpouse: 1500,
                 //balance
                 balanceCash: 200000,
                 balanceQ: 250000,
@@ -65,7 +65,7 @@ async function getInputForTesting(req: NextApiRequest, res: NextApiResponse) {
                 expenseHealth: 20000,
             };
             console.log("InitialValues", initialValues);
-            const newInput = new InputForTestingModel(initialValues);
+            const newInput = new InputForTestingPIAModel(initialValues);
             await newInput.save();
             res.status(200).json(newInput);
         } else {
@@ -83,10 +83,11 @@ const InputForTestingZodSchema = z.object({
     incomeSelf: z.number().optional(),
     incomeDependent: z.number().optional(),
     incomeSpouse: z.number().optional(),
-    incomeSocialSecurity: z.number().optional(),
-    incomeSocialSecuritySpouse: z.number().optional(),
     incomePension: z.number().optional(),
     incomeOther: z.number().optional(),
+
+    pia: z.number().optional(),
+    piaSpouse: z.number().optional(),
 
     balanceCash: z.number().optional(),
     balanceQ: z.number().optional(),
@@ -104,13 +105,15 @@ const InputForTestingZodSchema = z.object({
 });
 
 
-async function upsertInputForTesting(req: NextApiRequest, res: NextApiResponse) {
+async function upsertInputForTestingPIA(req: NextApiRequest, res: NextApiResponse) {
     try {
         await connectMongo();
+        console.log('********************');
         let inputData;
         try {
             // Validate input data against the Zod schema
             inputData = InputForTestingZodSchema.parse(req.body);
+            console.log('Input Data PIA', inputData);
         } catch (err) {
             console.error(err); // Log the specific error for debugging purposes.
             if (err instanceof z.ZodError) {
@@ -123,16 +126,16 @@ async function upsertInputForTesting(req: NextApiRequest, res: NextApiResponse) 
             res.status(500).json({ err: 'Internal Server Error' });
         }
 
-        const existingInputData = await InputForTestingModel.findOne();
+        const existingInputData = await InputForTestingPIAModel.findOne();
         let result;
         if (existingInputData) {
             // Update the existing settings document
-            result = await InputForTestingModel.findByIdAndUpdate(existingInputData._id, inputData, {
+            result = await InputForTestingPIAModel.findByIdAndUpdate(existingInputData._id, inputData, {
                 new: true
             });
         } else {
             // Create a new settings document since it doesn't exist
-            result = await InputForTestingModel.create(inputData);
+            result = await InputForTestingPIAModel.create(inputData);
         }
         return res.status(200).json({ success: true, data: result });
     } catch (err) {

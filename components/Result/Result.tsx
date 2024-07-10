@@ -73,6 +73,22 @@ const Result = () => {
                                 <Spinner /> // Showing a spinner while loading the data
                             ) : (
                                 <div className="overflow-x-auto">
+                                    <div className='flex flex-row mb-5'>
+                                        <div className="px-6 py-3 whitespace-nowrap text-lg font-medium text-gray-900 dark:text-white">
+                                            Optimized Present Value :
+                                        </div>
+                                        <div className="px-6 py-3 whitespace-nowrap text-lg text-gray-900 dark:text-white">
+                                            {Math.round(data.presentValue)}
+                                        </div>
+                                    </div>
+                                    <div className='flex flex-row mb-5'>
+                                        <div className="px-6 py-3 whitespace-nowrap text-lg font-medium text-gray-900 dark:text-white">
+                                            Optimized Filed Age :
+                                        </div>
+                                        <div className="px-6 py-3 whitespace-nowrap text-lg text-gray-900 dark:text-white">
+                                            {data.maxF !== undefined ? data.maxF : "When social security is fixed, we do not estimate the optimal filed age."}
+                                        </div>
+                                    </div>
                                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                         <thead>
                                             <tr>
@@ -102,6 +118,46 @@ const Result = () => {
                                                     Total Expenses
                                                 </td>
                                                 {data.valueOfTotalExpenses && data.valueOfTotalExpenses.map((value: number, index: Key) => (
+                                                    <td key={index} className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                                        {Math.round(value)}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                            <tr>
+                                                <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                                    Social Security
+                                                </td>
+                                                {data.valueofSocialSecurity && data.valueofSocialSecurity.map((value: number, index: Key) => (
+                                                    <td key={index} className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                                        {Math.round(value)}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                            <tr>
+                                                <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                                    Spouse's Social Security
+                                                </td>
+                                                {data.valueofSocialSecuritySpouse && data.valueofSocialSecuritySpouse.map((value: number, index: Key) => (
+                                                    <td key={index} className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                                        {Math.round(value)}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                            <tr>
+                                                <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                                    APTC
+                                                </td>
+                                                {data.valueofAPTC && data.valueofAPTC.map((value: number, index: Key) => (
+                                                    <td key={index} className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                                        {Math.round(value)}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                            <tr>
+                                                <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                                    IRMAA
+                                                </td>
+                                                {data.valueofIRMAA && data.valueofIRMAA.map((value: number, index: Key) => (
                                                     <td key={index} className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                                                         {Math.round(value)}
                                                     </td>
@@ -153,13 +209,6 @@ const Result = () => {
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <div className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                        Present Value
-                                    </div>
-                                    <div className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                        {Math.round(data.presentValue)}
-                                    </div>
-
                                 </div>
                             )}
 

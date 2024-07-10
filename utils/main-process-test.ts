@@ -7,18 +7,32 @@ import { ifError } from 'assert';
 import { getInterestRate } from "./zerocouponbond";
 import { get50thPercentileDataFromResponse, getMonteCarloSimulation } from "./portfolio-visualizer";
 import { array } from "zod";
+const EMAIL_TO_ADDRESS = process.env.NEXT_PUBLIC_EMAIL_TO_ADDRESS ?? "";
 
+function generateRandomToken() {
+    const characters =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const tokenLength = 32;
+    let token = '';
+
+    for (let i = 0; i < tokenLength; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        token += characters.charAt(randomIndex);
+    }
+    return token;
+}
 
 export async function mainProcessForTest() {
     console.log("Start main process for final test...");
     try {
-        const token = '0xff';
+        const token = generateRandomToken();
         const calculatedResults = await calculateAndStore(token);
         if (!calculatedResults.success) {
             return { success: false, error: 'Unknown error occurred during processing the answers.' };
         } else {
             const firstName = 'Jae';
-            const toEmail = 'uo0901576@gmail.com';
+            const toEmail = EMAIL_TO_ADDRESS;
+            console.log('toEmail', toEmail);
             const link = await generateLink(token)
             const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}api/send-result-email`, {
                 method: 'POST',
@@ -166,9 +180,9 @@ async function calculateAndStore(token: any) {
         console.log(`The Part B premium for a joint filing with an income of $${jointIncome} is ${jointPremiumPartB}`);
 
         // Mr X
-        const ageSelf = testingData.ageSelf;
+        let ageSelf = testingData.ageSelf;
         console.log('ageSelf', ageSelf);
-        const ageSpouse = testingData.ageSpouse;
+        let ageSpouse = testingData.ageSpouse;
         console.log('ageSpouse', ageSpouse);
         const totalYears = 2;
 
@@ -227,48 +241,14 @@ async function calculateAndStore(token: any) {
         console.log('expenseDaily', expenseDaily);
         let expenseHealth = testingData.expenseHealth;
         console.log('expenseHealth', expenseHealth);
-        /* aptc */
-        let aptc = 0;
-        let householdIncome = incomeSelf + incomeSpouse + incomeDependent + incomeOther
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/subsidy`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    state: "MI",
-                    zipCode: "48103",
-                    householdSize: 3,
-                    householdIncome: householdIncome,
-                    dependentsCount: 1,
-                    applicantDetails:
-                        [
-                            { age: ageSelf, smoker: false, relationship: "primary", gender: "male" },
-                            { age: ageSpouse, smoker: false, relationship: "spouse", gender: "female" },
-                            { age: 15, smoker: false, relationship: "dependent", gender: "male" },
-                        ],
-                }),
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok.');
-            }
-            const subsidyData = await response.json();
-            aptc = (subsidyData.subsidy ?? 0) * 12;
-
-        } catch (error) {
-            console.error("Error calling /api/subsidy:", error);
-        }
-        console.log('aptc', aptc)
-        /* aptc */
-
-        let irmaa = findPremium('joint', householdIncome, 'partB') * 12;
-        console.log('irmaa', irmaa);
         let totalExpenses;
+        let semiTotalExpenses;
 
         // Arrays Per Year
         let valueOfTotalIncome = [];
         let valueOfTotalExpenses = [];
+        let valueofSocialSecurity = [];
+        let valueofSocialSecuritySpouse = [];
         let expoentialNoAdjusted = [];
         let expoentialJaeAdjusted = [];
         let valueofTaxableIncome = [];
@@ -292,8 +272,8 @@ async function calculateAndStore(token: any) {
         console.log('Optimized---------------->>>>>>>>>>>>') // Optimized
         totalIncome = incomeSelf + incomeSpouse + incomeDependent + incomeSocialSecurity + incomeSocialSecuritySpouse + incomePension + incomeOther;
         console.log('totalIncome', totalIncome);
-        totalExpenses = expenseHousing + expenseTransportation + expenseDaily + expenseHealth - aptc + irmaa;
-        console.log('totalExpense', totalExpenses);
+        semiTotalExpenses = expenseHousing + expenseTransportation + expenseDaily + expenseHealth;
+        console.log('semiTotalExpenses', semiTotalExpenses);
 
         let portfolioForEachYears = new Array(countOfBalances);
         let withdrawalAmount = new Array(countOfBalances);
@@ -323,11 +303,59 @@ async function calculateAndStore(token: any) {
 
         for (let i = 0; i < totalYears; i++) {
             totalNetWorth[i] = 0;
+            let taxableIncome = incomeSelf + incomeSpouse + incomeDependent + incomeOther + withdrawalAmount[2][i] + withdrawalAmount[3][i];
+            let aptc = 0;
+            let irmaa = 0;
+            if (ageSelf < 65) {
+                /* aptc */
+                try {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/subsidy`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            state: "MI",
+                            zipCode: "48103",
+                            householdSize: 3,
+                            householdIncome: taxableIncome,
+                            dependentsCount: 1,
+                            applicantDetails:
+                                [
+                                    { age: ageSelf, smoker: false, relationship: "primary", gender: "male" },
+                                    { age: ageSpouse, smoker: false, relationship: "spouse", gender: "female" },
+                                    { age: 15, smoker: false, relationship: "dependent", gender: "male" },
+                                ],
+                        }),
+                    });
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok.');
+                    }
+                    const subsidyData = await response.json();
+                    aptc = (subsidyData.subsidy ?? 0) * 12;
+
+                } catch (error) {
+                    console.error("Error calling /api/subsidy:", error);
+                }
+                console.log('aptc', aptc)
+                /* aptc */
+                valueofAPTC.push(aptc);
+                valueofIRMAA.push(0);
+            }
+            else {
+                irmaa = findPremium('joint', taxableIncome, 'partB') * 12;
+                console.log('irmaa', irmaa);
+                valueofAPTC.push(0);
+                valueofIRMAA.push(irmaa);
+            }
+            valueofSocialSecurity.push(incomeSocialSecurity);
+            valueofSocialSecuritySpouse.push(incomeSocialSecuritySpouse);
+            
+            totalExpenses = (semiTotalExpenses - aptc + irmaa) * Math.pow(propotionAdjustedExpense, i);
             valueOfTotalExpenses.push(totalExpenses);
-            valueOfTotalIncome.push(totalIncome);    
+            valueOfTotalIncome.push(totalIncome);
             netIncomePerYear = totalIncome * (1 - taxRateForIncome / 100);
             console.log('netIncomePerYear', netIncomePerYear);
-
             /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
             if (totalExpenses <= totalIncome) {
                 for (var j = 0; j < countOfBalances; j++) {
@@ -349,9 +377,9 @@ async function calculateAndStore(token: any) {
                 const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
                 portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
             }
-            totalExpenses *= propotionAdjustedExpense;
             totalIncome *= propotionAdjustedCash;
-
+            ageSelf +=1;
+            ageSpouse +=1;
         }
         let lastNetworth = 0;
         for (var i = 0; i < countOfBalances; i++) {
@@ -371,6 +399,10 @@ async function calculateAndStore(token: any) {
                 totalYears: totalYears,
                 valueOfTotalIncome: valueOfTotalIncome,
                 valueOfTotalExpenses: valueOfTotalExpenses,
+                valueofSocialSecurity: valueofSocialSecurity,
+                valueofSocialSecuritySpouse: valueofSocialSecuritySpouse,
+                valueofAPTC: valueofAPTC,
+                valueofIRMAA: valueofIRMAA,
                 withdrawalAmount: withdrawalAmount,
                 portfolioForEachYears: portfolioForEachYears,
                 totalNetWorth: totalNetWorth,
@@ -440,9 +472,9 @@ const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: numb
     taxAmount[4] = variousRateData.taxRateForRoth;      //Roth
     taxAmount[5] = 0;                                   //Annuity
     taxAmount[6] = 0;                                   //LifeInsurance
-    const withdrawQMust = portfolioForEachYear[2] * getRMDPercentage(ageSelf);
-    const withdrawQSpouseMust = portfolioForEachYear[3] * getRMDPercentage(ageSpouse);
-    const netwithdrawQAllMust = withdrawQMust * (1 - taxAmount[2]/100) + withdrawQSpouseMust * (1 - taxAmount[3]/100);
+    const withdrawQMust = portfolioForEachYear[2] * getRMDPercentage(ageSelf) / 100;
+    const withdrawQSpouseMust = portfolioForEachYear[3] * getRMDPercentage(ageSpouse) / 100;
+    const netwithdrawQAllMust = withdrawQMust * (1 - taxAmount[2] / 100) + withdrawQSpouseMust * (1 - taxAmount[3] / 100);
     if (netwithdrawQAllMust >= shouldZeroValue) {
         for (let j = 0; j < portfolioForEachYear.length; j++) {
             withdrawalAmount[j] = 0;
@@ -468,10 +500,10 @@ const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: numb
         for (let j = 0; j < reorderedPortfolio.length; j++) {
             console.log('remaining', remaining)
             if (remaining <= 0) break; // No further withdrawAmount needed
-            const maxWithdrawable = remaining / (1 - reorderedTaxRates[j]/100);
+            const maxWithdrawable = remaining / (1 - reorderedTaxRates[j] / 100);
             const withdrawal = Math.min(maxWithdrawable, reorderedPortfolio[j]);
             withdrawalAmount[portfolioWithTaxRates[j].originalIndex] = withdrawal;
-            remaining -= withdrawal * (1 - reorderedTaxRates[j]/100);
+            remaining -= withdrawal * (1 - reorderedTaxRates[j] / 100);
         }
     }
     withdrawalAmount[2] = withdrawalAmount[2] + withdrawQMust;

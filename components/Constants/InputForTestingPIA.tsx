@@ -4,13 +4,15 @@ import { TableCellsIcon } from '@heroicons/react/24/outline';
 import Spinner from '../Spinner';
 import NumberInput from './NumberInput';
 import { mainProcessForTest } from '@/utils/main-process-test';
-const InputForTesting = () => {
+import { mainProcessForFinalTest } from '@/utils/main-process-final-test';
+
+const InputForTestingPIA = () => {
     const [isSaving, setIsSaving] = useState<boolean>(false);
 
     const handleSaveClick = async () => {
         setIsSaving(true);
+        console.log('**********');
         try {
-
             const inputForTestingData = {
                 //age
                 ageSelf,
@@ -19,10 +21,11 @@ const InputForTesting = () => {
                 incomeSelf,
                 incomeSpouse,
                 incomeDependent,
-                incomeSocialSecurity,
-                incomeSocialSecuritySpouse,
                 incomePension,
                 incomeOther,    // Annuity Income + Rental Income + Reverse Mortgage Income
+                //pia
+                pia,
+                piaSpouse,
                 //balance
                 balanceCash,
                 balanceQ,
@@ -37,7 +40,7 @@ const InputForTesting = () => {
                 expenseDaily,
                 expenseHealth,
             };
-            const inpoutForTestingResponse = await fetch('/api/inputfortesting', {
+            const inpoutForTestingResponse = await fetch('/api/inputfortestingpia', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -56,7 +59,8 @@ const InputForTesting = () => {
             setIsSaving(false);
         }
 
-        const result = await mainProcessForTest();
+        // const result = await mainProcessForTest();
+        const result = await mainProcessForFinalTest();
         console.log('Main Process For Test Result:', result);
     };
 
@@ -66,8 +70,8 @@ const InputForTesting = () => {
     const [incomeSelf, setIncomeSelf] = useState(0);
     const [incomeSpouse, setIncomeSpouse] = useState(0);
     const [incomeDependent, setIncomeDependent] = useState(0);
-    const [incomeSocialSecurity, setIncomeSocialSecurity] = useState(0);
-    const [incomeSocialSecuritySpouse, setIncomeSocialSecuritySpouse] = useState(0);
+    const [pia, setPia] = useState(0);
+    const [piaSpouse, setPIASpouse] = useState(0);
     const [incomePension, setIncomePension] = useState(0);
     const [incomeOther, setIncomeOther] = useState(0);
 
@@ -110,13 +114,13 @@ const InputForTesting = () => {
         console.log(newIncomeDependent);
         setIncomeDependent(newIncomeDependent);
     };
-    const handleIncomeSocialSecurityChange = (newIncomeSocialSecurity: number) => {
-        console.log(newIncomeSocialSecurity);
-        setIncomeSocialSecurity(newIncomeSocialSecurity);
+    const handlePiaChange = (newPia: number) => {
+        console.log(newPia);
+        setPia(newPia);
     };
-    const handleIncomeSocialSecuritySpouseChange = (newIncomeSocialSecuritySpouse: number) => {
-        console.log(newIncomeSocialSecuritySpouse);
-        setIncomeSocialSecuritySpouse(newIncomeSocialSecuritySpouse);
+    const handlePiaSpouseChange = (newPiaSpouse: number) => {
+        console.log(newPiaSpouse);
+        setPIASpouse(newPiaSpouse);
     };
     const handleIncomePensionChange = (newIncomePension: number) => {
         console.log(newIncomePension);
@@ -181,7 +185,7 @@ const InputForTesting = () => {
 
         async function fetchInputForTesting() {
             try {
-                const response = await fetch('/api/inputfortesting', { method: 'GET' });
+                const response = await fetch('/api/inputfortestingpia', { method: 'GET' });
                 console.log(response);
                 if (!response.ok) throw new Error('Failed to fetch input data for testing');
                 const data = await response.json();
@@ -195,8 +199,8 @@ const InputForTesting = () => {
                 setIncomeSelf(data.incomeSelf);
                 setIncomeSpouse(data.incomeSpouse);
                 setIncomeDependent(data.incomeDependent);
-                setIncomeSocialSecurity(data.incomeSocialSecurity);
-                setIncomeSocialSecuritySpouse(data.incomeSocialSecuritySpouse);
+                setPia(data.pia);
+                setPIASpouse(data.piaSpouse);
                 setIncomePension(data.incomePension);
                 setIncomeOther(data.incomeOther);
 
@@ -274,16 +278,16 @@ const InputForTesting = () => {
                                 onValueChange={handleIncomeDependentChange}
                             />
                             <NumberInput
-                                label="Social Security"
+                                label="PIA"
                                 placeholder="12345"
-                                value={incomeSocialSecurity}
-                                onValueChange={handleIncomeSocialSecurityChange}
+                                value={pia}
+                                onValueChange={handlePiaChange}
                             />
                             <NumberInput
-                                label="Spouse Social Security"
+                                label="Spouse PIA"
                                 placeholder="12345"
-                                value={incomeSocialSecuritySpouse}
-                                onValueChange={handleIncomeSocialSecuritySpouseChange}
+                                value={piaSpouse}
+                                onValueChange={handlePiaSpouseChange}
                             />
                             <NumberInput
                                 label="Pension Income"
@@ -394,4 +398,4 @@ const InputForTesting = () => {
         </>
     )
 }
-export default InputForTesting;
+export default InputForTestingPIA;

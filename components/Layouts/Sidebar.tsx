@@ -6,7 +6,9 @@ import shortid from "shortid";
 import {
     WindowIcon,
     CpuChipIcon,
-    TableCellsIcon
+    TableCellsIcon,
+    ComputerDesktopIcon,
+    BoltIcon
 } from '@heroicons/react/24/outline'
 
 import { navigations } from "@/config/navigations";
@@ -14,7 +16,9 @@ import { navigations } from "@/config/navigations";
 export const icons: any[] = [
     <span key={shortid()} className="inline-flex justify-center items-center ml-4"><WindowIcon className='h-5 w-5' /></span>,
     <span key={shortid()} className="inline-flex justify-center items-center ml-4"><CpuChipIcon className='h-5 w-5' /></span>,
-    <span key={shortid()} className="inline-flex justify-center items-center ml-4"><TableCellsIcon className='h-5 w-5' /></span>
+    <span key={shortid()} className="inline-flex justify-center items-center ml-4"><TableCellsIcon className='h-5 w-5' /></span>,
+    <span key={shortid()} className="inline-flex justify-center items-center ml-4"><ComputerDesktopIcon className='h-5 w-5' /></span>,
+    <span key={shortid()} className="inline-flex justify-center items-center ml-4"><BoltIcon className='h-5 w-5' /></span>,
 ]
 
 const Sidebar = () => {
@@ -46,7 +50,7 @@ const Sidebar = () => {
                     <li>
                         <div className={`flex items-center justify-start md:justify-center pl-3 w-14 md:w-64 h-14`}>
                             <a className='flex items-center gap-x-2'>
-                                <span className='hidden md:block text-[24px] text-white '><strong>Jsocre</strong> MVP</span>
+                                <span className='hidden md:block text-[24px] text-white '><strong>Jscore</strong> MVP</span>
                             </a>
                         </div>
                     </li>
