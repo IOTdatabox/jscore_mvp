@@ -187,6 +187,19 @@ const Result = () => {
                                                     ))}
                                                 </tr>
                                             ))}
+                                            {BALANCE_TYPES.map((balanceType, i) => (
+                                                <tr key={`portfolio-${i}`}>
+                                                    <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                                        Rate of Return ({balanceType})
+                                                    </td>
+                                                    {data.trrNominal && data.trrNominal[i] && data.trrNominal[i].map((value: number, index: Key) => (
+                                                        <td key={index} className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                                            {value}
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            ))}
+
                                             <tr>
                                                 <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                                     Net Worth

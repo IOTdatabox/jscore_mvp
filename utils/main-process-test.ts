@@ -5,7 +5,7 @@ import { getOSSForSeveralFiledDate } from './openSocialSecurity';
 import { ApplicantData } from '@/types/backend.type';
 import { ifError } from 'assert';
 import { getInterestRate } from "./zerocouponbond";
-import { get50thPercentileDataFromResponse, getMonteCarloSimulation } from "./portfolio-visualizer";
+import { get50thPercentileDataFromResponse, getMonteCarloSimulation, getTimeWeightedRateOfReturnNominal } from "./portfolio-visualizer";
 import { array } from "zod";
 const EMAIL_TO_ADDRESS = process.env.NEXT_PUBLIC_EMAIL_TO_ADDRESS ?? "";
 
@@ -184,7 +184,7 @@ async function calculateAndStore(token: any) {
         console.log('ageSelf', ageSelf);
         let ageSpouse = testingData.ageSpouse;
         console.log('ageSpouse', ageSpouse);
-        const totalYears = 2;
+        const totalYears = 9;
 
         // Cash Flow Sources
         console.log('Income-----------------');
@@ -245,15 +245,15 @@ async function calculateAndStore(token: any) {
         let semiTotalExpenses;
 
         // Arrays Per Year
-        let valueOfTotalIncome = [];
-        let valueOfTotalExpenses = [];
-        let valueofSocialSecurity = [];
-        let valueofSocialSecuritySpouse = [];
-        let expoentialNoAdjusted = [];
-        let expoentialJaeAdjusted = [];
-        let valueofTaxableIncome = [];
-        let valueofAPTC = [];
-        let valueofIRMAA = [];
+        let valueOfTotalIncome: number[] = new Array(totalYears).fill(0);
+        let valueOfTotalExpenses: number[] = new Array(totalYears).fill(0);
+        let expoentialNoAdjusted: number[] = new Array(totalYears).fill(0);
+        let expoentialJaeAdjusted: number[] = new Array(totalYears).fill(0);
+        let valueofTaxableIncome: number[] = new Array(totalYears).fill(0);
+        let valueofSocialSecurity: number[] = new Array(totalYears).fill(0);
+        let valueofSocialSecuritySpouse: number[] = new Array(totalYears).fill(0);
+        let valueofAPTC: number[] = new Array(totalYears).fill(0);
+        let valueofIRMAA: number[] = new Array(totalYears).fill(0);
         let netIncomePerYear;
 
 
@@ -277,13 +277,16 @@ async function calculateAndStore(token: any) {
 
         let portfolioForEachYears = new Array(countOfBalances);
         let withdrawalAmount = new Array(countOfBalances);
+        let trrNominal = new Array(countOfBalances);
         let totalNetWorth = [];
         for (var i = 0; i < countOfBalances; i++) {
             portfolioForEachYears[i] = [];
             withdrawalAmount[i] = [];
+            trrNominal[i] = [];
             for (var j = 0; j < totalYears; j++) {
                 portfolioForEachYears[i][j] = 0;
                 withdrawalAmount[i][j] = 0;
+                trrNominal[i][j] = '';
             }
             portfolioForEachYears[i][0] = sources[i].balance;
         }
@@ -294,8 +297,8 @@ async function calculateAndStore(token: any) {
         if (Array.isArray(interpolatedRates)) {
             interpolatedRates.unshift(0);
             for (var i = 0; i <= totalYears; i++) {
-                expoentialNoAdjusted.push(Math.pow(1 + interpolatedRates[i] / 200, i * 2));
-                expoentialJaeAdjusted.push(Math.pow(1 + (interpolatedRates[i] + jaeExtraInput) / 200, i * 2));
+                expoentialNoAdjusted[i] = Math.pow(1 + interpolatedRates[i] / 200, i * 2);
+                expoentialJaeAdjusted[i] = Math.pow(1 + (interpolatedRates[i] + jaeExtraInput) / 200, i * 2);
             }
         }
         console.log('expoentialJaeAdjusted', expoentialJaeAdjusted);
@@ -339,21 +342,21 @@ async function calculateAndStore(token: any) {
                 }
                 console.log('aptc', aptc)
                 /* aptc */
-                valueofAPTC.push(aptc);
-                valueofIRMAA.push(0);
+                valueofAPTC[i] = aptc;
+                valueofIRMAA[i] = 0;
             }
             else {
                 irmaa = findPremium('joint', taxableIncome, 'partB') * 12;
                 console.log('irmaa', irmaa);
-                valueofAPTC.push(0);
-                valueofIRMAA.push(irmaa);
+                valueofAPTC[i] = 0;
+                valueofIRMAA[i] = irmaa;
             }
-            valueofSocialSecurity.push(incomeSocialSecurity);
-            valueofSocialSecuritySpouse.push(incomeSocialSecuritySpouse);
+            valueofSocialSecurity[i] = incomeSocialSecurity;
+            valueofSocialSecuritySpouse[i] = incomeSocialSecuritySpouse;
             
             totalExpenses = (semiTotalExpenses - aptc + irmaa) * Math.pow(propotionAdjustedExpense, i);
-            valueOfTotalExpenses.push(totalExpenses);
-            valueOfTotalIncome.push(totalIncome);
+            valueOfTotalExpenses[i] = totalExpenses;
+            valueOfTotalIncome[i] = totalIncome;
             netIncomePerYear = totalIncome * (1 - taxRateForIncome / 100);
             console.log('netIncomePerYear', netIncomePerYear);
             /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
@@ -375,7 +378,9 @@ async function calculateAndStore(token: any) {
                 totalNetWorth[i] += portfolioForEachYears[j][i];
                 const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
                 const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
+                let trrNominalAtFifty = await getTimeWeightedRateOfReturnNominal(response) ?? 0;
                 portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
+                trrNominal[j][i+1] = trrNominalAtFifty ?? '';
             }
             totalIncome *= propotionAdjustedCash;
             ageSelf +=1;
@@ -405,6 +410,7 @@ async function calculateAndStore(token: any) {
                 valueofIRMAA: valueofIRMAA,
                 withdrawalAmount: withdrawalAmount,
                 portfolioForEachYears: portfolioForEachYears,
+                trrNominal: trrNominal,
                 totalNetWorth: totalNetWorth,
                 divisionResults: divisionResults,
                 presentValue: presentValue

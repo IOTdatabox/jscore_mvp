@@ -51,11 +51,12 @@ async function getResult(req: NextApiRequest, res: NextApiResponse) {
 
 // Function to handle POST requests
 async function saveResult(req: NextApiRequest, res: NextApiResponse) {
-    const { questionID, totalYears, valueOfTotalIncome, valueOfTotalExpenses, withdrawalAmount, 
-        portfolioForEachYears, totalNetWorth, divisionResults, presentValue } = req.body;
+    const { questionID, totalYears, valueOfTotalIncome, valueOfTotalExpenses, valueofSocialSecurity, valueofSocialSecuritySpouse, 
+        valueofAPTC, valueofIRMAA, withdrawalAmount, portfolioForEachYears, trrNominal, totalNetWorth, divisionResults, presentValue, maxF } = req.body;
     console.log('Inside Saveresult', questionID);
-    if (!questionID || !totalYears || !valueOfTotalIncome || !valueOfTotalExpenses || !withdrawalAmount ||
-        !portfolioForEachYears|| !totalNetWorth || !divisionResults || !presentValue ) {
+    if (!questionID || !totalYears || !valueOfTotalIncome || !valueOfTotalExpenses || !valueofSocialSecurity || !valueofSocialSecuritySpouse || 
+        !valueofAPTC || !valueofIRMAA || !withdrawalAmount || !portfolioForEachYears|| !trrNominal || !totalNetWorth || !divisionResults || 
+        !presentValue || !maxF) {
             console.log('Missing required fields')
         return res.status(400).json({ err: 'Missing required fields' });
     }
@@ -66,11 +67,17 @@ async function saveResult(req: NextApiRequest, res: NextApiResponse) {
             totalYears,
             valueOfTotalIncome,
             valueOfTotalExpenses,
+            valueofSocialSecurity,
+            valueofSocialSecuritySpouse,
+            valueofAPTC,
+            valueofIRMAA,
             withdrawalAmount,
             portfolioForEachYears,
+            trrNominal,
             totalNetWorth,
             divisionResults,
-            presentValue
+            presentValue,
+            maxF
         };
         const newResult = new ResultData({ results: [newEntry] });
         await newResult.save();

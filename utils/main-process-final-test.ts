@@ -5,7 +5,7 @@ import { getOSSForSeveralFiledDate } from './openSocialSecurity';
 import { ApplicantData } from '@/types/backend.type';
 import { ifError } from 'assert';
 import { getInterestRate } from "./zerocouponbond";
-import { get50thPercentileDataFromResponse, getMonteCarloSimulation } from "./portfolio-visualizer";
+import { get50thPercentileDataFromResponse, getMonteCarloSimulation, getTimeWeightedRateOfReturnNominal } from "./portfolio-visualizer";
 import { array } from "zod";
 const EMAIL_TO_ADDRESS = process.env.NEXT_PUBLIC_EMAIL_TO_ADDRESS ?? "";
 
@@ -185,7 +185,7 @@ async function calculateAndStore(token: any) {
         console.log('ageSelf', ageSelf);
         let ageSpouse = testingData.ageSpouse;
         console.log('ageSpouse', ageSpouse);
-        const totalYears = 2;
+        const totalYears = 9;
 
         // Cash Flow Sources
         console.log('Income-----------------');
@@ -257,17 +257,20 @@ async function calculateAndStore(token: any) {
         let semiTotalExpenses;
 
         // Arrays Per Year
-        let valueOfTotalIncome = [];
-        let valueOfTotalExpenses = [];
-        let expoentialNoAdjusted = [];
-        let expoentialJaeAdjusted = [];
-        let valueofTaxableIncome = [];
-        let valueofSocialSecurity = [];
-        let valueofSocialSecuritySpouse = [];
-        let valueofAPTC = [];
-        let valueofIRMAA = [];
-        let netIncomePerYear;
 
+        let valueOfTotalIncome: number[] = new Array(totalYears).fill(0);
+        let valueOfTotalExpenses: number[] = new Array(totalYears).fill(0);
+        let expoentialNoAdjusted: number[] = new Array(totalYears).fill(0);
+        let expoentialJaeAdjusted: number[] = new Array(totalYears).fill(0);
+        let valueofTaxableIncome: number[] = new Array(totalYears).fill(0);
+        let valueofSocialSecurity: number[] = new Array(totalYears).fill(0);
+        let valueofSocialSecuritySpouse: number[] = new Array(totalYears).fill(0);
+        let valueofAPTC: number[] = new Array(totalYears).fill(0);
+        let valueofIRMAA: number[] = new Array(totalYears).fill(0);
+        let totalNetWorth: number[] = new Array(totalYears + 1).fill(0);
+        let netIncomePerYear;
+        let divisionResults;
+        let presentValue;
 
         // Consts
         const countOfBalances = 7;
@@ -289,7 +292,7 @@ async function calculateAndStore(token: any) {
 
         let portfolioForEachYears = new Array(countOfBalances);
         let withdrawalAmount = new Array(countOfBalances);
-        let totalNetWorth = [];
+        let trrNominal = new Array(countOfBalances);
 
         /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
         // let interpolatedRates = await getInterestRate(totalYears);
@@ -297,16 +300,14 @@ async function calculateAndStore(token: any) {
         if (Array.isArray(interpolatedRates)) {
             interpolatedRates.unshift(0);
             for (var i = 0; i <= totalYears; i++) {
-                expoentialNoAdjusted.push(Math.pow(1 + interpolatedRates[i] / 200, i * 2));
-                expoentialJaeAdjusted.push(Math.pow(1 + (interpolatedRates[i] + jaeExtraInput) / 200, i * 2));
+                expoentialNoAdjusted[i] = Math.pow(1 + interpolatedRates[i] / 200, i * 2);
+                expoentialJaeAdjusted[i] = Math.pow(1 + (interpolatedRates[i] + jaeExtraInput) / 200, i * 2);
             }
         }
         console.log('expoentialJaeAdjusted', expoentialJaeAdjusted);
         /* ------------------ Calculate and Fill Coupon Bond ------------------------- */
 
         // optimizeds values
-        let divisionResults;
-        let presentValue;
         let maxValueofTotalIncome;
         let maxValueOfTotalExpenses;
         let maxValueofSocialSecurity;
@@ -315,6 +316,7 @@ async function calculateAndStore(token: any) {
         let maxValueofIRMAA;
         let maxWithdrawalAmount;
         let maxPortfolioForEachYears;
+        let maxTrrNominal;
         let maxTotalNetWorth;
         let maxDivisionResults;
         let maxPresentValue = 0;
@@ -323,9 +325,11 @@ async function calculateAndStore(token: any) {
             for (var i = 0; i < countOfBalances; i++) {
                 portfolioForEachYears[i] = [];
                 withdrawalAmount[i] = [];
+                trrNominal[i] = [];
                 for (var j = 0; j < totalYears; j++) {
                     portfolioForEachYears[i][j] = 0;
                     withdrawalAmount[i][j] = 0;
+                    trrNominal[i][j] = '';
                 }
                 portfolioForEachYears[i][0] = sources[i].balance;
             }
@@ -367,36 +371,36 @@ async function calculateAndStore(token: any) {
                     }
                     console.log('aptc', aptc)
                     /* aptc */
-                    valueofAPTC.push(aptc);
-                    valueofIRMAA.push(0);
+                    valueofAPTC[i] = aptc;
+                    valueofIRMAA[i] = 0;
                 }
                 else {
                     irmaa = findPremium('joint', taxableIncome, 'partB') * 12;
                     console.log('irmaa', irmaa);
-                    valueofAPTC.push(0);
-                    valueofIRMAA.push(irmaa);
+                    valueofAPTC[i] = 0;
+                    valueofIRMAA[i] = irmaa;
                 }
                 if (ageSelf < f) {
                     incomeSocialSecurity = 0;
-                    valueofSocialSecurity.push(incomeSocialSecurity);
+                    valueofSocialSecurity[i] = incomeSocialSecurity;
                 }
                 else {
                     incomeSocialSecurity = parseInt(socialSecurityArray[0][f - 62].replace(/[$,]/g, '')) ?? 0;
-                    valueofSocialSecurity.push(incomeSocialSecurity);
+                    valueofSocialSecurity[i] = incomeSocialSecurity;
                 }
                 if (ageSpouse < f) {
                     incomeSocialSecuritySpouse = 0;
-                    valueofSocialSecuritySpouse.push(incomeSocialSecuritySpouse);
+                    valueofSocialSecuritySpouse[i] = incomeSocialSecuritySpouse;
                 }
                 else {
                     incomeSocialSecuritySpouse = parseInt(socialSecuritySouseArray[0][f - 62].replace(/[$,]/g, '')) ?? 0;
-                    valueofSocialSecuritySpouse.push(incomeSocialSecuritySpouse);
+                    valueofSocialSecuritySpouse[i] = incomeSocialSecuritySpouse;
                 }
 
                 totalExpenses = (semiTotalExpenses - aptc + irmaa) * Math.pow(propotionAdjustedExpense, i);
                 totalIncome = (semiTotalIncome + incomeSocialSecurity + incomeSocialSecuritySpouse) * Math.pow(propotionAdjustedCash, i)
-                valueOfTotalExpenses.push(totalExpenses);
-                valueOfTotalIncome.push(totalIncome);
+                valueOfTotalExpenses[i] = totalExpenses;
+                valueOfTotalIncome[i] = totalIncome;
                 netIncomePerYear = totalIncome * (1 - taxRateForIncome / 100);
                 console.log('netIncomePerYear', netIncomePerYear);
                 /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
@@ -418,7 +422,9 @@ async function calculateAndStore(token: any) {
                     totalNetWorth[i] += portfolioForEachYears[j][i];
                     const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
                     const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
+                    let trrNominalAtFifty = await getTimeWeightedRateOfReturnNominal(response) ?? 0;
                     portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
+                    trrNominal[j][i + 1] = trrNominalAtFifty ?? '';
                 }
                 ageSelf += 1;
                 ageSpouse += 1;
@@ -428,7 +434,7 @@ async function calculateAndStore(token: any) {
             for (var i = 0; i < countOfBalances; i++) {
                 lastNetworth += portfolioForEachYears[i][totalYears];
             }
-            totalNetWorth.push(lastNetworth);
+            totalNetWorth[totalYears] = lastNetworth;
             console.log('totalNetWorth', totalNetWorth);
             divisionResults = totalNetWorth.map((value, index) => {
                 return expoentialJaeAdjusted[index] !== 0 ? value / expoentialJaeAdjusted[index] : 0;
@@ -448,6 +454,7 @@ async function calculateAndStore(token: any) {
                 maxPortfolioForEachYears = portfolioForEachYears.map(arr => [...arr]);
                 maxTotalNetWorth = [...totalNetWorth];
                 maxDivisionResults = [...divisionResults];
+                maxTrrNominal = trrNominal.map(arr => [...arr]);
                 maxF = f;
             }
         }
@@ -463,6 +470,7 @@ async function calculateAndStore(token: any) {
                 valueofIRMAA: maxValueofIRMAA,
                 withdrawalAmount: maxWithdrawalAmount,
                 portfolioForEachYears: maxPortfolioForEachYears,
+                trrNominal: maxTrrNominal,
                 totalNetWorth: maxTotalNetWorth,
                 divisionResults: maxDivisionResults,
                 presentValue: maxPresentValue,

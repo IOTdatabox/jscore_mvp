@@ -230,7 +230,7 @@ export async function getMonteCarloSimulation(initialAmountInput: number, withdr
     '&meanReturn=' + meanReturn +
     '&percentileList=' + percentileList +
     '&rollingAveragePeriods=' + rollingAveragePeriods +
-    '&fullHistory=' + fullHistory + '&' + 
+    '&fullHistory=' + fullHistory + '&' +
     assetString +
     '&initialAmount=' + initialAmount +
     '&adjustmentAmount=' + adjustmentAmount +
@@ -333,6 +333,40 @@ export function get50thPercentileDataFromResponse(responseData: any) {
 
   return fiftyPercentileData;
 }
+
+export function getTimeWeightedRateOfReturnNominal(responseData: any) {
+  // Check if responseData is an array
+  if (!Array.isArray(responseData)) {
+    console.error("Invalid response data; expected an array.");
+    return null;
+  }
+
+  let twrrNominal;
+
+  // Iterate through the responseData items
+  responseData.some((item: { performanceSummary: any[] }) => {
+    // Check if the item has performanceSummary
+    if (item.performanceSummary && Array.isArray(item.performanceSummary)) {
+      const rateOfReturn = item.performanceSummary.find((rate: [string, string]) => rate[0] === 'Time Weighted Rate of Return (nominal)');
+
+      if (rateOfReturn) {
+        twrrNominal = rateOfReturn[1]; // Get the rate value
+        return true; // Break the loop          
+      }
+    }
+    return false; // Continue the loop if not found
+  });
+
+  if (twrrNominal) {
+    console.log("Time Weighted Rate of Return (nominal):", twrrNominal);
+  } else {
+    console.log("Time Weighted Rate of Return (nominal) not found in the 50th percentile performance summary.");
+  }
+
+  return twrrNominal;
+}
+
+
 
 
 function generateQueryString(allocations: string[], amounts: number[]): string {
