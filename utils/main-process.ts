@@ -232,7 +232,7 @@ async function calculateAndStore(answerObj: any, token: any) {
         console.log('birthDate', birthDate);
         const birthDateSpouse = getDateComponents(answerObj["Your Spouse's Date Of Birth"]);
         console.log('birthDateSpouse', birthDateSpouse);
-        const totalYears = 2;
+        const totalYears = 9;
 
         // Cash Flow Sources
         let incomeSelf = answerObj['Annual Earned Income?'] ?? 0;
