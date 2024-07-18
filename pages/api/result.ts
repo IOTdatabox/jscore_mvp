@@ -56,7 +56,7 @@ async function saveResult(req: NextApiRequest, res: NextApiResponse) {
     console.log('Inside Saveresult', questionID);
     if (!questionID || !totalYears || !valueOfTotalIncome || !valueOfTotalExpenses || !valueofSocialSecurity || !valueofSocialSecuritySpouse || 
         !valueofAPTC || !valueofIRMAA || !withdrawalAmount || !portfolioForEachYears|| !trrNominal || !totalNetWorth || !divisionResults || 
-        !presentValue || !maxF) {
+        !presentValue) {
             console.log('Missing required fields')
         return res.status(400).json({ err: 'Missing required fields' });
     }

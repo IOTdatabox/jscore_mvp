@@ -86,7 +86,7 @@ const Result = () => {
                                             Optimized Filed Age :
                                         </div>
                                         <div className="px-6 py-3 whitespace-nowrap text-lg text-gray-900 dark:text-white">
-                                            {data.maxF !== undefined ? data.maxF : "When social security is fixed, we do not estimate the optimal filed age."}
+                                            {( data.maxF !== undefined && data.maxF != 0) ? data.maxF : "When social security is fixed, we do not estimate the optimal filed age."}
                                         </div>
                                     </div>
                                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">

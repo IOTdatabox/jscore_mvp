@@ -7,54 +7,54 @@ export async function getOSSForSeveralFiledDate(personAGender: string, personADo
     const lastMonth = personADobM;
     const lastYear = personADobY + 70;
     let magicString;
-    let mainArray = new Array(2); // 2*9, if month is Dec, 2*8
+    let mainArray: any[] | null = new Array(2); // Allow mainArray to be null
     for (var i = 0; i < 2; i++) {
         mainArray[i] = [];
     }
-    for (let i = firstYear; i <= lastYear; i++) {
-        if (i == firstYear) {
-            magicString = `&aFixedRBm=${firstMonth}&aFixedRBy=${firstYear}`;
-            // console.log(`${i}th:`, magicString);
-        }
-        else if (i == lastYear) {
-            if (personADobD != 1) {
-                magicString = `&aFixedRBm=${lastMonth}&aFixedRBy=${lastYear}`;
+    try {
+        for (let i = firstYear; i <= lastYear; i++) {
+            if (i == firstYear) {
+                magicString = `&aFixedRBm=${firstMonth}&aFixedRBy=${firstYear}`;
+                // console.log(`${i}th:`, magicString);
             }
-            else{
-                magicString = `&aFixedRBm=1&aFixedRBy=${i-1}`;
+            else if (i == lastYear) {
+                if (personADobD != 1) {
+                    magicString = `&aFixedRBm=${lastMonth}&aFixedRBy=${lastYear}`;
+                }
+                else {
+                    magicString = `&aFixedRBm=1&aFixedRBy=${i - 1}`;
+                }
             }
-            // console.log(`${i}th:`, magicString);
+            else {
+                magicString = `&aFixedRBm=1&aFixedRBy=${i}`;
+            }
+            const targetURL = `${baseURL}?aGender=${personAGender}&aDOBm=${personADobM}&aDOBd=${personADobD}&aDOBy=${personADobY}&aPIA=${personAPIA}&aFiled=true${magicString}`;
+            console.log('targetURL of open social security', i, targetURL);
+            const response = await fetch(`https://api.apify.com/v2/actor-tasks/sOa6Rge6OlaxJs5TR/run-sync-get-dataset-items/`, {
+                method: 'post',
+                body: JSON.stringify({
+                    url: targetURL,
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer apify_api_Nt71Ia1RmU92JvZCzy7u5qx5jQtScn1WFPVw`,
+                },
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const resultArray = await response.json();
+            if (resultArray.length === 0 || !resultArray[0].data) {
+                throw new Error('No data found');
+            }
+            const mainResult = resultArray[0].data;
+            mainArray[0][i - firstYear] = mainResult[0][1] ?? 0;
+            mainArray[1][i - firstYear] = mainResult[1][1] ?? 0;
         }
-        else {
-            magicString = `&aFixedRBm=1&aFixedRBy=${i}`;
-            // console.log(`${i}th:`, magicString);
-        }
-        const targetURL = `${baseURL}?aGender=${personAGender}&aDOBm=${personADobM}&aDOBd=${personADobD}&aDOBy=${personADobY}&aPIA=${personAPIA}&aFiled=true${magicString}`;
-        console.log('targetURL of open social security', i, targetURL);
-        const response = await fetch(`https://api.apify.com/v2/actor-tasks/sOa6Rge6OlaxJs5TR/run-sync-get-dataset-items/`, {
-            method: 'post',
-            body: JSON.stringify({
-                url: targetURL,
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer apify_api_Nt71Ia1RmU92JvZCzy7u5qx5jQtScn1WFPVw`,
-            },
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const resultArray = await response.json();
-        if (resultArray.length === 0 || !resultArray[0].data) {
-            throw new Error('No data found');
-        }
-        const mainResult = resultArray[0].data;
-        mainArray[0][i - firstYear] = mainResult[0][1];
-        mainArray[1][i - firstYear] = mainResult[1][1];
+        console.log('OpenScocialSecurityValues', mainArray);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        mainArray = null;
     }
-    console.log('OpenScocialSecurityValues', mainArray);
     return mainArray;
 }
-
-
-

@@ -60,7 +60,14 @@ const InputForTestingPIA = () => {
         }
 
         // const result = await mainProcessForTest();
+        setIsSaving(true);
         const result = await mainProcessForFinalTest();
+        setIsSaving(false);
+        if (result.success) {
+            alert(result.message)
+        } else {
+            alert(result.error)
+        }
         console.log('Main Process For Test Result:', result);
     };
 
@@ -234,7 +241,7 @@ const InputForTestingPIA = () => {
             />
             <section className='mt-5'>
                 <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 rounded-[15px]">
-                <div className='pl-5 pt-5 flex items-center text-lg font-semibold leading-6 text-gray-900 dark:text-white'>
+                    <div className='pl-5 pt-5 flex items-center text-lg font-semibold leading-6 text-gray-900 dark:text-white'>
                         Age
                     </div>
                     <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">

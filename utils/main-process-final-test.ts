@@ -29,7 +29,7 @@ export async function mainProcessForFinalTest() {
         const token = generateRandomToken();
         const calculatedResults = await calculateAndStore(token);
         if (!calculatedResults.success) {
-            return { success: false, error: 'Unknown error occurred during processing the answers.' };
+            return { success: false, error: calculatedResults.error };
         } else {
             const firstName = 'Jae';
             const toEmail = EMAIL_TO_ADDRESS;
@@ -69,7 +69,9 @@ export async function mainProcessForFinalTest() {
 let loadedRMDValues: { age: number; percentage: number; }[] = [];
 async function fetchRMDSettings() {
     const responseForRMD = await fetch(`${process.env.NEXT_PUBLIC_URL}api/rmdsettings`);
-    if (!responseForRMD.ok) throw new Error(`HTTP error! Status: ${responseForRMD.status}`);
+    if (!responseForRMD.ok) {
+        throw new Error('Failed to fetch RMD settings');
+    }
     loadedRMDValues = await responseForRMD.json();
 }
 function getRMDPercentage(ageToLookup: number): number {
@@ -87,7 +89,9 @@ function getRMDPercentage(ageToLookup: number): number {
 let variousRateData: any = null;
 async function fetchVariousRateSettings() {
     const responseForVariousRate = await fetch(`${process.env.NEXT_PUBLIC_URL}api/variousratesettings`, { method: 'GET' });
-    if (!responseForVariousRate.ok) throw new Error('Failed to fetch portfolio settings');
+    if (!responseForVariousRate.ok) {
+        throw new Error('Failed to fetch various rate settings');
+    }
     variousRateData = await responseForVariousRate.json();
     console.log("variousRateData", variousRateData);
 }
@@ -97,7 +101,9 @@ async function fetchVariousRateSettings() {
 let loadedPremiums: any = null;
 async function fetchIRMAASettings() {
     const responseForIRMAA = await fetch(`${process.env.NEXT_PUBLIC_URL}api/irmaasettings`);
-    if (!responseForIRMAA.ok) throw new Error(`HTTP error! Status: ${responseForIRMAA.status}`);
+    if (!responseForIRMAA.ok) {
+        throw new Error('Failed to fetch IRMAA settings');
+    }
     loadedPremiums = await responseForIRMAA.json();
 }
 
@@ -134,7 +140,7 @@ function findPremium(type = 'individual', income = 0, part = 'partB') {
     if (premiumInfo) {
         return parseFloat(premiumInfo[part].replace('$', ''));
     } else {
-        throw new Error('No matching premium information found for the given criteria.');
+        return 0;
     }
 }
 /*------Fetch IRMAA Settings-------*/
@@ -143,7 +149,9 @@ function findPremium(type = 'individual', income = 0, part = 'partB') {
 let PvDatas: any = null;
 async function fetchPortfolioSettings() {
     const responseForPV = await fetch(`${process.env.NEXT_PUBLIC_URL}api/portfoliosettings`, { method: 'GET' });
-    if (!responseForPV.ok) throw new Error('Failed to fetch portfolio settings');
+    if (!responseForPV.ok) {
+        throw new Error('Failed to fetch Portfolio settings');
+    }
     PvDatas = await responseForPV.json();
     console.log("inflationOption", PvDatas.inflationOption);
 }
@@ -154,7 +162,9 @@ let testingData: any = null;
 async function fetchInputDataForTesting() {
     const responseForTestingData = await fetch('/api/inputfortestingpia', { method: 'GET' });
     console.log(responseForTestingData);
-    if (!responseForTestingData.ok) throw new Error('Failed to fetch input data for testing');
+    if (!responseForTestingData.ok) {
+        throw new Error('Failed to fetch testing data');
+    }
     testingData = await responseForTestingData.json();
 }
 /*------Fetch User Input Data For Testing-------*/
@@ -162,10 +172,25 @@ async function fetchInputDataForTesting() {
 async function calculateAndStore(token: any) {
     try {
         await fetchVariousRateSettings();
+        if (variousRateData == null) {
+            return { success: false, error: 'Fetching Various Rate Setting Error' };
+        }
         await fetchRMDSettings();
+        if (loadedRMDValues == null) {
+            return { success: false, error: 'Fetching RMD Setting Error' };
+        }
         await fetchIRMAASettings();
+        if (loadedPremiums == null) {
+            return { success: false, error: 'Fetching IRMAA Setting Error' };
+        }
         await fetchPortfolioSettings();
+        if (PvDatas == null) {
+            return { success: false, error: 'Fetching Portfolio Setting Error' };
+        }
         await fetchInputDataForTesting();
+        if (testingData == null) {
+            return { success: false, error: 'Fetching Testing Data Error' };
+        }
         // Example usage
         const ageToLookup = 100;
         const RMDpercentage = getRMDPercentage(ageToLookup);
@@ -207,15 +232,18 @@ async function calculateAndStore(token: any) {
         console.log('pia', pia);
         let piaSpouse = testingData.piaSpouse;
         console.log('piaSpouse', piaSpouse);
-        let socialSecuritySouseArray: any[][];
-        let socialSecurityArray: any[][];
+        let socialSecurityArray: any[][] | null;
+        let socialSecuritySouseArray: any[][] | null;
         let incomeSocialSecurity;
         let incomeSocialSecuritySpouse;
         socialSecurityArray = await getOSSForSeveralFiledDate('male', 1, 1, new Date().getFullYear() - ageSelf, pia);
+        if (socialSecurityArray == null) {
+            return { success: false, error: 'Fetching Social Security Data From https://opensocialsecurity.com/ Error' };
+        }
         socialSecuritySouseArray = await getOSSForSeveralFiledDate('female', 1, 1, new Date().getFullYear() - ageSpouse, piaSpouse);
-
-
-
+        if (socialSecuritySouseArray == null) {
+            return { success: false, error: 'Fetching Spouse Social Security Data From https://opensocialsecurity.com/ Error' };
+        }
         // Balances
         console.log('Balance-----------------');
         const balanceCash = testingData.balanceCash;
@@ -274,12 +302,12 @@ async function calculateAndStore(token: any) {
 
         // Consts
         const countOfBalances = 7;
-        const percentageAdjustedCash = variousRateData.cashRate;
-        const percentageAdjustedExpense = variousRateData.expenseRate;
-        const jaeExtraInput = variousRateData.jAdjustedRate;
-        const taxRateForIncome = variousRateData.taxRateForIncome;
-        const taxRateForRoth = variousRateData.taxRateForRoth;
-        const taxRateForGains = variousRateData.taxRateForGains;
+        const percentageAdjustedCash = variousRateData.cashRate ?? 0;
+        const percentageAdjustedExpense = variousRateData.expenseRate ?? 0;
+        const jaeExtraInput = variousRateData.jAdjustedRate ?? 0;
+        const taxRateForIncome = variousRateData.taxRateForIncome ?? 0;
+        const taxRateForRoth = variousRateData.taxRateForRoth ?? 0;
+        const taxRateForGains = variousRateData.taxRateForGains ?? 0;
         let propotionAdjustedExpense = 1 + percentageAdjustedExpense / 100;
         let propotionAdjustedCash = 1 + percentageAdjustedCash / 100;
 
@@ -319,9 +347,12 @@ async function calculateAndStore(token: any) {
         let maxTrrNominal;
         let maxTotalNetWorth;
         let maxDivisionResults;
-        let maxPresentValue = 0;
+        let maxPresentValue = -Infinity;
         let maxF;
+        let isAnyBalanceInsufficient = false;
         for (let f = 62; f <= 70; f++) {
+            console.log('---Filed Age--- : ', f);
+            isAnyBalanceInsufficient = false; // Reset the flag for each iteration of f
             for (var i = 0; i < countOfBalances; i++) {
                 portfolioForEachYears[i] = [];
                 withdrawalAmount[i] = [];
@@ -412,7 +443,11 @@ async function calculateAndStore(token: any) {
                 else {
                     let shouldZeroValue = totalExpenses - netIncomePerYear;
                     const currentPortfolioForEachYear = portfolioForEachYears.map(portfolio => portfolio[i]);
-                    const withdrawals = determineWithdrawal(shouldZeroValue, currentPortfolioForEachYear, ageSelf, ageSpouse);
+                    const [withdrawals, isBalanceInsufficient] = determineWithdrawal(shouldZeroValue, currentPortfolioForEachYear, ageSelf, ageSpouse);
+                    if (isBalanceInsufficient) {
+                        isAnyBalanceInsufficient = true;
+                        break; // Skip to the next f if balance is insufficient
+                    }
                     for (var j = 0; j < countOfBalances; j++) {
                         withdrawalAmount[j][i] = withdrawals[j];
                     }
@@ -420,15 +455,23 @@ async function calculateAndStore(token: any) {
                 /* ----------------- Calculate withdrawAmount Per Each Balance during Monte Carlo Simulation ------------------------- */
                 for (var j = 0; j < countOfBalances; j++) {
                     totalNetWorth[i] += portfolioForEachYears[j][i];
-                    const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
-                    const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
-                    let trrNominalAtFifty = await getTimeWeightedRateOfReturnNominal(response) ?? 0;
-                    portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
-                    trrNominal[j][i + 1] = trrNominalAtFifty ?? '';
+                    if (portfolioForEachYears[j][i] > 1) {
+                        const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
+                        const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
+                        let trrNominalAtFifty = await getTimeWeightedRateOfReturnNominal(response) ?? 0;
+                        portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
+                        trrNominal[j][i + 1] = trrNominalAtFifty ?? '';
+                    }
+                    else {
+                        portfolioForEachYears[j][i + 1] = 0;
+                        trrNominal[j][i + 1] = '';
+                    }
                 }
                 ageSelf += 1;
                 ageSpouse += 1;
             }
+
+            if (isAnyBalanceInsufficient) continue; // Move to the next f
 
             let lastNetworth = 0;
             for (var i = 0; i < countOfBalances; i++) {
@@ -458,6 +501,9 @@ async function calculateAndStore(token: any) {
                 maxF = f;
             }
         }
+        if (maxPresentValue === -Infinity) {
+            return { success: false, error: 'Failed to save result. Balance is not enough. Please try again with reasonable input data set.' };
+        }
         try {
             const resultData = {
                 questionID: token,
@@ -477,10 +523,14 @@ async function calculateAndStore(token: any) {
                 maxF: maxF
             };
             console.log('resultData', resultData);
-            await saveResult(resultData);
+            const responseSaveResult =  await saveResult(resultData);
+            if (responseSaveResult == null) {
+                return { success: false, error: 'Saving Result Error' };
+            }
             return { success: true, message: 'Result was calculated and stored successfully.' };
         } catch (error) {
-            return { success: false, error: 'Unknown error occurred during processing the answers.' };
+            console.error('Error saving result:', error);
+            return { success: false, error: 'Failed to save result. Please try again later.' };
         }
     }
     catch (error: any) {
@@ -488,7 +538,7 @@ async function calculateAndStore(token: any) {
         if (error.response) {
             console.error('ResponseErrorInMainProcess', error.response.body);
         } else {
-            console.error(error);
+            console.error('Error during calculation:', error);
         }
         return { success: false, error: 'Unknown error occurred during processing the answers.' };
     }
@@ -528,7 +578,8 @@ interface PortfolioItem {
     originalIndex: number;
 }
 
-const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: number[], ageSelf: number, ageSpouse: number): number[] => {
+const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: number[], ageSelf: number, ageSpouse: number):
+    [number[], boolean] => {
     const withdrawalAmount: number[] = new Array(portfolioForEachYear.length).fill(0);
     const taxAmount: number[] = new Array(portfolioForEachYear.length).fill(0);
     taxAmount[0] = variousRateData.taxRateForIncome;    //Cash
@@ -571,8 +622,12 @@ const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: numb
             withdrawalAmount[portfolioWithTaxRates[j].originalIndex] = withdrawal;
             remaining -= withdrawal * (1 - reorderedTaxRates[j] / 100);
         }
+        if (remaining > 0) {
+            console.log('Insufficient Balance');
+            return [withdrawalAmount, true]; // Balance is insufficient
+        }
     }
     withdrawalAmount[2] = withdrawalAmount[2] + withdrawQMust;
     withdrawalAmount[3] = withdrawalAmount[3] + withdrawQSpouseMust;
-    return withdrawalAmount;
+    return [withdrawalAmount, false];
 };

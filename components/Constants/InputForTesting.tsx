@@ -55,8 +55,14 @@ const InputForTesting = () => {
         } finally {
             setIsSaving(false);
         }
-
+        setIsSaving(true);
         const result = await mainProcessForTest();
+        setIsSaving(false);
+        if (result.success) {
+            alert(result.message)
+        } else {
+            alert(result.error)
+        }
         console.log('Main Process For Test Result:', result);
     };
 
