@@ -433,14 +433,14 @@ async function calculateAndStore(token: any) {
                 else {
                     incomeSocialSecurity = parseInt(socialSecurityArray[0][f - 62].replace(/[$,]/g, '')) ?? 0;
                     valueofSocialSecurity[i] = incomeSocialSecurity * Math.pow(propotionAdjustedCash, i);
-                    if (ageSpouse < f) {
-                        incomeSocialSecuritySpouse = 0;
-                        valueofSocialSecuritySpouse[i] = incomeSocialSecuritySpouse;
-                    }
-                    else {
-                        incomeSocialSecuritySpouse = parseInt(socialSecuritySpouseArray[0][f - 62].replace(/[$,]/g, '')) ?? 0;
-                        valueofSocialSecuritySpouse[i] = incomeSocialSecuritySpouse * Math.pow(propotionAdjustedCash, i);
-                    }
+                }
+                if (ageSpouse < f) {
+                    incomeSocialSecuritySpouse = 0;
+                    valueofSocialSecuritySpouse[i] = incomeSocialSecuritySpouse;
+                }
+                else {
+                    incomeSocialSecuritySpouse = parseInt(socialSecuritySpouseArray[0][f - 62].replace(/[$,]/g, '')) ?? 0;
+                    valueofSocialSecuritySpouse[i] = incomeSocialSecuritySpouse * Math.pow(propotionAdjustedCash, i);
                 }
 
                 totalExpenses = (semiTotalExpenses - aptc + irmaa) * Math.pow(propotionAdjustedExpense, i);

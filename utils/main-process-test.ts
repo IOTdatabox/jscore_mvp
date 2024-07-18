@@ -295,6 +295,8 @@ async function calculateAndStore(token: any) {
         let valueofAPTC: number[] = new Array(totalYears).fill(0);
         let valueofIRMAA: number[] = new Array(totalYears).fill(0);
         let netIncomePerYear;
+        let divisionResults;
+        let presentValue;
 
 
         // Consts
@@ -442,11 +444,11 @@ async function calculateAndStore(token: any) {
         }
         totalNetWorth.push(lastNetworth);
         console.log('totalNetWorth', totalNetWorth);
-        let divisionResults = totalNetWorth.map((value, index) => {
+        divisionResults = totalNetWorth.map((value, index) => {
             return expoentialJaeAdjusted[index] !== 0 ? value / expoentialJaeAdjusted[index] : 0;
         });
         console.log('divisionResults', divisionResults)
-        let presentValue = divisionResults.reduce((sum, currentValue) => sum + currentValue, 0);
+        presentValue = divisionResults.reduce((sum, currentValue) => sum + currentValue, 0);
         console.log('Present Value', presentValue);
         try {
             const resultData = {

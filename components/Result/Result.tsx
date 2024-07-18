@@ -105,7 +105,7 @@ const Result = () => {
                                         <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                                             <tr>
                                                 <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                                    Total Cash
+                                                    All Cash Sources
                                                 </td>
                                                 {data.valueOfTotalIncome && data.valueOfTotalIncome.map((value: number, index: Key) => (
                                                     <td key={index} className="px-6 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
