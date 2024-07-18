@@ -172,7 +172,7 @@ async function calculateAndStore(answerObj: any, token: any) {
 
 
         let incomeSocialSecuritySpouse = 10000;
-        let socialSecuritySouseArray: any[][];
+        let socialSecuritySpouseArray: any[][] | null;
         if (answerObj['Do You Currently Receive Social Security benefits?']) {
             incomeSocialSecuritySpouse = answerObj["Your Spouse's Monthly Social Security Amount"] ?? 0;
         }
@@ -180,8 +180,11 @@ async function calculateAndStore(answerObj: any, token: any) {
             const PIAAmountSpouse = answerObj["What Is Your Spouse's Primary Insured Amount (PIA)"] ?? 0;
             console.log('PIAAmountSpouse', PIAAmountSpouse);
             try {
-                socialSecuritySouseArray = await getOSSForSeveralFiledDate('female', birthDateSpouse.month, birthDateSpouse.day, birthDateSpouse.year, PIAAmountSpouse);
-                incomeSocialSecuritySpouse = parseInt(socialSecuritySouseArray[0][0].replace(/[$,]/g, ''));
+                socialSecuritySpouseArray = await getOSSForSeveralFiledDate('female', birthDateSpouse.month, birthDateSpouse.day, birthDateSpouse.year, PIAAmountSpouse);
+                if (socialSecuritySpouseArray == null){
+                    return { success: false, error: 'Fetching Spouse Social Security Data From https://opensocialsecurity.com/ Error' };
+                }
+                incomeSocialSecuritySpouse = parseInt(socialSecuritySpouseArray[0][0].replace(/[$,]/g, ''));
             } catch (error) {
                 console.error('Error fetching social security data:', error);
             }

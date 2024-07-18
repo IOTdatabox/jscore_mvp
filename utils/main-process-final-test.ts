@@ -233,15 +233,15 @@ async function calculateAndStore(token: any) {
         let piaSpouse = testingData.piaSpouse;
         console.log('piaSpouse', piaSpouse);
         let socialSecurityArray: any[][] | null;
-        let socialSecuritySouseArray: any[][] | null;
+        let socialSecuritySpouseArray: any[][] | null;
         let incomeSocialSecurity;
         let incomeSocialSecuritySpouse;
         socialSecurityArray = await getOSSForSeveralFiledDate('male', 1, 1, new Date().getFullYear() - ageSelf, pia);
         if (socialSecurityArray == null) {
             return { success: false, error: 'Fetching Social Security Data From https://opensocialsecurity.com/ Error' };
         }
-        socialSecuritySouseArray = await getOSSForSeveralFiledDate('female', 1, 1, new Date().getFullYear() - ageSpouse, piaSpouse);
-        if (socialSecuritySouseArray == null) {
+        socialSecuritySpouseArray = await getOSSForSeveralFiledDate('female', 1, 1, new Date().getFullYear() - ageSpouse, piaSpouse);
+        if (socialSecuritySpouseArray == null) {
             return { success: false, error: 'Fetching Spouse Social Security Data From https://opensocialsecurity.com/ Error' };
         }
         // Balances
@@ -424,7 +424,7 @@ async function calculateAndStore(token: any) {
                     valueofSocialSecuritySpouse[i] = incomeSocialSecuritySpouse;
                 }
                 else {
-                    incomeSocialSecuritySpouse = parseInt(socialSecuritySouseArray[0][f - 62].replace(/[$,]/g, '')) ?? 0;
+                    incomeSocialSecuritySpouse = parseInt(socialSecuritySpouseArray[0][f - 62].replace(/[$,]/g, '')) ?? 0;
                     valueofSocialSecuritySpouse[i] = incomeSocialSecuritySpouse;
                 }
 
