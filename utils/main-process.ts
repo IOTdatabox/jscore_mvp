@@ -190,18 +190,6 @@ async function fetchPortfolioSettings() {
 }
 /*------Fetch Portfolio Setting Data-------*/
 
-/*------Fetch User Input Data For Testing-------*/
-let testingData: any = null;
-async function fetchInputDataForTesting() {
-    const responseForTestingData = await fetch('/api/inputfortestingpia', { method: 'GET' });
-    console.log(responseForTestingData);
-    if (!responseForTestingData.ok) {
-        throw new Error('Failed to fetch testing data');
-    }
-    testingData = await responseForTestingData.json();
-}
-/*------Fetch User Input Data For Testing-------*/
-
 
 async function calculateAndStore(answerObj: any, token: any) {
     try {
@@ -220,10 +208,6 @@ async function calculateAndStore(answerObj: any, token: any) {
         await fetchPortfolioSettings();
         if (PvDatas == null) {
             return { success: false, error: 'Fetching Portfolio Setting Error' };
-        }
-        await fetchInputDataForTesting();
-        if (testingData == null) {
-            return { success: false, error: 'Fetching Testing Data Error' };
         }
         // Example usage
         const ageToLookup = 100;
