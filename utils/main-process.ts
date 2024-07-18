@@ -437,7 +437,7 @@ async function calculateAndStore(answerObj: any, token: any) {
 
         /* aptc */
 
-        if (answerObj['Do You Currently Receive Social Security benefits?']) {
+        if (!answerObj['Do You Currently Receive Social Security benefits?']) {
             // optimizeds values
             let maxValueofTotalIncome;
             let maxValueOfTotalExpenses;
