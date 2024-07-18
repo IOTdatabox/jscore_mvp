@@ -28,6 +28,21 @@ export async function mainProcessForTest() {
         const token = generateRandomToken();
         const calculatedResults = await calculateAndStore(token);
         if (!calculatedResults.success) {
+            const firstName = 'Jae';
+            const toEmail = EMAIL_TO_ADDRESS;
+            console.log('toEmail', toEmail);
+            const errorMessage = calculatedResults.error;
+            const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}api/send-result-failed-email`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ toEmail, userName: firstName, errorMessage })
+            });
+            if (!emailResponse.ok) {
+                console.log('Email Response for result failed was not ok.');
+                return { success: false, error: 'Failed to send result failed email' };
+            }
             return { success: false, error: calculatedResults.error };
         } else {
             const firstName = 'Jae';
