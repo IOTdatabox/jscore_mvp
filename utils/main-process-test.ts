@@ -392,8 +392,8 @@ async function calculateAndStore(token: any) {
                 valueofAPTC[i] = 0;
                 valueofIRMAA[i] = irmaa;
             }
-            valueofSocialSecurity[i] = incomeSocialSecurity;
-            valueofSocialSecuritySpouse[i] = incomeSocialSecuritySpouse;
+            valueofSocialSecurity[i] = incomeSocialSecurity * Math.pow(propotionAdjustedCash, i);
+            valueofSocialSecuritySpouse[i] = incomeSocialSecuritySpouse * Math.pow(propotionAdjustedCash, i);
 
             totalExpenses = (semiTotalExpenses - aptc + irmaa) * Math.pow(propotionAdjustedExpense, i);
             valueOfTotalExpenses[i] = totalExpenses;
