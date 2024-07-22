@@ -5,7 +5,7 @@ import Spinner from '../Spinner';
 import NumberInput from './NumberInput';
 import { mainProcessOSSTest } from '@/utils/main-process-oss-test';
 import { useAsyncDebounce } from 'react-table';
-const InputForTesting = () => {
+const InputForTestingOSS = () => {
     const [isSaving, setIsSaving] = useState<boolean>(false);
 
     const handleSaveClick = async () => {
@@ -436,4 +436,4 @@ const InputForTesting = () => {
         </>
     )
 }
-export default InputForTesting;
+export default InputForTestingOSS;

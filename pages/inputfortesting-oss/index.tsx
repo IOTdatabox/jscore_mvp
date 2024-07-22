@@ -1,9 +1,9 @@
 import Layout from "@/components/Layouts/Layout";
-import InputForTesting from "@/components/Constants/InputForTesting";
+import InputForTestingOSS from "@/components/Constants/InputForTestingOSS";
 const Index = () => {
     return (
         <Layout>
-            <InputForTesting />
+            <InputForTestingOSS />
         </Layout>
     )
 };

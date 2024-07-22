@@ -15,9 +15,9 @@ export const navigations = [
         href: '/otherconstraint'
     },
     {
-        label: 'Input For Testing - SS',
+        label: 'Input For Testing - OSS',
         show: [],
-        href: '/inputfortesting'
+        href: '/inputfortesting-oss'
     },
     {
         label: 'Input For Testing - PIA',

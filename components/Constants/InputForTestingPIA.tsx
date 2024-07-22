@@ -3,7 +3,7 @@ import PageBanner from '../PageBanner';
 import { TableCellsIcon } from '@heroicons/react/24/outline';
 import Spinner from '../Spinner';
 import NumberInput from './NumberInput';
-import { mainProcessOSSTest } from '@/utils/main-process-oss-test';
+import { mainProcessPIATest } from '@/utils/main-process-pia-test';
 
 const InputForTestingPIA = () => {
     const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -64,7 +64,7 @@ const InputForTestingPIA = () => {
 
         // const result = await mainProcessForTest();
         setIsSaving(true);
-        const result = await mainProcessOSSTest();
+        const result = await mainProcessPIATest();
         setIsSaving(false);
         if (result.success) {
             alert(result.message)
