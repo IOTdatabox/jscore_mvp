@@ -251,7 +251,7 @@ const InputForTestingOSS = () => {
             />
             <section className='mt-5'>
                 <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 rounded-[15px]">
-                <div className='pl-5 pt-5 flex items-center text-lg font-semibold leading-6 text-gray-900 dark:text-white'>
+                    <div className='pl-5 pt-5 flex items-center text-lg font-semibold leading-6 text-gray-900 dark:text-white'>
                         Age
                     </div>
                     <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
@@ -371,7 +371,7 @@ const InputForTestingOSS = () => {
                     </div>
 
                     <div className='pl-5 pt-5 flex items-center text-lg font-semibold leading-6 text-gray-900 dark:text-white'>
-                        Expense
+                        Annual Expense
                     </div>
                     <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
                         <div className="flex flex-row mx-3 w-full">

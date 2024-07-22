@@ -352,10 +352,10 @@ async function calculateAndStore(token: any) {
 
         for (let i = 0; i < totalYears; i++) {
             totalNetWorth[i] = 0;
-            totalIncome = ageSelf < retirementAge ? incomeSelf : 0 + ageSpouse < retirementAgeSpouse ? incomeSpouse : 0 + incomeDependent +
-                incomeSocialSecurity + incomeSocialSecuritySpouse + incomePension + incomeOther;
-            let taxableIncome = ageSelf < retirementAge ? incomeSelf : 0 + ageSpouse < retirementAgeSpouse ? incomeSpouse : 0 + incomeDependent +
-                incomeOther + withdrawalAmount[2][i] + withdrawalAmount[3][i];
+            totalIncome = ((ageSelf < retirementAge ? incomeSelf : 0) + (ageSpouse < retirementAgeSpouse ? incomeSpouse : 0) + incomeDependent +
+                incomeSocialSecurity + incomeSocialSecuritySpouse + incomePension + incomeOther) * Math.pow(propotionAdjustedCash, i);            
+            let taxableIncome = ((ageSelf < retirementAge ? incomeSelf : 0) + (ageSpouse < retirementAgeSpouse ? incomeSpouse : 0) + incomeDependent +
+                incomeOther + withdrawalAmount[2][i] + withdrawalAmount[3][i]) * Math.pow(propotionAdjustedCash, i);
             console.log('TaxableIncome', taxableIncome);
             let aptc = 0;
             let irmaa = 0;
@@ -443,7 +443,6 @@ async function calculateAndStore(token: any) {
                     trrNominal[j][i + 1] = '';
                 }
             }
-            totalIncome *= propotionAdjustedCash;
             ageSelf += 1;
             ageSpouse += 1;
         }

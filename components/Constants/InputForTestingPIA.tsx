@@ -377,7 +377,7 @@ const InputForTestingPIA = () => {
                     </div>
 
                     <div className='pl-5 pt-5 flex items-center text-lg font-semibold leading-6 text-gray-900 dark:text-white'>
-                        Expense
+                        Annual Expense
                     </div>
                     <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
                         <div className="flex flex-row mx-3 w-full">
@@ -427,7 +427,7 @@ const InputForTestingPIA = () => {
                             />
                         </div>
                     </div>
-                    
+
                     <div className='m-4 flex items-center justify-end'>
                         <button
                             className="sm:w-fit w-full flex items-center justify-center text-white bg-primary-cyan hover:bg-secondary-cyan focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-cyan dark:hover:bg-secondary-cyan focus:outline-none dark:focus:ring-secondary-cyan"
