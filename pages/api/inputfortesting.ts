@@ -63,6 +63,10 @@ async function getInputForTesting(req: NextApiRequest, res: NextApiResponse) {
                 expenseTransportation: 9600,
                 expenseDaily: 180000,
                 expenseHealth: 20000,
+
+                //retirement age
+                retirementAge: 1000,
+                retirementAgeSpouse: 1000,
             };
             console.log("InitialValues", initialValues);
             const newInput = new InputForTestingModel(initialValues);
@@ -101,6 +105,8 @@ const InputForTestingZodSchema = z.object({
     expenseDaily: z.number().optional(),
     expenseHealth: z.number().optional(),
 
+    retirementAge: z.number().optional(),
+    retirementAgeSpouse: z.number().optional()
 });
 
 

@@ -3,8 +3,7 @@ import PageBanner from '../PageBanner';
 import { TableCellsIcon } from '@heroicons/react/24/outline';
 import Spinner from '../Spinner';
 import NumberInput from './NumberInput';
-import { mainProcessForTest } from '@/utils/main-process-test';
-import { mainProcessForFinalTest } from '@/utils/main-process-final-test';
+import { mainProcessOSSTest } from '@/utils/main-process-oss-test';
 
 const InputForTestingPIA = () => {
     const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -39,6 +38,10 @@ const InputForTestingPIA = () => {
                 expenseTransportation,
                 expenseDaily,
                 expenseHealth,
+
+                //retirement age
+                retirementAge,
+                retirementAgeSpouse,
             };
             const inpoutForTestingResponse = await fetch('/api/inputfortestingpia', {
                 method: 'POST',
@@ -61,7 +64,7 @@ const InputForTestingPIA = () => {
 
         // const result = await mainProcessForTest();
         setIsSaving(true);
-        const result = await mainProcessForFinalTest();
+        const result = await mainProcessOSSTest();
         setIsSaving(false);
         if (result.success) {
             alert(result.message)
@@ -94,6 +97,8 @@ const InputForTestingPIA = () => {
     const [expenseTransportation, setExpenseTransportation] = useState(0);
     const [expenseDaily, setExpenseDaily] = useState(0);
     const [expenseHealth, setExpenseHealth] = useState(0);
+    const [retirementAge, setRetirementAge] = useState(0);
+    const [retirementAgeSpouse, setRetirementAgeSpouse] = useState(0);
 
     const [taxRateForIncome, setTaxRateForIncome] = useState(0);
     const [taxRateForRoth, setTaxRateForRoth] = useState(0);
@@ -184,6 +189,15 @@ const InputForTestingPIA = () => {
         setExpenseHealth(newExpenseHealth);
     };
 
+    const handleRetirementAgeChange = (newRetirementAge: number) => {
+        console.log(newRetirementAge);
+        setRetirementAge(newRetirementAge);
+    };
+    const handleRetirementAgeSpouseChange = (newRetirementAgeSpouse: number) => {
+        console.log(newRetirementAgeSpouse);
+        setRetirementAgeSpouse(newRetirementAgeSpouse);
+    };
+
 
 
 
@@ -223,6 +237,8 @@ const InputForTestingPIA = () => {
                 setExpenseTransportation(data.expenseTransportation);
                 setExpenseDaily(data.expenseDaily);
                 setExpenseHealth(data.expenseHealth);
+                setRetirementAge(data.retirementAge);
+                setRetirementAgeSpouse(data.retirementAgeSpouse);
 
             } catch (error) {
                 console.error('An error occurred while initializing settings:', error);
@@ -391,6 +407,27 @@ const InputForTestingPIA = () => {
                             />
                         </div>
                     </div>
+
+                    <div className='pl-5 pt-5 flex items-center text-lg font-semibold leading-6 text-gray-900 dark:text-white'>
+                        Retirement Age
+                    </div>
+                    <div className="flex flex-col px-4 py-3 space-y-3 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:space-x-4">
+                        <div className="flex flex-row mx-3 w-full">
+                            <NumberInput
+                                label="Retirement Age"
+                                placeholder="12345"
+                                value={retirementAge}
+                                onValueChange={handleRetirementAgeChange}
+                            />
+                            <NumberInput
+                                label="Retirement Age Spouse"
+                                placeholder="12345"
+                                value={retirementAgeSpouse}
+                                onValueChange={handleRetirementAgeSpouseChange}
+                            />
+                        </div>
+                    </div>
+                    
                     <div className='m-4 flex items-center justify-end'>
                         <button
                             className="sm:w-fit w-full flex items-center justify-center text-white bg-primary-cyan hover:bg-secondary-cyan focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-cyan dark:hover:bg-secondary-cyan focus:outline-none dark:focus:ring-secondary-cyan"

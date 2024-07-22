@@ -22,7 +22,7 @@ function generateRandomToken() {
     return token;
 }
 
-export async function mainProcessForTest() {
+export async function mainProcessOSSTest() {
     console.log("Start main process for final test...");
     try {
         const token = generateRandomToken();
@@ -225,6 +225,10 @@ async function calculateAndStore(token: any) {
         let ageSpouse = testingData.ageSpouse;
         console.log('ageSpouse', ageSpouse);
         const totalYears = 9;
+        let retirementAge = testingData.retirementAge ?? 1000;
+        console.log('retirementAge', retirementAge);
+        let retirementAgeSpouse = testingData.retirementAgeSpouse ?? 1000;
+        console.log('retirementAgeSpouse', retirementAgeSpouse);
 
         // Cash Flow Sources
         console.log('Income-----------------');
@@ -348,7 +352,10 @@ async function calculateAndStore(token: any) {
 
         for (let i = 0; i < totalYears; i++) {
             totalNetWorth[i] = 0;
-            let taxableIncome = incomeSelf + incomeSpouse + incomeDependent + incomeOther + withdrawalAmount[2][i] + withdrawalAmount[3][i];
+            totalIncome = ageSelf < retirementAge ? incomeSelf : 0 + ageSpouse < retirementAgeSpouse ? incomeSpouse : 0 + incomeDependent +
+                incomeSocialSecurity + incomeSocialSecuritySpouse + incomePension + incomeOther;
+            let taxableIncome = ageSelf < retirementAge ? incomeSelf : 0 + ageSpouse < retirementAgeSpouse ? incomeSpouse : 0 + incomeDependent +
+                incomeOther + withdrawalAmount[2][i] + withdrawalAmount[3][i];
             console.log('TaxableIncome', taxableIncome);
             let aptc = 0;
             let irmaa = 0;
@@ -423,11 +430,13 @@ async function calculateAndStore(token: any) {
             for (var j = 0; j < countOfBalances; j++) {
                 totalNetWorth[i] += portfolioForEachYears[j][i];
                 if (portfolioForEachYears[j][i] > 1) {
-                    const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
-                    const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
-                    let trrNominalAtFifty = await getTimeWeightedRateOfReturnNominal(response) ?? 0;
-                    portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
-                    trrNominal[j][i + 1] = trrNominalAtFifty ?? '';
+                    // const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
+                    // const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
+                    // let trrNominalAtFifty = await getTimeWeightedRateOfReturnNominal(response) ?? 0;
+                    // portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
+                    // trrNominal[j][i + 1] = trrNominalAtFifty ?? '';
+                    portfolioForEachYears[j][i + 1] = (portfolioForEachYears[j][i] - Math.floor(withdrawalAmount[j][i])) * 1.1625;
+                    trrNominal[j][i + 1] = '';
                 }
                 else {
                     portfolioForEachYears[j][i + 1] = 0;

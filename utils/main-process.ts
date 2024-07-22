@@ -233,6 +233,11 @@ async function calculateAndStore(answerObj: any, token: any) {
         const birthDateSpouse = getDateComponents(answerObj["Your Spouse's Date Of Birth"]);
         console.log('birthDateSpouse', birthDateSpouse);
         const totalYears = 9;
+        let retirementAge = answerObj['In A "Perfect World," When Would You Like To Retire?'] ?? 1000;
+        console.log('retirementAge', retirementAge);
+        let retirementAgeSpouse = answerObj['In A "Perfect World," When Would You Like To Retire?'] ?? 1000;
+        console.log('retirementAgeSpouse', retirementAgeSpouse);
+
 
         // Cash Flow Sources
         let incomeSelf = answerObj['Annual Earned Income?'] ?? 0;
@@ -469,7 +474,10 @@ async function calculateAndStore(answerObj: any, token: any) {
                 }
                 for (let i = 0; i < totalYears; i++) {
                     totalNetWorth[i] = 0;
-                    let taxableIncome = incomeSelf + incomeSpouse + incomeDependent + incomeOther + withdrawalAmount[2][i] + withdrawalAmount[3][i];
+                    semiTotalIncome = ageSelf < retirementAge ? incomeSelf : 0 + ageSpouse < retirementAgeSpouse ? incomeSpouse : 0 + incomeDependent +
+                        incomePension + incomeOther;
+                    let taxableIncome = ageSelf < retirementAge ? incomeSelf : 0 + ageSpouse < retirementAgeSpouse ? incomeSpouse : 0 + incomeSpouse + incomeDependent +
+                        incomeOther + withdrawalAmount[2][i] + withdrawalAmount[3][i];
                     let aptc = 0;
                     let irmaa = 0;
                     if (ageSelf < 65) {
@@ -565,11 +573,13 @@ async function calculateAndStore(answerObj: any, token: any) {
                     for (var j = 0; j < countOfBalances; j++) {
                         totalNetWorth[i] += portfolioForEachYears[j][i];
                         if (portfolioForEachYears[j][i] > 1) {
-                            const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
-                            const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
-                            let trrNominalAtFifty = await getTimeWeightedRateOfReturnNominal(response) ?? 0;
-                            portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
-                            trrNominal[j][i + 1] = trrNominalAtFifty ?? '';
+                            // const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
+                            // const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
+                            // let trrNominalAtFifty = await getTimeWeightedRateOfReturnNominal(response) ?? 0;
+                            // portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
+                            // trrNominal[j][i + 1] = trrNominalAtFifty ?? '';
+                            portfolioForEachYears[j][i + 1] = (portfolioForEachYears[j][i] - Math.floor(withdrawalAmount[j][i])) * 1.1625;
+                            trrNominal[j][i + 1] = '';
                         }
                         else {
                             portfolioForEachYears[j][i + 1] = 0;
@@ -659,7 +669,10 @@ async function calculateAndStore(answerObj: any, token: any) {
 
             for (let i = 0; i < totalYears; i++) {
                 totalNetWorth[i] = 0;
-                let taxableIncome = incomeSelf + incomeSpouse + incomeDependent + incomeOther + withdrawalAmount[2][i] + withdrawalAmount[3][i];
+                totalIncome = ageSelf < retirementAge ? incomeSelf : 0 + ageSpouse < retirementAgeSpouse ? incomeSpouse : 0 + incomeDependent +
+                    incomeSocialSecurity + incomeSocialSecuritySpouse + incomePension + incomeOther;
+                let taxableIncome = ageSelf < retirementAge ? incomeSelf : 0 + ageSpouse < retirementAgeSpouse ? incomeSpouse : 0 + incomeDependent +
+                    incomeOther + withdrawalAmount[2][i] + withdrawalAmount[3][i];
                 console.log('TaxableIncome', taxableIncome);
                 let aptc = 0;
                 let irmaa = 0;
@@ -734,11 +747,13 @@ async function calculateAndStore(answerObj: any, token: any) {
                 for (var j = 0; j < countOfBalances; j++) {
                     totalNetWorth[i] += portfolioForEachYears[j][i];
                     if (portfolioForEachYears[j][i] > 1) {
-                        const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
-                        const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
-                        let trrNominalAtFifty = await getTimeWeightedRateOfReturnNominal(response) ?? 0;
-                        portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
-                        trrNominal[j][i + 1] = trrNominalAtFifty ?? '';
+                        // const response = await getMonteCarloSimulation(Math.floor(portfolioForEachYears[j][i]), Math.floor(withdrawalAmount[j][i]), 1);
+                        // const fiftyPercentileData = await get50thPercentileDataFromResponse(response) ?? [];
+                        // let trrNominalAtFifty = await getTimeWeightedRateOfReturnNominal(response) ?? 0;
+                        // portfolioForEachYears[j][i + 1] = fiftyPercentileData[1] ?? 0;
+                        // trrNominal[j][i + 1] = trrNominalAtFifty ?? '';
+                        portfolioForEachYears[j][i + 1] = (portfolioForEachYears[j][i] - Math.floor(withdrawalAmount[j][i])) * 1.1625;
+                        trrNominal[j][i + 1] = '';
                     }
                     else {
                         portfolioForEachYears[j][i + 1] = 0;
