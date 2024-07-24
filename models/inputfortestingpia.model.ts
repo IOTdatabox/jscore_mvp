@@ -25,6 +25,8 @@ const InputForTestingPIASchema = new Schema({
     balanceRoth: { type: Number },
     balanceAnnuity: { type: Number },
     balanceLifeInsurance: { type: Number },
+
+    useOtherSourcesOption: {type: String},
     //expense
     expenseHousing: { type: Number },
     expenseTransportation: { type: Number },
