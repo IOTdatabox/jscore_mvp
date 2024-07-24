@@ -533,11 +533,65 @@ interface PortfolioItem {
     originalIndex: number;
 }
 
+// const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: number[], ageSelf: number, ageSpouse: number):
+//     [number[], boolean] => {
+//     const withdrawalAmount: number[] = new Array(portfolioForEachYear.length).fill(0);
+//     const taxAmount: number[] = new Array(portfolioForEachYear.length).fill(0);
+//     taxAmount[0] = 0;    //Cash
+//     taxAmount[1] = variousRateData.taxRateForGains;     //NQ
+//     taxAmount[2] = variousRateData.taxRateForIncome;    //Q
+//     taxAmount[3] = variousRateData.taxRateForIncome;    //QSpouse
+//     taxAmount[4] = variousRateData.taxRateForRoth;      //Roth
+//     taxAmount[5] = 0;                                   //Annuity
+//     taxAmount[6] = 0;                                   //LifeInsurance
+//     const withdrawQMust = portfolioForEachYear[2] * getRMDPercentage(ageSelf) / 100;
+//     const withdrawQSpouseMust = portfolioForEachYear[3] * getRMDPercentage(ageSpouse) / 100;
+//     const netwithdrawQAllMust = withdrawQMust * (1 - taxAmount[2] / 100) + withdrawQSpouseMust * (1 - taxAmount[3] / 100);
+//     if (netwithdrawQAllMust >= shouldZeroValue) {
+//         for (let j = 0; j < portfolioForEachYear.length; j++) {
+//             withdrawalAmount[j] = 0;
+//         }
+//     }
+//     else {
+//         let adjustedPortfolioForEachYear = [...portfolioForEachYear];
+//         adjustedPortfolioForEachYear[2] -= withdrawQMust;
+//         adjustedPortfolioForEachYear[3] -= withdrawQSpouseMust;
+//         let portfolioWithTaxRates: PortfolioItem[] = adjustedPortfolioForEachYear.map((value, index) => ({
+//             value,
+//             taxRate: taxAmount[index],
+//             originalIndex: index
+//         }));
+//         portfolioWithTaxRates.sort((a, b) => a.taxRate - b.taxRate);
+//         let reorderedPortfolio: number[] = portfolioWithTaxRates.map(item => item.value);
+//         let reorderedTaxRates: number[] = portfolioWithTaxRates.map(pair => pair.taxRate);
+//         console.log('Original Portfolio:', portfolioForEachYear);
+//         console.log('Adjusted Portfolio:', adjustedPortfolioForEachYear);
+//         console.log('Reordered Portfolio (by increasing tax rate):', reorderedPortfolio);
+//         console.log('Tax Amount:', reorderedTaxRates);
+//         let remaining = shouldZeroValue - netwithdrawQAllMust;
+//         for (let j = 0; j < reorderedPortfolio.length; j++) {
+//             console.log('remaining', remaining)
+//             if (remaining <= 0) break; // No further withdrawAmount needed
+//             const maxWithdrawable = remaining / (1 - reorderedTaxRates[j] / 100);
+//             const withdrawal = Math.min(maxWithdrawable, reorderedPortfolio[j]);
+//             withdrawalAmount[portfolioWithTaxRates[j].originalIndex] = withdrawal;
+//             remaining -= withdrawal * (1 - reorderedTaxRates[j] / 100);
+//         }
+//         if (remaining > 0) {
+//             console.log('Insufficient Balance');
+//             return [withdrawalAmount, true]; // Balance is insufficient
+//         }
+//     }
+//     withdrawalAmount[2] = withdrawalAmount[2] + withdrawQMust;
+//     withdrawalAmount[3] = withdrawalAmount[3] + withdrawQSpouseMust;
+//     return [withdrawalAmount, false];
+// };
+
 const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: number[], ageSelf: number, ageSpouse: number):
     [number[], boolean] => {
     const withdrawalAmount: number[] = new Array(portfolioForEachYear.length).fill(0);
     const taxAmount: number[] = new Array(portfolioForEachYear.length).fill(0);
-    taxAmount[0] = variousRateData.taxRateForIncome;    //Cash
+    taxAmount[0] = 0;    //Cash
     taxAmount[1] = variousRateData.taxRateForGains;     //NQ
     taxAmount[2] = variousRateData.taxRateForIncome;    //Q
     taxAmount[3] = variousRateData.taxRateForIncome;    //QSpouse
@@ -556,6 +610,11 @@ const determineWithdrawal = (shouldZeroValue: number, portfolioForEachYear: numb
         let adjustedPortfolioForEachYear = [...portfolioForEachYear];
         adjustedPortfolioForEachYear[2] -= withdrawQMust;
         adjustedPortfolioForEachYear[3] -= withdrawQSpouseMust;
+        if(testingData.useOtherSourcesOption == 'Yes'){
+            adjustedPortfolioForEachYear[4] = 0;    //Roth
+            adjustedPortfolioForEachYear[5] = 0;    //Annuity
+            adjustedPortfolioForEachYear[6] = 0;    //LifeInsurance
+        }
         let portfolioWithTaxRates: PortfolioItem[] = adjustedPortfolioForEachYear.map((value, index) => ({
             value,
             taxRate: taxAmount[index],

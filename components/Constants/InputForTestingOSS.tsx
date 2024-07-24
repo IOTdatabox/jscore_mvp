@@ -5,7 +5,15 @@ import Spinner from '../Spinner';
 import NumberInput from './NumberInput';
 import { mainProcessOSSTest } from '@/utils/main-process-oss-test';
 import { useAsyncDebounce } from 'react-table';
+import Dropdown from './DropDown';
 const InputForTestingOSS = () => {
+    const useOtherSourcesOptions = ['Yes', 'No'];
+    const [useOtherSourcesOption, setUseOtherSourcesOptions] = useState('Yes');
+    const handleUserOtherSourceChange = () => (selectedValue: string) => {
+        console.log('Use Other Sources?', selectedValue);
+        setUseOtherSourcesOptions(selectedValue);
+    };
+
     const [isSaving, setIsSaving] = useState<boolean>(false);
 
     const handleSaveClick = async () => {
@@ -32,6 +40,8 @@ const InputForTestingOSS = () => {
                 balanceRoth,
                 balanceAnnuity,
                 balanceLifeInsurance,
+
+                useOtherSourcesOption,
                 //expense
                 expenseHousing,
                 expenseTransportation,
@@ -227,6 +237,8 @@ const InputForTestingOSS = () => {
                 setBalanceAnnuity(data.balanceAnnuity);
                 setBalanceLifeInsurance(data.balanceLifeInsurance);
 
+                setUseOtherSourcesOptions(data.useOtherSourcesOption);
+
                 setExpenseHousing(data.expenseHousing);
                 setExpenseTransportation(data.expenseTransportation);
                 setExpenseDaily(data.expenseDaily);
@@ -368,6 +380,14 @@ const InputForTestingOSS = () => {
                                 onValueChange={handleBalanceLifeInsuranceChange}
                             />
                         </div>
+                    </div>
+                    <div className='pl-5 w-60'>
+                        <Dropdown
+                            label="Do not use other sources?"
+                            options={useOtherSourcesOptions}
+                            value={useOtherSourcesOption}
+                            onSelectionChange={handleUserOtherSourceChange()}
+                        />
                     </div>
 
                     <div className='pl-5 pt-5 flex items-center text-lg font-semibold leading-6 text-gray-900 dark:text-white'>

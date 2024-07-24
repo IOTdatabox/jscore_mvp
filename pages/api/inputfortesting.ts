@@ -58,11 +58,14 @@ async function getInputForTesting(req: NextApiRequest, res: NextApiResponse) {
                 balanceRoth: 20000,
                 balanceAnnuity: 30000,
                 balanceLifeInsurance: 40000,
+
+                useOtherSourcesOption: 'Yes',
                 //expense
                 expenseHousing: 36000,
                 expenseTransportation: 9600,
                 expenseDaily: 180000,
                 expenseHealth: 20000,
+                
 
                 //retirement age
                 retirementAge: 1000,
@@ -99,6 +102,8 @@ const InputForTestingZodSchema = z.object({
     balanceRoth: z.number().optional(),
     balanceAnnuity: z.number().optional(),
     balanceLifeInsurance: z.number().optional(),
+
+    useOtherSourcesOption: z.string().optional(),
 
     expenseHousing: z.number().optional(),
     expenseTransportation: z.number().optional(),

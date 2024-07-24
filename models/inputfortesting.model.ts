@@ -1,4 +1,4 @@
-import { number } from "zod";
+import { number, string } from "zod";
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
@@ -24,6 +24,8 @@ const InputForTestingSchema = new Schema({
     balanceRoth: { type: Number },
     balanceAnnuity: { type: Number },
     balanceLifeInsurance: { type: Number },
+
+    useOtherSourcesOption: {type: String},
     //expense
     expenseHousing: { type: Number },
     expenseTransportation: { type: Number },
